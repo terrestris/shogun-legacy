@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <!-- A bean to be used by the initialize database bean that represents the 
+        standard WmsMapLayer object, that e.g. the anonymous user will get. -->
+    <bean id="stdWmsMapLayer" class="org.shogun.model.WmsMapLayer">
+        <property name="url" value="http://ows.terrestris.de/osm-basemap/service/" />
+        <property name="layers" value="OSM-WMS-Deutschland" />
+        <property name="transparent" value="true" />
+        <property name="format" value="image/png" />
+        <property name="name" value="terrestris OSM WMS" />
+        <property name="type" value="WMS" />
+        <property name="isBaseLayer" value="true" />
+    </bean>
+    
+    <!-- A bean to be used by the initialize database bean that represents the 
+        standard MapConfig object, that e.g. the anonymous user will get. -->
+    <bean id="stdMapConfig" class="org.shogun.model.MapConfig">
+        <property name="center" value="902753.23761423, 6679393.9069" />
+        <property name="mapId" value="stdmap" />
+        <property name="maxExtent" value="-20037508, -20037508, 20037508, 20037508" />
+        <property name="maxResolution" value="156543.0339" />
+        <property name="name" value="name" />
+        <property name="projection" value="EPSG:900913" />
+        <property name="title" value="Map" />
+        <property name="units" value="m" />
+        <property name="zoom" value="14" />
+    </bean>
+    
+    <!-- A bean to be used by the initialize database bean that represents the 
+        standard MapConfig object, that e.g. the anonymous user will get. -->
+    <bean id="stdGroup" class="org.shogun.model.Group">
+        <property name="group_nr" value="default-group" />
+        <property name="name" value="default-group" />
+        <property name="company" value="SHOGun" />
+    </bean>
+
+    
+    <!-- This bean initializes needed database objects 
+         like users, roles etc. -->
+    <bean id="databaseContentInitializer" 
+      class="org.shogun.init.DatabaseContentInitializer" 
+      init-method="initializeDatabaseContent">
+        <!-- The name of the user who will get the superadmin role -->
+        <property name="superAdminName" value="terrestris"/>
+        <!-- The password of the user who will get the superadmin role, will be
+             md5'ed before stored -->
+        <property name="superAdminPw" value="terrestris"/>
+        <!-- Shall we create a user with the role anonymous automatically?
+             Defaults to true
+        <property name="autoCreateAnonymousUser">
+            <value type="java.lang.Boolean">false</value>
+        </property>
+        -->
+        <!-- The list of roles available for assignment. Missing ones will be 
+             added. We currently will not delete roles that might already
+             exist in the database. -->
+        <property name="availableRoles">
+            <list value-type="java.lang.String">
+                <value>ROLE_SUPERADMIN</value>
+                <value>ROLE_ADMIN</value>
+                <value>ROLE_USER</value>
+                <value>ROLE_ANONYMOUS</value>
+            </list>
+        </property>
+        
+        <!-- The list of modules available for assignment. Missing ones will be 
+             added. We currently will not delete modules that might already
+             exist in the database. -->
+        <property name="availableModules">
+            <list>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="BasisOberflaeche" />
+                    <property name="module_fullname" value="Basis Oberfläche für den Suite Client" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="StandardLayerTree" />
+                    <property name="module_fullname" value="Standard Layer Tree" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="Help" />
+                    <property name="module_fullname" value="Hilfe Modul" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="Login" />
+                    <property name="module_fullname" value="Der Login" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="Logout" />
+                    <property name="module_fullname" value="Der Logout" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="Legende" />
+                    <property name="module_fullname" value="Legende" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="Header" />
+                    <property name="module_fullname" value="Header" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="BaseLayerComboBox" />
+                    <property name="module_fullname" value="Combo Box für BaseLayer" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="NominatimSearchCombo" />
+                    <property name="module_fullname" value="Combo Box für NominatimSearch" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="UserConfiguration" />
+                    <property name="module_fullname" value="Anlegen und editieren von Nutzern" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="OverviewMapPanel" />
+                    <property name="module_fullname" value="Die Übersichtskarte" />
+                </bean>
+                <bean class="org.shogun.model.Module">
+                    <property name="module_name" value="WmsGetFeatureInfo" />
+                    <property name="module_fullname" value="WMS GetFeatureInfo Abfrage" />
+                </bean>
+            </list>
+        </property>
+        
+        <!-- The list of modules for the anonymous user. We currently will not 
+             delete modules that the user might already have. -->
+        <property name="modulesForAnonymous">
+            <list value-type="java.lang.String">
+                <value>BasisOberflaeche</value>
+                <value>Login</value>
+                <value>OverviewMapPanel</value>
+            </list>
+        </property>
+        
+        <!-- the relevant properties of the standard mapconf,
+             which e.g. the anonymous user will get -->
+        <property name="mapConfig">
+            <ref local="stdMapConfig"/>
+        </property>
+        
+        <property name="wmsMapLayer">
+            <ref local="stdWmsMapLayer"/>
+        </property>
+        
+        <property name="defaultGroup">
+            <ref local="stdGroup"/>
+        </property>
+        
+    </bean>
+    
+</beans>

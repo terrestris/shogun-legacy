@@ -1,0 +1,145 @@
+<html>
+<head>
+    <title>SHOGun</title>
+    
+    <!-- ExtJS CSS -->
+    <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.4.0/resources/css/ext-all.css" />
+
+    <!-- ExtJS js -->
+    <script src="http://extjs.cachefly.net/ext-3.4.0/adapter/ext/ext-base.js"></script>
+    <script src="http://extjs.cachefly.net/ext-3.4.0/ext-all.js"></script>
+    
+    <!-- App JS -->
+    <script>
+    
+    /**
+     *
+     * Copyright (C) 2011  terrestris GmbH & Co. KG, info@terrestris.de
+     *
+     * This program is free software: you can redistribute it and/or modify
+     * it under the terms of the GNU General Public License as published by
+     * the Free Software Foundation, either version 3 of the License, or
+     * (at your option) any later version.
+     *
+     * This program is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     * GNU General Public License for more details.
+     *
+     * You should have received a copy of the GNU General Public License
+     * along with this program.  If not, see <http://www.gnu.org/licenses/>.-
+     *
+     * @author terrestris GmbH & Co. KG
+     */
+   Ext.ns('Terrestris');
+
+   var login;
+   Ext.onReady(function(){
+       Ext.QuickTips.init();
+       
+       
+       var currentLoginStatePanel = new Ext.Panel({
+           id: 'currentLoginStatePanel',
+           title: 'login status',
+           frame: true,
+           bodyStyle: 'padding:15px 15px;',
+           html: 'Not logged in.',
+           buttons: [ {
+               text: 'Logout',
+               disabled: true,
+               handler: function(){
+                   window.location.href = "./j_spring_security_logout";
+               },
+               id: 'logoutBtn'
+           }],
+           renderTo: Ext.getBody()
+       });
+       
+       
+       /**
+        * Handler to do the submit to authorize.
+        * Called on button click and ENTER press
+        */
+       var doSubmit = function(){
+           login.getForm().submit({
+               method: 'POST',
+               success: function(form, responseObj){
+                   var jsonResponse = Ext.decode(responseObj.response.responseText);
+                   var role = jsonResponse.role;
+
+                   Ext.getCmp('currentLoginStatePanel').update( 'Logged in with role: "' + role + '".' );
+                   Ext.getCmp('logoutBtn').enable();
+               },
+               failure: function(form, responseObj){
+                   if (Ext.isDefined(responseObj.response) && !Ext.isEmpty(responseObj.response.statusText && responseObj.statusText === "Unauthorized")) {  
+                       Ext.Msg.alert('Login Failed!', 'Authentifizierung fehlgeschlagen');
+                   }
+                   else if (!Ext.isEmpty(responseObj.failureType) && responseObj.failureType === "client"){
+                       // do nothing
+                   }
+                   else {
+                       Ext.Msg.alert('Login Failed!', '');
+                   }
+                   Ext.getCmp('currentLoginStatePanel').update( 'Not logged in.' );
+                   Ext.getCmp('logoutBtn').disable();
+               }
+           });
+       };
+       
+       /**
+        * Create a variable to hold our EXT login panel.
+        */ 
+       var login = new Ext.FormPanel({
+           labelWidth: 80,
+           url: 'j_spring_security_check',
+           frame: true,
+           title: 'Login',
+           defaultType: 'textfield',
+           width: 300,
+           height: 150,
+           monitorValid: true,
+           items: [{
+               fieldLabel: 'Username',
+               name: 'j_username',
+               allowBlank: false
+           }, {
+               fieldLabel: 'Password',
+               name: 'j_password',
+               inputType: 'password',
+               allowBlank: false
+           }],
+           buttons: [{
+               text: 'Login',
+               formBind: true,
+               handler: doSubmit
+           }],
+           keys: [{
+               key: [Ext.EventObject.ENTER],
+               handler: doSubmit
+           }]
+       
+       });
+       
+       /**
+        * This just creates a window to wrap the login form. 
+        * The login form is passed to the items collection.
+        */    
+       var win = new Ext.Window({
+           layout: 'fit',
+           width: 300,
+           height: 150,
+           closable: false,
+           resizable: false,
+           plain: true,
+           border: false,
+           items: [login]
+       });
+       win.show();
+   });
+
+    
+    </script>
+</head>
+<body>
+</body>
+</html>

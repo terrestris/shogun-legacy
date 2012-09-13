@@ -1,0 +1,30 @@
+Example Requests
+-----------------
+
+curl -X POST --header "Content-Type:application/json" -d @/tmp/get.json http://localhost:8080/SHOGun/data/get.action
+
+/tmp/get.json should look like this:
+
+{
+   "object_type": "User", 
+   "filter": {
+      "filterItems": [{
+           "fieldName": "id",
+           "operator": "Equals",
+           "operands": [61]
+       }, {
+           "fieldName": "user_name",
+           "operator": "Equals",
+           "operands": ["terrestris"]
+       }],
+      "logicalOperator": "OR"
+   }, 
+   "sortObject": {
+      "sortItems": []
+   }, 
+   "pagingObject": {
+     "start": null,
+      "limit": null
+   },  
+   "globalAndFilter": null
+}
