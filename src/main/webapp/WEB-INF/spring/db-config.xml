@@ -25,7 +25,7 @@
 	<!-- Hibernate SessionFactory -->
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource"><ref local="dataSource"/></property>
-  		<property name="packagesToScan" value="org.shogun.model" />
+  		<property name="packagesToScan" value="de.terrestris.shogun.model" />
 		<property name="hibernateProperties">
 			<props>
 	   			<!-- 

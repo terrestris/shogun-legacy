@@ -35,7 +35,7 @@
 
 	<!-- Filter for User/Password authentication, let us intercept
 		 on successful/failed login attempt -->
-	<beans:bean id="authenticationFilter" class="org.shogun.security.ShogunAuthProcessingFilter">
+	<beans:bean id="authenticationFilter" class="de.terrestris.shogun.security.ShogunAuthProcessingFilter">
 		<beans:property name="authenticationManager" ref="authenticationManager" />
 	</beans:bean>
 
@@ -47,7 +47,7 @@
 	
 	<!-- This is an entry point for a custom Authentication Manager, 
 		 use this when taking care yourself about the authentication
-	<beans:bean id="customAuthProvider" class="org.shogun.security.CustomAuthenticationProvider">
+	<beans:bean id="customAuthProvider" class="de.terrestris.shogun.security.CustomAuthenticationProvider">
 	</beans:bean>
 	 -->
 	 

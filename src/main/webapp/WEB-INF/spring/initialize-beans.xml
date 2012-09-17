@@ -9,7 +9,7 @@
 
 	<!-- A bean to be used by the initialize database bean that represents the 
 		standard WmsMapLayer object, that e.g. the anonymous user will get. -->
-	<bean id="stdWmsMapLayer" class="org.shogun.model.WmsMapLayer">
+	<bean id="stdWmsMapLayer" class="de.terrestris.shogun.model.WmsMapLayer">
 		<property name="url" value="http://ows.terrestris.de/osm-basemap/service/" />
 		<property name="layers" value="OSM-WMS-Deutschland" />
 		<property name="transparent" value="true" />
@@ -21,7 +21,7 @@
 	
 	<!-- A bean to be used by the initialize database bean that represents the 
 		standard MapConfig object, that e.g. the anonymous user will get. -->
-	<bean id="stdMapConfig" class="org.shogun.model.MapConfig">
+	<bean id="stdMapConfig" class="de.terrestris.shogun.model.MapConfig">
 		<property name="center" value="902753.23761423, 6679393.9069" />
 		<property name="mapId" value="stdmap" />
 		<property name="maxExtent" value="-20037508, -20037508, 20037508, 20037508" />
@@ -35,7 +35,7 @@
 	
 	<!-- A bean to be used by the initialize database bean that represents the 
 		standard user group object, that e.g. the anonymous user will get. -->
-	<bean id="stdGroup" class="org.shogun.model.Group">
+	<bean id="stdGroup" class="de.terrestris.shogun.model.Group">
 		<property name="group_nr" value="default-group" />
 		<property name="name" value="default-group" />
 		<property name="company" value="SHOGun" />
@@ -47,7 +47,7 @@
 		 created beans 
 	-->
 	<bean id="databaseContentInitializer" 
-	  class="org.shogun.init.DatabaseContentInitializer" 
+	  class="de.terrestris.shogun.init.DatabaseContentInitializer" 
 	  init-method="initializeDatabaseContent">
 		<!-- The name of the user who will get the SUPERADMIN role -->
 		<property name="superAdminName" value="terrestris"/>
@@ -77,51 +77,51 @@
 			 exist in the database. -->
 		<property name="availableModules">
 			<list>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="BasisOberflaeche" />
 					<property name="module_fullname" value="Basis Oberfläche für den Suite Client" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="StandardLayerTree" />
 					<property name="module_fullname" value="Standard Layer Tree" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="Help" />
 					<property name="module_fullname" value="Hilfe Modul" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="Login" />
 					<property name="module_fullname" value="Der Login" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="Logout" />
 					<property name="module_fullname" value="Der Logout" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="Legende" />
 					<property name="module_fullname" value="Legende" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="Header" />
 					<property name="module_fullname" value="Header" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="BaseLayerComboBox" />
 					<property name="module_fullname" value="Combo Box für BaseLayer" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="NominatimSearchCombo" />
 					<property name="module_fullname" value="Combo Box für NominatimSearch" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="UserConfiguration" />
 					<property name="module_fullname" value="Anlegen und editieren von Nutzern" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="OverviewMapPanel" />
 					<property name="module_fullname" value="Die Übersichtskarte" />
 				</bean>
-				<bean class="org.shogun.model.Module">
+				<bean class="de.terrestris.shogun.model.Module">
 					<property name="module_name" value="WmsGetFeatureInfo" />
 					<property name="module_fullname" value="WMS GetFeatureInfo Abfrage" />
 				</bean>
