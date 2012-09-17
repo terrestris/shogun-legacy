@@ -1,5 +1,5 @@
 SHOGun
 ======
 
-SHOGun the Java based WebGIS framework 
+SHOGun, a Java based WebGIS framework 
 
