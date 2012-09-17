@@ -39,7 +39,7 @@ import de.terrestris.shogun.model.User;
 
 
 /**
- * The database Data Accesss Object of SHOGun.
+ * The database Data Access Object of SHOGun.
  * 
  * <p>
  * This is a generic database DAO in order to do queries against the
@@ -68,12 +68,17 @@ public class DatabaseDAO {
 	 * @param hibernatePagingObject
 	 * @param hibernateAdditionalFilter
 	 * @return
-	 * @throws Exception
+	 * @throws ShogunDatabaseAccessException 
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject, HibernateFilter hibernateFilter, HibernatePagingObject hibernatePagingObject, HibernateFilter hibernateAdditionalFilter) throws Exception {
+	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject, 
+			HibernateFilter hibernateFilter, 
+			HibernatePagingObject hibernatePagingObject, 
+			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
 		
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(hibernateSortObject.getMainClass());
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
+				hibernateSortObject.getMainClass());
 
 		// PAGING
 		if (hibernatePagingObject != null) {
@@ -100,22 +105,25 @@ public class DatabaseDAO {
 				groupCriterion = Restrictions.eq(this.getGroupFieldName(hibernateFilter.getMainClass()), this.getGroupIdFromSession());
 				groupConjunction.add(groupCriterion);
 			} catch (Exception e) {
-				e.printStackTrace();
-				throw new Exception("Error retrieving the group ID from session while applying filter " + e.getMessage());
+				throw new ShogunDatabaseAccessException(
+						"Error retrieving the group ID from session while " +
+						"applying filter ", e);
 			}
 			
 			criteria.add(groupConjunction);
 		}
 		
-		// check additional filters:
-		// 
-		// These are being sent from a client and represent AND conditions to be
-		// applied globally.
-		// The use-case that lead us to implement the additionalFilter is
-		// the requirement that users are allowed to have both a AND and an OR
-		// filter (e.g. in the frontend for EigeneLayer).
-		// Usually one would implement this requirement with nested logical 
-		// filters
+
+		/*
+		 * Check additional filters:
+		 * These are being sent from a client and represent AND conditions to be
+		 * applied globally.
+		 * The use-case that lead us to implement the additionalFilter is 
+		 * the requirement that users are allowed to have both a AND and an OR 
+		 * filter (e.g. in the frontend for EigeneLayer). 
+		 * Usually one would implement this requirement with nested logical 
+		 * filters
+		 */
 		if (hibernateAdditionalFilter != null) {
 			Conjunction afConjunction = Restrictions.conjunction();
 			Criterion afCriterion = null;
@@ -125,7 +133,8 @@ public class DatabaseDAO {
 				afConjunction.add(afCriterion);
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new Exception("Error creating a criterion for additionalFilter.");
+				throw new ShogunDatabaseAccessException(
+						"Error creating a criterion for additionalFilter.", e);
 			}
 			
 			criteria.add(afConjunction);
@@ -154,8 +163,8 @@ public class DatabaseDAO {
 					criteria.add(dis);
 					
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new ShogunDatabaseAccessException(
+							"Error while adding an OR connected filter", e);
 				}
 					
 			} else {
@@ -164,7 +173,6 @@ public class DatabaseDAO {
 					Conjunction conjunction = Restrictions.conjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-//						conjunction.add(hfi.makeCriterion(hibernateFilter.getMainClass()));
 						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
 						if (criterion != null) {
 							conjunction.add(criterion);
@@ -173,8 +181,8 @@ public class DatabaseDAO {
 					criteria.add(conjunction);
 					
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new ShogunDatabaseAccessException(
+							"Error while adding an AND connected filter", e);
 				}
 			}
 		
@@ -190,15 +198,18 @@ public class DatabaseDAO {
 	
 	/**
 	 * Method returns distinct field values of a defined entity type. <br>
-	 * For example: retrieving all streets of the user table without duplicated values
+	 * For example: retrieving all streets of the user table without 
+	 * duplicated values
 	 * <br>
 	 * <br>
-	 * You can decide whether the returned field values should be filtered by the current group
-	 * logged in in the session or if all values are returned
+	 * You can decide whether the returned field values should be 
+	 * filtered by the current group logged in in the session or 
+	 * if all values are returned
 	 * 
 	 * @param clazz The model which should be filtered as Class object
 	 * @param field The field which should be returned
-	 * @param groupDependent flag to decide whether it is filtered by the current group
+	 * @param groupDependent flag to decide whether it is filtered by the 
+	 * 						 current group
 	 * 
 	 * @return List of String representations of the values of the desired field
 	 * 
@@ -352,20 +363,25 @@ public class DatabaseDAO {
 	}
 	
 	/**
-	 * Returns an Object by a String comparison of a specified field <br>
-	 * For example: Get a country by a given name (Return the country where the name equals GERMANY) <br><br>
+	 * Returns an Object by a String comparison of a specified field 
+	 * <br>
+	 * For example: Get a country by a given name 
+	 * (Return the country where the name equals GERMANY)
+	 * <br>
+	 * <br>
 	 * NOTE: The operator used is 'ILIKE'
-	 * 
-	 * <br><br>
-	 * TODO: exception handling
+	 * <br>
+	 * <br>
 	 * 
 	 * @param clazz The class of the object model to be used
 	 * @param fieldname the column which should be filtered
 	 * @param value the value to filter
 	 * 
 	 * @return The object fulfilling the filter request
+	 * @throws ShogunDatabaseAccessException 
 	 */
-	public Object getEntityByStringField(Class clazz, String fieldname, String value) {
+	public Object getEntityByStringField(
+			Class clazz, String fieldname, String value) throws ShogunDatabaseAccessException {
 		
 		HashMap<String, String> fieldsAndValues = new HashMap<String, String>();
 		fieldsAndValues.put(fieldname, value);
@@ -376,20 +392,25 @@ public class DatabaseDAO {
 	
 	/**
 	 * Returns an Object by a String comparison of specified fields <br>
-	 * For example: Get a record by a given name (Return the city where the name equals NEUSTADT) and its  
-	 * postcode
-	 * <br><br>
+	 * For example: Get a record by a given name 
+	 * (Return the city where the name equals NEUSTADT) and its postcode.
+	 * <br>
+	 * <br>
 	 * NOTE: The operator used is 'ILIKE'
-	 * <br><br>
-	 * TODO: add an explicit connector (AND/OR, no usage of default because of readability)
+	 * <br>
+	 * <br>
+	 * TODO: add an explicit connector (AND/OR, no usage of default because 
+	 *       of readability)
 	 * TODO: exception handling
 	 * 
 	 * @param clazz
 	 * @param fieldsAndValues
 	 * 
 	 * @return The object fulfilling the filter request
+	 * @throws ShogunDatabaseAccessException 
 	 */
-	public Object getEntityByStringFields(Class clazz, HashMap<String, String> fieldsAndValues) {
+	public Object getEntityByStringFields(Class clazz, 
+			HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
 		
 		Criteria criteria = null;
 		Object returnObject = null;
@@ -413,8 +434,9 @@ public class DatabaseDAO {
 			}
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ShogunDatabaseAccessException(
+					"Error getting entity " + clazz.getSimpleName() + 
+					" by text field.", e);
 		}
 		
 		return returnObject;
@@ -528,7 +550,8 @@ public class DatabaseDAO {
 			
 		} else {
 			throw new ShogunDatabaseAccessException(
-				"The " + clazz.getSimpleName() + " to be deleted is not accessible for the logged in user!");
+				"The " + clazz.getSimpleName() + 
+				" to be deleted is not accessible for the logged in user!");
 		}
 	}
 
@@ -591,7 +614,8 @@ public class DatabaseDAO {
 			}
 		
 		} catch (Exception e) {
-			throw new ShogunDatabaseAccessException("Error while getting User by name: " + e.getMessage(), e);
+			throw new ShogunDatabaseAccessException(
+					"Error while getting User by name: " + name, e);
 		}
 			
 		return criteria.list();
@@ -626,7 +650,7 @@ public class DatabaseDAO {
 	 * 
 	 * @param user the User object to create
 	 * @param role the role name
-	 * @param setSessionGroup flag controlls if the current user group should be set to new user
+	 * @param setSessionGroup flag controls if the current user group should be set to new user
 	 * @return
 	 * @throws Exception
 	 */
@@ -640,9 +664,9 @@ public class DatabaseDAO {
 				int group_id = this.getGroupIdFromSession();
 				user.setGroup_id(group_id);
 			} catch (Exception e) {
-				throw new ShogunDatabaseAccessException("Error getting group from session. " + e.getMessage());
+				throw new ShogunDatabaseAccessException(
+						"Error getting group from session. " + e.getMessage());
 			}
-
 		}
 
 		try {
@@ -657,7 +681,8 @@ public class DatabaseDAO {
 			user.setRoles(roles);
 		
 		} catch (Exception e) {
-			throw new ShogunDatabaseAccessException("Error creating User with roles. " + e.getMessage());
+			throw new ShogunDatabaseAccessException(
+					"Error creating User with roles. ", e);
 		}
 
 		return user;
@@ -700,7 +725,8 @@ public class DatabaseDAO {
 			
 		} else {
 			throw new ShogunDatabaseAccessException(
-					"The User to be deleted is not accessible for the logged in user!");
+					"The User to be deleted is not accessible " +
+					"for the logged in user!");
 		}
 	}
 	
@@ -732,7 +758,8 @@ public class DatabaseDAO {
 			this.deleteEntity(User.class, id);
 			
 		} else {
-			throw new ShogunDatabaseAccessException("No User found with ID " + id);
+			throw new ShogunDatabaseAccessException(
+					"No User found with ID " + id);
 		}
 	}
 	
@@ -788,7 +815,9 @@ public class DatabaseDAO {
 			criteria = this.sessionFactory.getCurrentSession().createCriteria(hibernateFilter.getMainClass());
 			
 		} catch (Exception e) {
-			throw new ShogunDatabaseAccessException("The requested model " + hibernateFilter.getMainClass() + " is not defined " + e.getMessage());
+			throw new ShogunDatabaseAccessException(
+					"The requested model " + hibernateFilter.getMainClass() + 
+					" is not defined ", e);
 		}
 		
 		
@@ -803,21 +832,26 @@ public class DatabaseDAO {
 				groupCriterion = Restrictions.eq(this.getGroupFieldName(hibernateFilter.getMainClass()), this.getGroupIdFromSession());
 				groupConjunction.add(groupCriterion);
 			} catch (Exception e) {
-				throw new ShogunDatabaseAccessException("Problems retrieving the group ID from session while calculating total " + e.getMessage());
+				throw new ShogunDatabaseAccessException(
+						"Problems retrieving the group ID from session while " +
+						"calculating total " + e.getMessage());
 			}
 			
 			criteria.add(groupConjunction);
 		}
 		
-		// check additional filters:
-		// 
-		// These are being sent from a client and represent AND conditions to be
-		// applied globally.
-		// The use-case that lead us to implement the additionalFilter is
-		// the requirement that users are allowed to have both a AND and an OR
-		// filter.
-		// Usually one would implement this requirement with nested logical 
-		// filters
+
+		/*
+		 * check additional filters:
+		 * 
+		 * These are being sent from a client and represent AND conditions to be 
+		 * applied globally.
+		 * The use-case that lead us to implement the additionalFilter is 
+		 * the requirement that users are allowed to have both a AND and an OR 
+		 * filter. 
+		 * Usually one would implement this requirement with nested logical 
+		 * filters
+		 */
 		if (hibernateAdditionalFilter != null) {
 			Conjunction afConjunction = Restrictions.conjunction();
 			Criterion afCriterion = null;
@@ -826,8 +860,8 @@ public class DatabaseDAO {
 				afCriterion = hfi.makeCriterion(hibernateAdditionalFilter.getMainClass());
 				afConjunction.add(afCriterion);
 			} catch (Exception e) {
-				e.printStackTrace();
-				throw new ShogunDatabaseAccessException("Error creating a criterion for additionalFilter.");
+				throw new ShogunDatabaseAccessException(
+						"Error creating a criterion for additionalFilter.", e);
 			}
 			
 			criteria.add(afConjunction);
@@ -855,7 +889,8 @@ public class DatabaseDAO {
 					criteria.add(dis);
 					
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException("Error while combining criteria with OR");
+					throw new ShogunDatabaseAccessException(
+							"Error while combining criteria with OR", e);
 				}
 					
 			} else {
@@ -870,10 +905,10 @@ public class DatabaseDAO {
 					}
 					
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException("Error while combining criteria with AND");
+					throw new ShogunDatabaseAccessException(
+							"Error while combining criteria with AND", e);
 				}
 			}
-        	
         }
         
         List<?> totalList = criteria.list();
@@ -1012,7 +1047,6 @@ public class DatabaseDAO {
 		
 		// let's assume that the super user never wants group dependent models:
 		if (this.getGroupIdFromSession() == 0) {
-			
 			return false;
 		}
 		
@@ -1023,7 +1057,6 @@ public class DatabaseDAO {
 			if(fields[j].getName().equalsIgnoreCase("group_id")) {
 				return true;
 			}
-			
 		}
 		
 		return false;
@@ -1047,7 +1080,6 @@ public class DatabaseDAO {
 			if(fields[j].getName().equalsIgnoreCase("group_id")) {
 				return fields[j].getName();
 			}
-			
 		}
 		
 		return null;
@@ -1078,7 +1110,6 @@ public class DatabaseDAO {
 			throw new RuntimeException(e);
 		}
 	}
-	
 	
 	/**
 	 * Sets the SessionFactory of Hibernate via Spring's DI
