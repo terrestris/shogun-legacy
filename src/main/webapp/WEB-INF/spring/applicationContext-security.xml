@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans:beans xmlns="http://www.springframework.org/schema/security"
-    xmlns:beans="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
 
-    <http auto-config='false' entry-point-ref="authenticationEntryPoint">
-    
-        <intercept-url pattern="/index*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-        <!-- <intercept-url pattern="/proxy/*" access="ROLE_USER"/>  -->
-		<!-- <intercept-url pattern="/admin/**" access="ROLE_SUPERADMIN"/> -->
+	<!-- HTTP configuration for login/logout -->
+	<http auto-config='false' entry-point-ref="authenticationEntryPoint">
+	
+		<!-- interceptors for special URLs -->
+		<intercept-url pattern="/index*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<intercept-url pattern="/config/getAppContext.action" access="ROLE_ANONYMOUS, ROLE_USER, ROLE_ADMIN"/>
-        <!-- <intercept-url pattern="/main*" access="ROLE_USER" /> -->
-        <!-- <intercept-url pattern="/config/**"  access="ROLE_USER, ROLE_ADMIN"/> -->
-        
-        <!-- default interception -->
-        <intercept-url pattern="/*" access="ROLE_USER, ROLE_ADMIN" />
-        
-        <custom-filter position="FORM_LOGIN_FILTER" ref="authenticationFilter" />
-        
-        <logout invalidate-session="true" logout-success-url="/index.html"
+		
+		<!-- default interception -->
+		<intercept-url pattern="/*" access="ROLE_USER, ROLE_ADMIN" />
+		
+		<custom-filter position="FORM_LOGIN_FILTER" ref="authenticationFilter" />
+		
+		<!-- Logout configuration -->
+		<logout invalidate-session="true" logout-success-url="/index.html"
 			logout-url="/j_spring_security_logout" />
 			
 		<remember-me key="xaab.springmvclogin" />
@@ -32,55 +31,43 @@
 				error-if-maximum-exceeded="false" />
 		</session-management>
 		
-    </http>
+	</http>
 
-    <beans:bean id="authenticationFilter" class="org.shogun.security.ShogunAuthProcessingFilter">
-        <beans:property name="authenticationManager" ref="authenticationManager" />
-    </beans:bean>
+	<!-- Filter for User/Password authentication, let us intercept
+		 on successful/failed login attempt -->
+	<beans:bean id="authenticationFilter" class="org.shogun.security.ShogunAuthProcessingFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+	</beans:bean>
 
-    <beans:bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-        <beans:property name="loginFormUrl" value="/index.jsp" />
-    </beans:bean>
-
-    <!-- This is a base example of using a Authentication Manager with
-         2 static users
-         
-    Usernames/Passwords are
-        moez/moez
-        test/test        
-    
-    <authentication-manager alias="authenticationManager" >
-        <authentication-provider>
-            <password-encoder hash="md5"/>
-            <user-service>
-                <user name="moez" password="f69471ca2c42621b8b8e731b2b4446e4" authorities="ROLE_SUPERVISOR, ROLE_USER, ROLE_TELLER" />
-                <user name="test" password="098f6bcd4621d373cade4e832627b4f6" authorities="ROLE_USER" />                
-            </user-service>
-        </authentication-provider>
-    </authentication-manager>
-    -->
-    
-    <!-- This is an entry point for a custom Authentication Manager, 
-         use this when taking care yourself about the authentication
-    <beans:bean id="customAuthProvider" class="org.shogun.security.CustomAuthenticationProvider">
-    </beans:bean>
-     -->
-    <authentication-manager alias="authenticationManager" >
-    
-        <!-- -->
-        <authentication-provider>
-		     <password-encoder hash="md5"/>
+	<!-- the entry point for authentication, via URL -->
+	<beans:bean id="authenticationEntryPoint" 
+		class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<beans:property name="loginFormUrl" value="/index.html" />
+	</beans:bean>
+	
+	<!-- This is an entry point for a custom Authentication Manager, 
+		 use this when taking care yourself about the authentication
+	<beans:bean id="customAuthProvider" class="org.shogun.security.CustomAuthenticationProvider">
+	</beans:bean>
+	 -->
+	 
+	<!-- The Authentication Manager, manages a database based 
+		 authentication -->
+	<authentication-manager alias="authenticationManager" >
+	
+		<authentication-provider>
+			 <password-encoder hash="md5"/>
 			 <jdbc-user-service data-source-ref="dataSource"
-			    users-by-username-query="select user_name as username, user_password as password, 1 from tbl_user where user_name = ?"
-			    authorities-by-username-query="SELECT tbl_user.user_name as username, tbl_role.name as authorities FROM tbl_user, tbl_role, tbl_user_tbl_role WHERE tbl_user_tbl_role.tbl_user_id = tbl_user.id AND tbl_user_tbl_role.roles_id = tbl_role.id AND tbl_user.user_name = ?"
+				users-by-username-query="select user_name as username, user_password as password, 1 from tbl_user where user_name = ?"
+				authorities-by-username-query="SELECT tbl_user.user_name as username, tbl_role.name as authorities FROM tbl_user, tbl_role, tbl_user_tbl_role WHERE tbl_user_tbl_role.tbl_user_id = tbl_user.id AND tbl_user_tbl_role.roles_id = tbl_role.id AND tbl_user.user_name = ?"
 			 />
 		</authentication-provider>
 		
 		<!-- 
-        <authentication-provider ref="customAuthProvider">
-        </authentication-provider>
-        -->
-        
-    </authentication-manager>
+		<authentication-provider ref="customAuthProvider">
+		</authentication-provider>
+		-->
+		
+	</authentication-manager>
 
 </beans:beans>

@@ -8,41 +8,43 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
+	<!-- database connection via JDBC driver -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-	
 		<!-- 
 		<property name="driverClassName"><value>oracle.jdbc.driver.OracleDriver</value></property>
-        	<property name="url"><value>jdbc:oracle:thin:@<host>:<port>:<dbname></value></property>
-       		<property name="username"><value>scott</value></property>
-        	<property name="password"><value>xxxxx</value></property>
+		<property name="url"><value>jdbc:oracle:thin:@<host>:<port>:<dbname></value></property>
+	   	<property name="username"><value>scott</value></property>
+		<property name="password"><value>xxxxx</value></property>
 		 -->
 		<property name="driverClassName"><value>org.postgresql.Driver</value></property>
- 	    	<property name="url"><value>jdbc:postgresql://localhost/shogun-mvn</value></property>
-        	<property name="username"><value>postgres</value></property>
-        	<property name="password"><value>xxxxx</value></property> 
-    	</bean>
-    
-    	<!-- Hibernate SessionFactory -->
-    	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        	<property name="dataSource"><ref local="dataSource"/></property>
-      		<property name="packagesToScan" value="org.shogun.model" />
-        	<property name="hibernateProperties">
-        		<props>
-           			<!-- 
+ 		<property name="url"><value>jdbc:postgresql://localhost/shogun</value></property>
+		<property name="username"><value>postgres</value></property>
+		<property name="password"><value>xxxxx</value></property> 
+	</bean>
+	
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource"><ref local="dataSource"/></property>
+  		<property name="packagesToScan" value="org.shogun.model" />
+		<property name="hibernateProperties">
+			<props>
+	   			<!-- 
 				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
 				-->
-            			<prop key="hibernate.dialect">org.hibernatespatial.postgis.PostgisDialect</prop>
-            			<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.dialect">org.hibernatespatial.postgis.PostgisDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
-        		</props>
-        	</property>
-    	</bean>
+			</props>
+		</property>
+	</bean>
 	
 	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
 	<tx:annotation-driven transaction-manager="transactionManager"/>
-    	
+		
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        	<property name="sessionFactory"><ref local="sessionFactory"/></property>
-    	</bean>
-    
+		<property name="sessionFactory">
+			<ref local="sessionFactory"/>
+		</property>
+	</bean>
+	
 </beans>

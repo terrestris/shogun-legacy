@@ -1,61 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:mvc="http://www.springframework.org/schema/mvc"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:sec="http://www.springframework.org/schema/security"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
-        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
-    <!-- Scans the classpath of this application for @Components to deploy as beans -->
-    <context:component-scan base-package="org.shogun" />
-    
-    <!-- Configures the @Controller programming model -->
-    <mvc:annotation-driven />
-    
-    <!-- enable post pre annotations -->    
-    <sec:global-method-security pre-post-annotations="enabled"/>
-    
-    <!-- <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" lazy-init="default"/> -->
+	<!-- Scans the classpath of this application for @Components to deploy as beans -->
+	<context:component-scan base-package="de.terrestris.shogun" />
+	
+	<!-- Configures the @Controller programming model -->
+	<mvc:annotation-driven />
+	
+	<!-- enable post pre annotations -->	
+	<sec:global-method-security pre-post-annotations="enabled"/>
+	
+	<!-- misc - internal view resolver -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
 
-    <!-- misc -->
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-        <property name="suffix" value=".jsp"/>
-    </bean>
-
-    
-    <!-- Configure the multipart resolver -->
-    <!-- 
-    <bean id="multipartResolver" class="org.shogun.upload.DropOversizeFilesMultipartResolver">
-        <property name="maxUploadSize" value="5242880"/>
-    </bean>
-    -->
-     
-    <!-- Configure GeoServer Tools Bean -->
-    <!-- 
-    <bean id="geoserverWmsToolsBean" class="org.shogun.geoserver.rest.GeoserverWmsTools">
-        <constructor-arg type="String"><value>http://curveball-box/geoserver</value></constructor-arg>
-        <constructor-arg type="String"><value>admin</value></constructor-arg>
-        <constructor-arg type="String"><value>geoserver</value></constructor-arg>
-    </bean>
-     -->
-    
-    <import resource="initialize-beans.xml" />
-    
- <!-- 
-     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="mail.terrestis.de" />
-    </bean>
- -->
-    
-    <!-- Configures Hibernate - Database Config -->
-    <import resource="db-config.xml" />
-    
-    <!-- Configures The Security Stuff -->
-    <import resource="applicationContext-security.xml" />
-    
+	<!-- Configures the initialization script, 
+	     for example a standard user to be created on first startup
+	-->
+	<import resource="initialize-beans.xml" />
+	
+	<!-- Configures Hibernate - database configuration -->
+	<import resource="db-config.xml" />
+	
+	<!-- Configures the security mechanism -->
+	<import resource="applicationContext-security.xml" />
+	
 </beans>
