@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--
+
+    /**
+     *
+     * Copyright (C) 2012  terrestris GmbH & Co. KG, info@terrestris.de
+     *
+     * This program is free software: you can redistribute it and/or modify
+     * it under the terms of the GNU General Public License as published by
+     * the Free Software Foundation, either version 3 of the License, or
+     * (at your option) any later version.
+     *
+     * This program is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     * GNU General Public License for more details.
+     *
+     * You should have received a copy of the GNU General Public License
+     * along with this program.  If not, see <http://www.gnu.org/licenses/>.-
+     *
+     * @author terrestris GmbH & Co. KG
+     */
+     
+ -->
+        <title>SHOGun - WebGIS</title>
+        
+        <!-- ExtJS CSS -->
+        <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.4.0/resources/css/ext-all.css" />
+
+        <!-- ExtJS -->
+        <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.4.0/adapter/ext/ext-base.js"></script>
+        <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.4.0/ext-all.js"></script>
+        
+        <!-- OpenLayers -->
+        <script type="text/javascript" src="http://openlayers.org/dev/OpenLayers.js"></script>
+        
+        <!-- <script type="text/javascript" src="lib/OpenLayers-2.12/lib/OpenLayers.js"></script> -->
+        <script type="text/javascript" src="javascript/overrides/OpenLayers.Control.Click.js"></script>
+        
+        <!-- GeoExt -->
+        <script type="text/javascript" src="http://api.geoext.org/1.1/script/GeoExt.js"></script>
+
+    </head>
+    <body>
+
+        <!-- DEVELOPMENT ONLY -->
+        <!-- Load the config for the dynamic script loader in dev-mode -->        
+        <script type="text/javascript" src="javascript/SHOGun/shogun-js-loader.config.js"></script>
+        <script type="text/javascript" src="javascript/SHOGun/shogun-js-loader.js"></script>
+        
+        
+        <script type="text/javascript">
+        
+        // since the minified custom OpenLayers library has a name different 
+        // than OpenLayers.js, we overwrite this internal method to reflect the
+        // location of our OpenLayers-library
+/*         OpenLayers._getScriptLocation = function(){
+            return "./lib/openlayers/";  
+        };
+         */
+            
+        Ext.ns('SHOGun');
+        var application;
+        Ext.onReady(function(){
+            Ext.QuickTips.init();
+            Ext.Ajax.request({
+                url: '../config/getAppContext.action',
+                success: function(response){
+                    var json = Ext.decode(response.responseText);
+                    if (json && json.data) {
+                        var data = json.data;
+                        //TODO rename base app 
+                        application = new SHOGun.BaseApplication(data);
+                        application.initApplication();
+                    }
+                    else
+                    {
+                        Ext.Msg.alert('Status', 'Failed to load Application Context!', function(btn, text){
+                            window.location.href = "./j_spring_security_logout";
+                        });
+                    }    
+                        
+                },
+                failure: function(){
+                    Ext.Msg.alert('Status', 'Failed to load Application Context!', function(btn, text){
+                        window.location.href = "./j_spring_security_logout";
+                    });
+                }
+            });
+        });
+        </script>
+        <div id="overviewmap" style="width:100%; height:100%;"></div>
+    </body>
+</html>
