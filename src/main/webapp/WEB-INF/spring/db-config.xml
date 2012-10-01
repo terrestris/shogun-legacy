@@ -29,10 +29,11 @@
 		<property name="password">
 			<value></value>
 		</property>
-		--> 
-		
-		<!-- enter your absolute path as "url" to store the derby 
-                     database -->
+		-->
+		<!--
+			enter your absolute path as "url" to store the derby
+			database in, if you want to create a db, append ";create=true"
+		-->
 		<property name="driverClassName">
 			<value>org.apache.derby.jdbc.EmbeddedDriver</value>
 		</property>
