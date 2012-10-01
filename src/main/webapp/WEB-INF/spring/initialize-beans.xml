@@ -22,7 +22,7 @@
 	<!-- A bean to be used by the initialize database bean that represents the 
 		standard MapConfig object, that e.g. the anonymous user will get. -->
 	<bean id="stdMapConfig" class="de.terrestris.shogun.model.MapConfig">
-		<property name="center" value="902753.23761423, 6679393.9069" />
+		<property name="center" value="1485021.845244, 6773120.0339171" />
 		<property name="mapId" value="stdmap" />
 		<property name="maxExtent" value="-20037508, -20037508, 20037508, 20037508" />
 		<property name="maxResolution" value="156543.0339" />
@@ -30,7 +30,7 @@
 		<property name="projection" value="EPSG:900913" />
 		<property name="title" value="Map" />
 		<property name="units" value="m" />
-		<property name="zoom" value="14" />
+		<property name="zoom" value="6" />
 	</bean>
 	
 	<!-- A bean to be used by the initialize database bean that represents the 
