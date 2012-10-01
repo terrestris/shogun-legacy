@@ -57,7 +57,7 @@
 		<!-- Shall we create a user with the role anonymous automatically?
 			 Defaults to true -->
 		<property name="autoCreateAnonymousUser">
-			<value type="java.lang.Boolean">false</value>
+			<value type="java.lang.Boolean">true</value>
 		</property>
 		
 		<!-- The list of roles available for assignment. Missing ones will be 
