@@ -29,10 +29,10 @@ SHOGun.module.OverviewMapPanel = Ext.extend(SHOGun.module.BorderLayout, {
      * initializes this component
      */
     initComponent: function(){
-    	
-    	/**
-    	 * the items to be rendered in the west
-    	 */
+        
+        /**
+         * the items to be rendered in the west
+         */
         this.westPanelElements.items = [];
         
         // apply config
@@ -42,59 +42,59 @@ SHOGun.module.OverviewMapPanel = Ext.extend(SHOGun.module.BorderLayout, {
          * private function called after the div is rendered
          */
         var addOverview = function() {
-        	var ovEl = Ext.get('overviewmap'),
-        	    ovWidthOffset = 30;
-        	
-        	var overview_map = new OpenLayers.Control.OverviewMap({
-        		size: new OpenLayers.Size(ovEl.getWidth()-ovWidthOffset, 200),
-    			autopan: false,
+            var ovEl = Ext.get('overviewmap'),
+                ovWidthOffset = 30;
+            
+            var overview_map = new OpenLayers.Control.OverviewMap({
+                size: new OpenLayers.Size(ovEl.getWidth()-ovWidthOffset, 200),
+                autopan: false,
                 div: ovEl,
                 // destroy issues in IE to be fixed, workaround for now 
                 destroy: function() {},
-    			mouseMode: 'dragRectangle',
+                mouseMode: 'dragRectangle',
                 mapOptions: {
                     maxExtent: map.getMaxExtent(),
-    			    zoom: new OpenLayers.Control.ZoomToMaxExtent,
+                    zoom: new OpenLayers.Control.ZoomToMaxExtent,
                     numZoomLevels: 1,
                     projection: map.getProjection(),
-    			    displayProjection: map.getProjection(),
+                    displayProjection: map.getProjection(),
                     units: 'm'
                 }
             });
             map.addControl(overview_map);
-    		overview_map.activate();
+            overview_map.activate();
         };
         
         /**
          * the pinable panel
          */
-		var overview = new SHOGun.widget.PinablePanel({
-			border: false,
-			title: "Überblick",
-			id : 'overviewmap_panel',
-			helpId : this.helpId,
-			collapsed : false,
-			collapsible : true,
-			parentPanelId : 'terrestris-west',
-			childPanelId: 'overviewmap_panel',
-			draggable : {
-				insertProxy : true,
-				ddGroup : 'pinablePanel'
-			},
-			items: [{
-				border: false,
-				id: 'overviewmap',
-	            xtype: "panel", 
-	            listeners: {
-					'afterlayout': {
-						fn: function() {
-							addOverview();
-						}, 
-						single: true
-					}
-				}
-			}]
-	    });
+        var overview = new SHOGun.widget.PinablePanel({
+            border: false,
+            title: "Überblick",
+            id : 'overviewmap_panel',
+            helpId : this.helpId,
+            collapsed : false,
+            collapsible : true,
+            parentPanelId : 'terrestris-west',
+            childPanelId: 'overviewmap_panel',
+            draggable : {
+                insertProxy : true,
+                ddGroup : 'pinablePanel'
+            },
+            items: [{
+                border: false,
+                id: 'overviewmap',
+                xtype: "panel", 
+                listeners: {
+                    'afterlayout': {
+                        fn: function() {
+                            addOverview();
+                        }, 
+                        single: true
+                    }
+                }
+            }]
+        });
         
         this.westPanelElements.items = [ overview ];
         
