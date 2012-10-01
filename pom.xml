@@ -16,6 +16,7 @@
   </properties>
   
   <repositories>
+
     <repository>
       <id>central</id>
       <name>Central Repository</name>
@@ -120,7 +121,15 @@
         <artifactId>hibernate-spatial-postgis</artifactId>
         <version>1.0</version>
     </dependency>
-    
+
+
+    <!-- H2 database -->
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.3.168</version>
+    </dependency>
+
     <!-- JPA -->
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
