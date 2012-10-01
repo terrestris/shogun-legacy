@@ -282,7 +282,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the notes
 	 */
-	@Column(name="NOTES", length=10485760)
+	@Column(name="NOTES", length=1024)
 	public String getNotes() {
 		return notes;
 	}
