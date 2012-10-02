@@ -1,5 +1,6 @@
 # SHOGun
 
+[![Build Status](https://travis-ci.org/terrestris/shogun.png)](https://travis-ci.org/terrestris/shogun)
 
 SHOGun, a Java based WebGIS framework.
 
