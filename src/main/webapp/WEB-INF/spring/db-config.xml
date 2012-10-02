@@ -19,6 +19,7 @@
 
 		<!-- enter your absolute path as "url" to store the H2 database, "~" for 
 			home is also supported.
+		-->
 		<property name="driverClassName">
 			<value>org.h2.Driver</value>
 		</property>
@@ -29,11 +30,11 @@
 		<property name="password">
 			<value></value>
 		</property>
-		-->
+		
 		<!--
 			enter your absolute path as "url" to store the derby
 			database in, if you want to create a db, append ";create=true"
-		-->
+		
 		<property name="driverClassName">
 			<value>org.apache.derby.jdbc.EmbeddedDriver</value>
 		</property>
@@ -44,7 +45,7 @@
 		<property name="password">
 			<value>admin</value>
 		</property>
-		
+		-->
 	</bean>
 
 	<!-- Hibernate SessionFactory -->
@@ -58,8 +59,8 @@
 			<props>
 				<!-- <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop> -->
 				<!-- <prop key="hibernate.dialect">org.hibernatespatial.postgis.PostgisDialect</prop> -->
-				<!-- <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop> -->
-				<prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+				<!-- <prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop> -->
 				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
 			</props>
