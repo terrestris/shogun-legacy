@@ -441,7 +441,24 @@ public class DatabaseDAO {
 		
 		return returnObject;
 	}
-	
+
+	/**
+	 * Returns a set of Objects from database by a Integer comparison
+	 * of a specified field <br>
+	 *
+	 * @param clazz
+	 * @param fieldname
+	 * @param value
+	 * @return
+	 */
+	public List<Object> getEntitiesByIntegerField(Class clazz, String fieldname, Integer value) {
+
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria.add(Restrictions.eq(fieldname, value));
+
+		return criteria.list();
+	}
+
 	/**
 	 * Creates a record of a given Entity in the database
 	 * 
