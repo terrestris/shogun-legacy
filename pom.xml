@@ -295,6 +295,24 @@
 
         </executions>
       </plugin>
+      
+      <plugin>
+          <groupId>ro.isdc.wro4j</groupId>
+          <artifactId>wro4j-maven-plugin</artifactId>
+          <version>1.5.0</version>
+          <executions>
+              <execution>
+                  <phase>compile</phase>
+                  <goals>
+                      <goal>jshint</goal>
+                  </goals>
+              </execution>
+          </executions>
+          <configuration>
+              <options>devel,evil,noarg</options>
+          </configuration>
+      </plugin>
+      
     </plugins>
     
     <finalName>${project.build.finalName}</finalName>

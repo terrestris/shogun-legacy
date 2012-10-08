@@ -303,8 +303,8 @@ Ext.apply(SHOGun.util.General, {
      */
     
     toggleAllChilds: function(node, state){
-        if (state == true) {
-            if (this.expanded == false) {  
+        if (state === true) {
+            if (this.expanded === false) {  
                 this.toggle();
             }
             node.eachChild( function() {
@@ -323,7 +323,7 @@ Ext.apply(SHOGun.util.General, {
             });
         }
         else {
-            if (this.expanded == true) {  
+            if (this.expanded === true) {  
                 this.toggle();
             }
             node.eachChild( function() {
@@ -345,8 +345,8 @@ Ext.apply(SHOGun.util.General, {
      * Gives back base-Url
      */
     getBaseURL: function(){
-        var url = location.href; // entire url including querystring - also: window.location.href;
-        var baseURL = url.substring(0, url.indexOf('/', 14));
+        var origUrl = location.href; // entire url including querystring - also: window.location.href;
+        var baseURL = origUrl.substring(0, origUrl.indexOf('/', 14));
         
 // JW 20111202: Commented some of the following parts, they are unnecessary, doesnt matter if localhost or not, always append the baseLocalURL (projectname)        
 //        if (baseURL.indexOf('http://localhost') != -1) {

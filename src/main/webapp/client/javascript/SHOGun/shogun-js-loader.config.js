@@ -62,7 +62,7 @@
             'javascript/SHOGun/widget/MenuToolbar.js',
             
             // Initialize Application
-            'javascript/SHOGun/BaseApplication.js',
+            'javascript/SHOGun/BaseApplication.js'
 
 
         ];

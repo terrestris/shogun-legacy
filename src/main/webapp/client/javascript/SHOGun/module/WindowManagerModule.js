@@ -61,7 +61,7 @@ SHOGun.module.WindowManagerModule = Ext.extend(SHOGun.module.BorderLayout, {
             var managedCmps = Ext.ComponentMgr.all.filterBy(function(cmp){
                 
                 if (!Ext.isEmpty(cmp) && !Ext.isEmpty(cmp.managed) && cmp.managed === true) {
-                    return true
+                    return true;
                 }
                 else {
                     return false;

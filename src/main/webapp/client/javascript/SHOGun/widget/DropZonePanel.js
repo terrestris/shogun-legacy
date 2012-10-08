@@ -30,7 +30,6 @@ SHOGun.widget.DropZonePanel = Ext.extend(Ext.Panel, {
     defaults: {
         border: false
     },
-    split: true,
     layout: 'fit',
     enableDD: true,
     split: true,
