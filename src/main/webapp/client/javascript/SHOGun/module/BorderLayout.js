@@ -132,11 +132,11 @@ SHOGun.module.BorderLayout = Ext.extend(Ext.Component, {
                     }
                     
                     else {
-                    
+                        var elementForPart;
                         //letzter Eintrag -> muss ja menuitem sein
                         if (depth === menuParts.length - 1 && lastAnchor) {
                         
-                            var elementForPart = findFirstMenuElementByText(lastAnchor.menu, menuPart);
+                            elementForPart = findFirstMenuElementByText(lastAnchor.menu, menuPart);
                             if (!elementForPart) {
                             
                                 var dynMenuItem = {
@@ -161,7 +161,7 @@ SHOGun.module.BorderLayout = Ext.extend(Ext.Component, {
                         else {
                         
                             if (lastAnchor && lastAnchor.menu) {
-                                var elementForPart = findFirstMenuElementByText(lastAnchor.menu, menuPart);
+                                elementForPart = findFirstMenuElementByText(lastAnchor.menu, menuPart);
                                 if (!elementForPart) {
                                     // this one ist not existing, so we need to create it
                                     var tmpMenu = new Ext.menu.Item({

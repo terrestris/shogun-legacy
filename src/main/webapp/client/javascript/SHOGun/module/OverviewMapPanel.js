@@ -54,7 +54,7 @@ SHOGun.module.OverviewMapPanel = Ext.extend(SHOGun.module.BorderLayout, {
                 mouseMode: 'dragRectangle',
                 mapOptions: {
                     maxExtent: map.getMaxExtent(),
-                    zoom: new OpenLayers.Control.ZoomToMaxExtent,
+                    zoom: new OpenLayers.Control.ZoomToMaxExtent(),
                     numZoomLevels: 1,
                     projection: map.getProjection(),
                     displayProjection: map.getProjection(),

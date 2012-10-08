@@ -173,7 +173,7 @@ SHOGun.module.Login = Ext.extend(SHOGun.module.BorderLayout, {
             Ext.each(this.mapPanelElements.tbarItems, function(value, key) {
                 appMapPanelToolbar.addItem(value);
             });
-        };
+        }
     }
 });
 
