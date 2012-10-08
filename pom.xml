@@ -1,391 +1,365 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.terrestris.shogun</groupId>
-  <artifactId>SHOGun</artifactId>
-  <packaging>war</packaging>
-  <version>0.1-SNAPSHOT</version>
-  <name>SHOGun</name>
-  <url>http://shogun-webmapping.org</url>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.terrestris.shogun</groupId>
+	<artifactId>SHOGun</artifactId>
+	<packaging>war</packaging>
+	<version>0.1-SNAPSHOT</version>
+	<name>SHOGun</name>
+	<url>http://shogun-webmapping.org</url>
 
-  <properties>
-    <java.version>1.6</java.version>
-    <javax.jstl.version>1.2</javax.jstl.version>
-    <spring.version>3.0.5.RELEASE</spring.version>
-    <project.build.finalName>SHOGun</project.build.finalName>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
-  <repositories>
+	<properties>
+		<java.version>1.6</java.version>
+		<javax.jstl.version>1.2</javax.jstl.version>
+		<spring.version>3.0.5.RELEASE</spring.version>
+		<project.build.finalName>SHOGun</project.build.finalName>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-    <repository>
-      <id>central</id>
-      <name>Central Repository</name>
-      <url>http://repo1.maven.apache.org/maven2</url>
-      <layout>default</layout>
-    </repository>
-    <repository>
-        <id>OSGEO GeoTools repo</id>
-        <url>http://download.osgeo.org/webdav/geotools</url>
-    </repository>
-    <repository>
-        <id>Hibernate Spatial repo</id>
-        <url>http://www.hibernatespatial.org/repository</url>
-    </repository>
-        
-  </repositories>
+	<repositories>
 
-  <dependencies>
-  
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-servlet-api</artifactId>
-      <version>7.0.26</version>
-    </dependency>
-            
+		<repository>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>http://repo1.maven.apache.org/maven2</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>OSGEO GeoTools repo</id>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
+			<id>Hibernate Spatial repo</id>
+			<url>http://www.hibernatespatial.org/repository</url>
+		</repository>
 
-    <!-- Jackson JSON Mapper -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.7.1</version>
-    </dependency>
+	</repositories>
 
-    <!-- Spring 3 dependencies -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>${spring.version}</version> 
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-orm</artifactId>
-      <version>${spring.version}</version> 
-    </dependency> 
-            
-    
-    <!-- Spring Security -->
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-web</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-config</artifactId>
-      <version>${spring.version}</version>
-    </dependency> 
-    <!-- 
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-taglibs</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-     -->
-     
-     <!-- Hibernate -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>3.5.6-Final</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
-      <version>3.5.6-Final</version> 
-    </dependency>
-            
-    
-    <!-- Hibernate Spatial -->
-    <dependency>
-        <groupId>org.hibernatespatial</groupId>
-        <artifactId>hibernate-spatial-postgis</artifactId>
-        <version>1.0</version>
-    </dependency>
+	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-servlet-api</artifactId>
+			<version>7.0.26</version>
+		</dependency>
 
 
-    <!-- H2 database -->
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>1.3.168</version>
-    </dependency>
-    
-    <!-- derby database -->
-    <dependency>
-         <groupId>org.apache.derby</groupId>
-         <artifactId>derby</artifactId>
-         <version>10.9.1.0</version>
-    </dependency>
-    
-    <dependency>
-        <groupId>org.apache.derby</groupId>
-        <artifactId>derbyclient</artifactId>
-        <version>10.9.1.0</version>
-    </dependency>
-        
-    <dependency>
-        <groupId>org.apache.derby</groupId>
-        <artifactId>derbynet</artifactId>
-        <version>10.9.1.0</version>
-    </dependency>
-        
-    <dependency>
-        <groupId>org.apache.derby</groupId>
-        <artifactId>derbytools</artifactId>
-        <version>10.9.1.0</version>
-    </dependency>
-    
-            
+		<!-- Jackson JSON Mapper -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.7.1</version>
+		</dependency>
 
-    <!-- JPA -->
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-    
-    <!-- JDBC -->
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.4-702.jdbc4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.postgis</groupId>
-      <artifactId>postgis-jdbc</artifactId>
-      <version>1.3.3</version>
-    </dependency>
-    
-    <!-- Apache Commons -->
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.4</version>
-    </dependency>
-    <!-- -->
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <version>1.8.3</version>
-    </dependency>
-    
-    
-    <!-- Code Generation Library -->
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
-      <version>2.2.2</version>
-    </dependency>
-            
-            
-    <!-- JavaX Mail -->
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4.4</version>
-    </dependency>
-    
-    <!-- JTS -->
-    <dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts</artifactId>
-      <version>1.8</version>
-    </dependency>
-            
-             
+		<!-- Spring 3 dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 
-    <!-- Simple Logging Facade -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.5.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.5.8</version>
-    </dependency> 
 
-    <!-- Log4j -->
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.16</version>
-    </dependency>
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId> 
+			<version>${spring.version}</version> </dependency> -->
 
-    <!-- JUnit testing framework -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-  
-  </dependencies>
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>
 
-  <build>
-    <plugins>
-    
-      <!-- Maven compiler plugin 
-           (see http://maven.apache.org/plugins/maven-compiler-plugin/) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-        <version>2.5.1</version>
-      </plugin>
-        
-      <!-- Maven Tomcat Plugin 
-           (see http://mojo.codehaus.org/tomcat-maven-plugin/) -->
-<!--       
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>tomcat-maven-plugin</artifactId>
-        <configuration>
-          <url>http://localhost:8080/manager/text</url>
-          <server>MyTomcat</server>
-          <path>/SHOGun</path>
-        </configuration>
-      </plugin> 
--->
-      
-      
-      <!-- Exec Maven Plugin 
-           (see http://mojo.codehaus.org/exec-maven-plugin/) -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.1</version>
-        <executions>
-          <!--
-          <execution>
-            <id>execution-001</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>${basedir}/src/main/webapp/build/build-client-application.sh</executable>
-            </configuration>
-          </execution>
-         -->
 
-        </executions>
-      </plugin>
-      
-      <plugin>
-          <groupId>ro.isdc.wro4j</groupId>
-          <artifactId>wro4j-maven-plugin</artifactId>
-          <version>1.5.0</version>
-          <executions>
-              <execution>
-                  <phase>compile</phase>
-                  <goals>
-                      <goal>jshint</goal>
-                  </goals>
-              </execution>
-          </executions>
-          <configuration>
-              <options>devel,evil,noarg</options>
-          </configuration>
-      </plugin>
-      
-    </plugins>
-    
-    <finalName>${project.build.finalName}</finalName>
-  </build>
-  
-  <!-- Project Report generated with 'mvn site'. 
-       Generates the JavaDocs at the moment 
-       Can also be called with mvn javadoc:javadoc
-       to get standalone JavaDocs -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8.1</version>
-        <configuration>
-          <stylesheetfile>${basedir}/src/site/javadoc/stylesheet.css</stylesheetfile>
-          <show>public</show>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-  
+		<!-- Hibernate Spatial -->
+		<dependency>
+			<groupId>org.hibernatespatial</groupId>
+			<artifactId>hibernate-spatial-postgis</artifactId>
+			<version>1.0</version>
+		</dependency>
 
-  <developers>
-    <developer>
-      <name>Christian Mayer</name>
-      <id>chrismayer</id>
-      <email>mayer@terrestris.de</email>
-      <organizationUrl>www.terrestris.de</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Marc Jansen</name>
-      <id>marcjansen</id>
-      <email>jansen@terrestris.de</email>
-      <organizationUrl>www.terrestris.de</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-    </developer>    
-    <developer>
-      <name>Johannes Weskamm</name>
-      <id>weskamm</id>
-      <email>weskamm@terrestris.de</email>
-      <organizationUrl>www.terrestris.de</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Contributors</name>
-      <id>contributors</id>
-      <email></email>
-      <organizationUrl></organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
 
-  <licenses>
-    <license>
-      <name>GNU GPL v3</name>
-      <url>http://www.gnu.org/licenses/gpl-3.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+		<!-- H2 database -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.168</version>
+		</dependency>
+
+		<!-- derby database -->
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.9.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbyclient</artifactId>
+			<version>10.9.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbynet</artifactId>
+			<version>10.9.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
+			<version>10.9.1.0</version>
+		</dependency>
+
+
+
+		<!-- JPA -->
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+
+		<!-- JDBC -->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.4-702.jdbc4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.postgis</groupId>
+			<artifactId>postgis-jdbc</artifactId>
+			<version>1.3.3</version>
+		</dependency>
+
+		<!-- Apache Commons -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<!-- -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.8.3</version>
+		</dependency>
+
+
+		<!-- Code Generation Library -->
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+
+
+		<!-- JavaX Mail -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.4</version>
+		</dependency>
+
+		<!-- JTS -->
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>1.8</version>
+		</dependency>
+
+
+
+		<!-- Simple Logging Facade -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+
+		<!-- Log4j -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+		</dependency>
+
+		<!-- JUnit testing framework -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- Maven compiler plugin (see http://maven.apache.org/plugins/maven-compiler-plugin/) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+				<version>2.5.1</version>
+			</plugin>
+
+			<!-- Maven Tomcat Plugin (see http://mojo.codehaus.org/tomcat-maven-plugin/) -->
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId> 
+				<configuration> <url>http://localhost:8080/manager/text</url> <server>MyTomcat</server> 
+				<path>/SHOGun</path> </configuration> </plugin> -->
+
+
+			<!-- Exec Maven Plugin (see http://mojo.codehaus.org/exec-maven-plugin/) -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<!-- <execution> <id>execution-001</id> <phase>compile</phase> <goals> 
+						<goal>exec</goal> </goals> <configuration> <executable>${basedir}/src/main/webapp/build/build-client-application.sh</executable> 
+						</configuration> </execution> -->
+
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>ro.isdc.wro4j</groupId>
+				<artifactId>wro4j-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jshint</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<options>devel,evil,noarg</options>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+		<finalName>${project.build.finalName}</finalName>
+	</build>
+
+	<!-- Project Report generated with 'mvn site'. Generates the JavaDocs at 
+		the moment Can also be called with mvn javadoc:javadoc to get standalone 
+		JavaDocs -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<stylesheetfile>${basedir}/src/site/javadoc/stylesheet.css</stylesheetfile>
+					<show>public</show>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+
+	<developers>
+		<developer>
+			<name>Christian Mayer</name>
+			<id>chrismayer</id>
+			<email>mayer@terrestris.de</email>
+			<organizationUrl>www.terrestris.de</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Marc Jansen</name>
+			<id>marcjansen</id>
+			<email>jansen@terrestris.de</email>
+			<organizationUrl>www.terrestris.de</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Johannes Weskamm</name>
+			<id>weskamm</id>
+			<email>weskamm@terrestris.de</email>
+			<organizationUrl>www.terrestris.de</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Contributors</name>
+			<id>contributors</id>
+			<email></email>
+			<organizationUrl></organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>GNU GPL v3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 </project>
