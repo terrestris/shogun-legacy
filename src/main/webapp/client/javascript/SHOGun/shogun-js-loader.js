@@ -25,18 +25,18 @@
  * and have 'undef' be 'undefined' 
  */
 (function(window, document,  undef){
-    if (window.SHOGun !== undef
-        && window.SHOGun.files !== undef
-        && window.Ext !== undef) {
+    if (window.SHOGun !== undef &&
+        window.SHOGun.files !== undef &&
+        window.Ext !== undef) {
         var jsfiles = window.SHOGun.files,
             allScriptTags = [];
             host = "";    
     
         Ext.each(jsfiles, function(jsfile) {
             allScriptTags.push(
-                "<script type='text/javascript' src='" 
-                + host + jsfile 
-                + "'></script>"
+                "<script type='text/javascript' src='" +
+                host + jsfile + 
+                "'></script>"
             );
         });
         
