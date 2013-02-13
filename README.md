@@ -81,7 +81,7 @@ on your terminal, you are ready to copy the created `war`-file to tomcats `webap
 ### Checking visually
 
 Now you can visit http://localhost:8080/SHOGun/ with you favorite web browser an you should be greeted with very basic login page. 
-Try to log in as user `terrestris` with the password `xxxx`. On the top of the page you should now see a notce, that you are logged
+Try to log in as user `terrestris` with the password `xxxx`. On the top of the page you should now see a notice, that you are logged
 in with the role 'ROLE_SUPERADMIN'.
 
 
