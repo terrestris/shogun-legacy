@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -102,7 +103,7 @@ public class BaseModel implements BaseModelInterface {
 	 * 
 	 * @param updated_at
 	 */
-	@JsonDeserialize(using = DateDeserializer.class)
+	@JsonIgnore
 	public void setUpdated_at(Date updated_at) {
 		this.updated_at = updated_at;
 	}
