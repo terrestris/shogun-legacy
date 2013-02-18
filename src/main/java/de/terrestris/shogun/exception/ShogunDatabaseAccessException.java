@@ -1,32 +1,30 @@
 package de.terrestris.shogun.exception;
 
 /**
- * Common exception class for database access errors
+ * The database Access Exception class.
+ *
+ * @author terrestris GmbH & Co. KG
  */
-public class ShogunDatabaseAccessException extends Exception {
+public class ShogunDatabaseAccessException extends ShogunException {
 
 	/**
-	 * the serial version UID
+	 *
 	 */
 	private static final long serialVersionUID = 8838422708926053728L;
 
 	/**
-	 * the standard constructor
+	 *
 	 */
-	public ShogunDatabaseAccessException() {
-		super();
-	}
+	public ShogunDatabaseAccessException() {}
 
 	/**
-	 * Constructor handling a error message
-	 * @param msg the error message describing this exception
+	 * @param msg
 	 */
 	public ShogunDatabaseAccessException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor handling a throwable, e.g. a nested exception
 	 * @param throwable
 	 */
 	public ShogunDatabaseAccessException(Throwable throwable) {
@@ -34,8 +32,6 @@ public class ShogunDatabaseAccessException extends Exception {
 	}
 
 	/**
-	 * Constructor handling an error message and a throwable
-	 * 
 	 * @param msg
 	 * @param throwable
 	 */

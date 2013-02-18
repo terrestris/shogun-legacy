@@ -1,31 +1,30 @@
-/**
- * 
- */
 package de.terrestris.shogun.exception;
 
 /**
+ * The class handling errors at the service level.
  *
+ * @author terrestris GmbH & Co. KG
  */
-public class ShogunServiceException extends Exception {
+public class ShogunServiceException extends ShogunException {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8838422708926053728L;
 
 	/**
-	 * 
+	 *
 	 */
 	public ShogunServiceException() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	/**
-	 * @param arg0
+	 *
+	 * @param msg
 	 */
 	public ShogunServiceException(String msg) {
 		super(msg);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -33,7 +32,6 @@ public class ShogunServiceException extends Exception {
 	 */
 	public ShogunServiceException(Throwable throwable) {
 		super(throwable);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -42,7 +40,6 @@ public class ShogunServiceException extends Exception {
 	 */
 	public ShogunServiceException(String msg, Throwable throwable) {
 		super(msg, throwable);
-		// TODO Auto-generated constructor stub
 	}
 
 }
