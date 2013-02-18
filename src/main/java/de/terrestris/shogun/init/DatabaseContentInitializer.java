@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
-import de.terrestris.shogun.dao.DatabaseDAO;
+import de.terrestris.shogun.dao.DatabaseDao;
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
 import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
@@ -89,7 +89,7 @@ public class DatabaseContentInitializer {
 	/**
      * the DB dao to access database via Hibernate
      */
-	DatabaseDAO dbDao;
+	DatabaseDao dbDao;
 
 	/**
 	 * The method called on init.
@@ -551,7 +551,7 @@ public class DatabaseContentInitializer {
 	 * @param dao
 	 */
 	@Autowired
-	public void setDAO(DatabaseDAO dao) {
+	public void setDAO(DatabaseDao dao) {
 		this.dbDao = dao;
 	}
 

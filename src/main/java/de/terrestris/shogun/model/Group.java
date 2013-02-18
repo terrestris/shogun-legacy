@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
-import de.terrestris.shogun.dao.DatabaseDAO;
+import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
  * Group POJO
@@ -352,9 +352,9 @@ public class Group extends BaseModel{
 	 * {@link Module} objects. This list is set to the <i>modules</i> variable 
 	 * of the calling {@link Group} instance
 	 * 
-	 * @param databaseDAO a {@link DatabaseDAO} instance in order to access the database
+	 * @param databaseDAO a {@link DatabaseDao} instance in order to access the database
 	 */
-	public void transformSimpleModuleListToModuleObjects(DatabaseDAO databaseDAO) {
+	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
 		
 		// create Module object list from comma separated string (user_module_list)
 		List<Module> newModules = null;

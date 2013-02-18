@@ -51,7 +51,7 @@ import de.terrestris.shogun.model.User;
  */
 @Repository
 @Transactional
-public class DatabaseDAO {
+public class DatabaseDao {
 	
 	/**
 	 * the Hibernate SessionFactory reference 
