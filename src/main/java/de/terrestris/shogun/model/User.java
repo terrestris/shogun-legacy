@@ -228,8 +228,6 @@ public class User extends BaseModel {
 	 * 
 	 * @return the modules
 	 */
-//	@Cache(usage = CacheConcurrencyStrategy.NONE)
-//	@Cacheable(false)
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
 	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = { 
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) }, 
@@ -254,8 +252,11 @@ public class User extends BaseModel {
 	/**
 	 * @return the mapLayers
 	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=MapLayer.class)
-//	@Cache(usage = CacheConcurrencyStrategy.NONE)
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "TBL_USER_TBL_MAPLAYER",  joinColumns = {
+			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
+			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
+					nullable = false, updatable = false) })
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}
