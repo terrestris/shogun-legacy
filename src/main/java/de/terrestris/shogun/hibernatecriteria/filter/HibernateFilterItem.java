@@ -45,12 +45,19 @@ public class HibernateFilterItem extends FilterItem {
 		int operandCount = this.getOperands().size();
 		String fieldName = this.getFieldName();
 
-		// Cast the oprands to the correct data type of the DB field
-		Object finalOperand = castOperandToFinalDataType(mainClass, fieldName, (String) this.getOperands().get(0).getOperand());
+		Object finalOperand = null;
 		Object finalOperand2 = null;
 		
-		if (operandCount == 2) {
-			finalOperand2 = castOperandToFinalDataType(mainClass, fieldName, (String) this.getOperands().get(1).getOperand());
+		if (this.getOperator() != Operator.Statement) {
+			// Cast the operands to the correct data type of the DB field
+			finalOperand = castOperandToFinalDataType(mainClass, fieldName, (String) this.getOperands().get(0).getOperand());
+			finalOperand2 = null;
+
+			if (operandCount == 2) {
+				finalOperand2 = castOperandToFinalDataType(mainClass, fieldName, (String) this.getOperands().get(1).getOperand());
+			}
+		} else {
+			finalOperand = (String) this.getOperands().get(0).getOperand();
 		}
 
 		switch (this.getOperator()) {
@@ -102,6 +109,9 @@ public class HibernateFilterItem extends FilterItem {
 			break;
 		case SmallerEq:
 			criterion = Restrictions.le(fieldName, finalOperand);
+			break;
+		case Statement:
+			criterion = Restrictions.sqlRestriction((String)finalOperand);
 			break;
 		case DWithin:
 			criterion = SpatialRestrictions.within(fieldName, (Geometry)finalOperand);

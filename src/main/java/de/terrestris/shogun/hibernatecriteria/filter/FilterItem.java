@@ -48,6 +48,7 @@ public class FilterItem implements Serializable {
 		Between, 
 		Any, 
 		NotNull, 
+		Statement,
 		In, 
 		NotEquals, 
 		NotLike, 
