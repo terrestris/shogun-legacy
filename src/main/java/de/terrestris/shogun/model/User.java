@@ -18,7 +18,7 @@ import javax.persistence.Table;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import de.terrestris.shogun.dao.DatabaseDAO;
+import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
  * User POJO
@@ -382,7 +382,7 @@ public class User extends BaseModel {
 	 * 
 	 * @param databaseDAO
 	 */
-	public void transformSimpleModuleListToModuleObjects(DatabaseDAO databaseDAO) {
+	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
 		// create module object list from comma-separated list
 		List<Module> newModules = null;
 		

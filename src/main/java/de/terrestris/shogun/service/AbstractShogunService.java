@@ -5,7 +5,7 @@ package de.terrestris.shogun.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.terrestris.shogun.dao.DatabaseDAO;
+import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
  * The service level of SHOGun
@@ -18,23 +18,23 @@ public abstract class AbstractShogunService {
 	/**
 	 * Reference to an database DAO object
 	 */
-	private DatabaseDAO databaseDAO;
+	private DatabaseDao databaseDAO;
 	
 
 	/**
 	 * @return the databaseDAO
 	 */
-	public DatabaseDAO getDatabaseDAO() {
+	public DatabaseDao getDatabaseDAO() {
 		return databaseDAO;
 	}
 
 	/**
-	 * Auto generation of an DatabaseDAO instance via dependency injection.
+	 * Auto generation of an DatabaseDao instance via dependency injection.
 	 * 
 	 * @param databaseDAO the databaseDAO to set
 	 */
 	@Autowired
-	public void setDatabaseDAO(DatabaseDAO databaseDAO) {
+	public void setDatabaseDAO(DatabaseDao databaseDAO) {
 		this.databaseDAO = databaseDAO;
 	}
 
