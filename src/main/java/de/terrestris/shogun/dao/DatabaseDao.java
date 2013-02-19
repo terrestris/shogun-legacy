@@ -217,20 +217,24 @@ public class DatabaseDao {
 	public List<String> getDistinctEntitiesByField(Class<?> clazz, String field,
 			boolean groupDependent) {
 
-		Criteria crit = this.sessionFactory.getCurrentSession().createCriteria(
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
 				clazz);
 
-		crit.setProjection(Projections.distinct(Projections.projectionList()
+		criteria.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property(field), field)));
 
 		// filter by group
 		if (groupDependent == true) {
 
 			int groupId = this.getGroupIdFromSession();
-			crit.add(Restrictions.eq("group_id", groupId));
+			criteria.add(Restrictions.eq("group_id", groupId));
 		}
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
-		return crit.list();
+		return criteria.list();
 	}
 	
 	
@@ -247,6 +251,10 @@ public class DatabaseDao {
 		
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		
 		return criteria.list();
 	}
@@ -266,6 +274,10 @@ public class DatabaseDao {
 		int userId = this.getUserIdFromSession(); 
 		criteria.add(Restrictions.eq("user_id", userId));
 		List<Object> records = criteria.list();
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		
 		return records;
 	}
@@ -310,17 +322,17 @@ public class DatabaseDao {
 	 */
 	public Object getEntityById(int id, Class clazz) {
 
-        Criteria criteria = null;
-        criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
-        criteria.add(Restrictions.eq("id", id));
-        List<Object> objectList = criteria.list();
-        
-        if (objectList.size() > 0) {
-            return objectList.get(0);
-        }
-        else {
-            return null;
-        }
+		Criteria criteria = null;
+		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria.add(Restrictions.eq("id", id));
+		List<Object> objectList = criteria.list();
+		
+		if (objectList.size() > 0) {
+			return objectList.get(0);
+		}
+		else {
+			return null;
+		}
 	}
 	
 	/**
@@ -338,6 +350,10 @@ public class DatabaseDao {
 		if (values.length > 0) {
 			criteria.add(Restrictions.in("id", values));
 		}
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		
 		return criteria.list();
 	}
@@ -358,6 +374,10 @@ public class DatabaseDao {
 		if (values.length > 0) {
 			criteria.add(Restrictions.not(Restrictions.in("id", values)));
 		}
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		
 		return criteria.list();
 	}
@@ -455,6 +475,10 @@ public class DatabaseDao {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(fieldname, value));
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
 		return criteria.list();
 	}
@@ -884,12 +908,12 @@ public class DatabaseDao {
 			criteria.add(afConjunction);
 		}
 		
-        criteria.setProjection(Projections.count("id"));
-        
-        if (hibernateFilter != null) {
+		criteria.setProjection(Projections.count("id"));
+		
+		if (hibernateFilter != null) {
 			
-        	int filterItemCount = hibernateFilter.getFilterItemCount();
-        	
+			int filterItemCount = hibernateFilter.getFilterItemCount();
+			
 			// FILTER
 			if (hibernateFilter.getLogicalOperator().equals(LogicalOperator.OR)) { 
 				
@@ -926,10 +950,10 @@ public class DatabaseDao {
 							"Error while combining criteria with AND", e);
 				}
 			}
-        }
-        
-        List<?> totalList = criteria.list();
-        
+		}
+		
+		List<?> totalList = criteria.list();
+		
 		return (Long)totalList.get(0);
 	}
 	
