@@ -523,10 +523,10 @@ public class DatabaseDao {
 	 */
 	public Object updateEntity(String entityClass, Object objToUpdate) {
 		
-		this.sessionFactory.getCurrentSession().merge(entityClass, objToUpdate);
+		Object updatedObject = this.sessionFactory.getCurrentSession().merge(entityClass, objToUpdate);
 		this.sessionFactory.getCurrentSession().flush();
 		
-		return objToUpdate;
+		return updatedObject;
 	}
 	
 	/**
