@@ -21,6 +21,7 @@ import javax.persistence.ManyToMany;
 
 import org.apache.log4j.Logger;
 import org.hibernate.collection.PersistentSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,6 +57,12 @@ public class ShogunService extends AbstractShogunService {
 	 * the logger instance
 	 */
 	private static Logger LOGGER = Logger.getLogger(ShogunService.class);
+	
+	
+	/**
+	 * the list of packages where mapped DB model classes are located
+	 */
+	private ArrayList<String> dbEntitiesPackages;
 
 	/**
 	 * Get Entities defined within a request Request defines filter, sorting and
@@ -75,9 +82,22 @@ public class ShogunService extends AbstractShogunService {
 
 		try {
 
+			// Detect the mapped model class for the given
+			// object type
 			String objectType = request.getObject_type();
+			Class clazz = null;
 			
-			Class clazz = Class.forName("de.terrestris.shogun.model." + objectType);
+			for (String dbEntityPackage : this.dbEntitiesPackages) {
+				try {
+					clazz = Class.forName(dbEntityPackage + "." + objectType);
+				} catch (Exception e) {
+					// DO NOTHING
+				}
+			}
+			
+			if (clazz == null) {
+				throw new ShogunServiceException("No mapped class for object type " + objectType + " found.");
+			}
 
 			// get the criteria objects from client request
 			Sort sortObject = request.getSortObject();
@@ -119,7 +139,7 @@ public class ShogunService extends AbstractShogunService {
 
 		} catch (Exception e) {
 
-			throw new ShogunServiceException("Undefined error while requesting data " + e.getMessage() );
+			throw new ShogunServiceException("Error while requesting data " + e.getMessage(), e);
 		}
 	}
 
@@ -348,7 +368,7 @@ public class ShogunService extends AbstractShogunService {
 	 * 
 	 * @return the list of module objects
 	 * @throws Exception
-	 *             Specifiy generic errors with an own error message
+	 *			 Specifiy generic errors with an own error message
 	 */
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
@@ -439,32 +459,32 @@ public class ShogunService extends AbstractShogunService {
 		
 		if (rightKeys.isFile()) {
 			
-		    // Note that FileReader is used, not File, since File is not closeable
-		    Scanner scanner = new Scanner(new FileReader(rightKeys));
-		    StringBuffer sb = new StringBuffer();
-		    try {
-		      //first use a Scanner to get each line
-		      while ( scanner.hasNextLine() ){
-		        sb.append(JsHelper.processLineRightKeys(scanner.nextLine(), module.getModule_name()));
-		      }
-		    }
-		    finally {
-		      // ensure the underlying stream is always closed
-		      // this only has any effect if the item passed to the Scanner
-		      // constructor implements closeable (which it does in this case).
-		      scanner.close();
-		    }
-		    
-		    // use buffering
-		    Writer output = new BufferedWriter(new FileWriter(rightKeys));
-		    try {
-		      // FileWriter always assumes default encoding is OK!
-		      output.write( sb.toString() );
-		    }
-		    finally {
-		      output.close();
-		    }
-		    
+			// Note that FileReader is used, not File, since File is not closeable
+			Scanner scanner = new Scanner(new FileReader(rightKeys));
+			StringBuffer sb = new StringBuffer();
+			try {
+				//first use a Scanner to get each line
+				while ( scanner.hasNextLine() ){
+					sb.append(JsHelper.processLineRightKeys(scanner.nextLine(), module.getModule_name()));
+				}
+			}
+			finally {
+				// ensure the underlying stream is always closed
+				// this only has any effect if the item passed to the Scanner
+				// constructor implements closeable (which it does in this case).
+				scanner.close();
+			}
+			
+			// use buffering
+			Writer output = new BufferedWriter(new FileWriter(rightKeys));
+			try {
+				// FileWriter always assumes default encoding is OK!
+				output.write( sb.toString() );
+			}
+			finally {
+				output.close();
+			}
+			
 		} else {
 			throw new IOException("file " + contextPath + "src/main/webapp/client/configs/right-keys.js not found ...");
 		}
@@ -477,31 +497,31 @@ public class ShogunService extends AbstractShogunService {
 		
 		if (moduleTemplate.isFile()) {
 			
-		    //Note that FileReader is used, not File, since File is not Closeable
-		    Scanner scanner = new Scanner(new FileReader(moduleTemplate));
-		    StringBuffer sb = new StringBuffer();
-		    try {
-		      //first use a Scanner to get each line
-		      while ( scanner.hasNextLine() ){
-		        sb.append(JsHelper.processLine(scanner.nextLine(), module.getModule_name()));
-		      }
-		    }
-		    finally {
-		      //ensure the underlying stream is always closed
-		      //this only has any effect if the item passed to the Scanner
-		      //constructor implements Closeable (which it does in this case).
-		      scanner.close();
-		    }
-		    
-		    //use buffering
-		    Writer output = new BufferedWriter(new FileWriter(newClassFile));
-		    try {
-		      //FileWriter always assumes default encoding is OK!
-		      output.write( sb.toString() );
-		    }
-		    finally {
-		      output.close();
-		    }
+			//Note that FileReader is used, not File, since File is not Closeable
+			Scanner scanner = new Scanner(new FileReader(moduleTemplate));
+			StringBuffer sb = new StringBuffer();
+			try {
+				//first use a Scanner to get each line
+				while ( scanner.hasNextLine() ){
+					sb.append(JsHelper.processLine(scanner.nextLine(), module.getModule_name()));
+				}
+			}
+			finally {
+				//ensure the underlying stream is always closed
+				//this only has any effect if the item passed to the Scanner
+				//constructor implements Closeable (which it does in this case).
+				scanner.close();
+			}
+			
+			//use buffering
+			Writer output = new BufferedWriter(new FileWriter(newClassFile));
+			try {
+				//FileWriter always assumes default encoding is OK!
+				output.write( sb.toString() );
+			}
+			finally {
+				output.close();
+			}
 			
 
 		} else {
@@ -514,31 +534,31 @@ public class ShogunService extends AbstractShogunService {
 
 		if (loaderConfigOld.isFile()) {
 			
-		    //Note that FileReader is used, not File, since File is not Closeable
-		    Scanner scanner = new Scanner(new FileReader(loaderConfigOld));
-		    StringBuffer sb = new StringBuffer();
-		    try {
-		      //first use a Scanner to get each line
-		      while ( scanner.hasNextLine() ){
-		    	sb.append(JsHelper.processLoaderConfByLine(scanner.nextLine(), module.getModule_name()));
-		      }
-		    }
-		    finally {
-		      //ensure the underlying stream is always closed
-		      //this only has any effect if the item passed to the Scanner
-		      //constructor implements Closeable (which it does in this case).
-		      scanner.close();
-		    }
-		    
-		    //use buffering
-		    Writer output = new BufferedWriter(new FileWriter(loaderConfigOld));
-		    try {
-		      //FileWriter always assumes default encoding is OK!
-		      output.write( sb.toString() );
-		    }
-		    finally {
-		      output.close();
-		    }
+			//Note that FileReader is used, not File, since File is not Closeable
+			Scanner scanner = new Scanner(new FileReader(loaderConfigOld));
+			StringBuffer sb = new StringBuffer();
+			try {
+				//first use a Scanner to get each line
+				while ( scanner.hasNextLine() ){
+					sb.append(JsHelper.processLoaderConfByLine(scanner.nextLine(), module.getModule_name()));
+				}
+			}
+			finally {
+				//ensure the underlying stream is always closed
+				//this only has any effect if the item passed to the Scanner
+				//constructor implements Closeable (which it does in this case).
+				scanner.close();
+			}
+			
+			//use buffering
+			Writer output = new BufferedWriter(new FileWriter(loaderConfigOld));
+			try {
+				//FileWriter always assumes default encoding is OK!
+				output.write( sb.toString() );
+			}
+			finally {
+				output.close();
+			}
 		
 		} else {
 			throw new IOException("file " + contextPath + "src/main/webapp/client/javascript/terrestris-suite.config.loader.js not found ...");
@@ -556,6 +576,22 @@ public class ShogunService extends AbstractShogunService {
 	public void deleteModule(String module_name) {
 		
 		this.getDatabaseDao().deleteEntityByValue(Module.class, "module_name", module_name);
+	}
+
+
+	/**
+	 * @return the dbEntitiesPackages
+	 */
+	public ArrayList<String> getDbEntitiesPackages() {
+		return dbEntitiesPackages;
+	}
+
+	/**
+	 * @param dbEntitiesPackages the dbEntitiesPackages to set
+	 */
+	@Autowired
+	public void setDbEntitiesPackages(ArrayList<String> dbEntitiesPackages) {
+		this.dbEntitiesPackages = dbEntitiesPackages;
 	}
 
 }
