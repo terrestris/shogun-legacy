@@ -47,6 +47,15 @@
 		</property>
 		-->
 	</bean>
+	
+	<!-- the packages containing hibernate models -->
+	<bean id="dbEntitiesPackages" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>de.terrestris.shogun.model</value>
+			</list>
+		</constructor-arg>
+	</bean>
 
 	<!-- Hibernate SessionFactory -->
 	<bean id="sessionFactory"
@@ -54,7 +63,9 @@
 		<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
-		<property name="packagesToScan" value="de.terrestris.shogun.model" />
+		<property name="packagesToScan">
+			<ref local="dbEntitiesPackages"></ref>
+		</property>
 		<property name="hibernateProperties">
 			<props>
 				<!-- <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop> -->
