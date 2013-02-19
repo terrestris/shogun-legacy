@@ -85,15 +85,7 @@ public class ShogunService extends AbstractShogunService {
 			// Detect the mapped model class for the given
 			// object type
 			String objectType = request.getObject_type();
-			Class clazz = null;
-			
-			for (String dbEntityPackage : this.dbEntitiesPackages) {
-				try {
-					clazz = Class.forName(dbEntityPackage + "." + objectType);
-				} catch (Exception e) {
-					// DO NOTHING
-				}
-			}
+			Class clazz = this.getHibernateModelByObjectType(objectType);
 			
 			if (clazz == null) {
 				throw new ShogunServiceException("No mapped class for object type " + objectType + " found.");
@@ -167,8 +159,8 @@ public class ShogunService extends AbstractShogunService {
 		
 		try {
 			
-			leftClazz = Class.forName("de.terrestris.shogun.model." + association.getLeftEntity());
-			rightClazz = Class.forName("de.terrestris.shogun.model." + association.getRightEntity());
+			leftClazz = this.getHibernateModelByObjectType(association.getLeftEntity());
+			rightClazz = this.getHibernateModelByObjectType(association.getRightEntity());
 			leftEntityId = association.getLeftEntityId();
 			assocications = association.getAssociations();
 			
@@ -578,6 +570,24 @@ public class ShogunService extends AbstractShogunService {
 		this.getDatabaseDao().deleteEntityByValue(Module.class, "module_name", module_name);
 	}
 
+	
+	/**
+	 * 
+	 * @param objectType
+	 * @return
+	 */
+	private Class getHibernateModelByObjectType(String objectType) {
+		Class mappedClazz = null;
+		for (String dbEntityPackage : this.dbEntitiesPackages) {
+			try {
+				mappedClazz = Class.forName(dbEntityPackage + "." + objectType);
+			} catch (Exception e) {
+				// DO NOTHING
+			}
+		}
+		
+		return mappedClazz;
+	}
 
 	/**
 	 * @return the dbEntitiesPackages
