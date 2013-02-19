@@ -1,9 +1,16 @@
 package de.terrestris.shogun.model;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 
 /**
@@ -46,6 +53,8 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private Integer numZoomLevels = null;
 	private Boolean displayOutsideMaxExtent = false;
 	private String transitionEffect = null;
+	
+	private Set<LayerMetadata> metadata;
 	
 
 	/**
@@ -364,6 +373,22 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	public void setTransitionEffect(String transitionEffect) {
 		this.transitionEffect = transitionEffect;
+	}
+
+	/**
+	 * @return the metadata
+	 */
+	@OneToMany(fetch = FetchType.EAGER)
+	@Fetch(FetchMode.SELECT)
+	public Set<LayerMetadata> getMetadata() {
+		return metadata;
+	}
+
+	/**
+	 * @param metadata the metadata to set
+	 */
+	public void setMetadata(Set<LayerMetadata> metadata) {
+		this.metadata = metadata;
 	}
 
 }
