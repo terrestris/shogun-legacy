@@ -33,7 +33,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	@Transactional
 	public MapConfig updateMapConfigs(MapConfig mapConfig) {
 		
-		return (MapConfig)getDatabaseDAO().updateEntity(MapConfig.class.getSimpleName(),mapConfig);
+		return (MapConfig)this.getDatabaseDao().updateEntity(MapConfig.class.getSimpleName(),mapConfig);
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 */
 	@Transactional
 	public WfsProxyConfig updateWfsProxyConfigs(WfsProxyConfig wfsProxyConfig) {
-		return (WfsProxyConfig)getDatabaseDAO().updateEntity(WfsProxyConfig.class.getSimpleName(), wfsProxyConfig);
+		return (WfsProxyConfig)this.getDatabaseDao().updateEntity(WfsProxyConfig.class.getSimpleName(), wfsProxyConfig);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 */
 	@Transactional
 	public WmsProxyConfig updateWmsProxyConfigs(WmsProxyConfig wmsProxyConfig) {
-		return (WmsProxyConfig)getDatabaseDAO().updateEntity(WmsProxyConfig.class.getSimpleName(), wmsProxyConfig);
+		return (WmsProxyConfig)this.getDatabaseDao().updateEntity(WmsProxyConfig.class.getSimpleName(), wmsProxyConfig);
 	}
 	
 	/**
@@ -68,14 +68,14 @@ public class MapAdministrationService extends AbstractShogunService {
 	public WmsMapLayer createWmsMapLayer(WmsMapLayer wmsMapLayer) {
 		
 		// create the instance itself
-		WmsMapLayer newWmsMapLayer = (WmsMapLayer)getDatabaseDAO().createEntity(WmsMapLayer.class.getSimpleName(), wmsMapLayer);
+		WmsMapLayer newWmsMapLayer = (WmsMapLayer)this.getDatabaseDao().createEntity(WmsMapLayer.class.getSimpleName(), wmsMapLayer);
 		
 		// add the newly created wmsmaplayer to he current logged in user
-		User user = getDatabaseDAO().getUserObjectFromSession();
+		User user = this.getDatabaseDao().getUserObjectFromSession();
 		Set<MapLayer> currentMapLayersSet = user.getMapLayers();
 		currentMapLayersSet.add(newWmsMapLayer);
 		
-		getDatabaseDAO().updateUser(user);
+		this.getDatabaseDao().updateUser(user);
 		
 		return newWmsMapLayer;
 	}
@@ -88,7 +88,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 */
 	@Transactional
 	public WmsMapLayer updateWmsMapLayer(WmsMapLayer WmsMapLayer) {
-		return (WmsMapLayer)getDatabaseDAO().updateEntity(WmsMapLayer.class.getSimpleName(), WmsMapLayer);
+		return (WmsMapLayer)this.getDatabaseDao().updateEntity(WmsMapLayer.class.getSimpleName(), WmsMapLayer);
 	}
 	
 	/**
@@ -101,7 +101,7 @@ public class MapAdministrationService extends AbstractShogunService {
 		
 		// it is only one object - cast to object/bean
 		Integer id = new Integer(deleteId);
-		getDatabaseDAO().deleteEntity(WmsMapLayer.class, id);
+		this.getDatabaseDao().deleteEntity(WmsMapLayer.class, id);
 	}
 
 }

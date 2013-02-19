@@ -56,9 +56,9 @@ public class UserAdministrationService extends AbstractShogunService {
 			// create an integer out of the id-String
 			int iUserId = Integer.parseInt(user_id);
 
-			int group_id = getDatabaseDAO().getGroupIdFromSession();
+			int group_id = this.getDatabaseDao().getGroupIdFromSession();
 			// get the User object
-			user = (User) getDatabaseDAO().getEntityById(iUserId, User.class, group_id);
+			user = (User) this.getDatabaseDao().getEntityById(iUserId, User.class, group_id);
 
 		} catch (Exception e) {
 			throw new ShogunServiceException("Error while getting User from database with ID " + 
@@ -75,7 +75,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			user.setUser_password(hashed);
 
 			// write back to database
-			getDatabaseDAO().updateUser(user);
+			this.getDatabaseDao().updateUser(user);
 
 			// send an email with the new password
 			String mailtext = "Sehr geehrter Nutzer " + user.getUser_name()
@@ -99,7 +99,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 	@Transactional
 	public Integer getGroupIdBySession() {
-		return getDatabaseDAO().getGroupIdFromSession();
+		return this.getDatabaseDao().getGroupIdFromSession();
 	}
 	
 	/**
@@ -147,23 +147,23 @@ public class UserAdministrationService extends AbstractShogunService {
 			// of adding a new user.
 			// subadmin/(normal)user are only allowed to add in their own group.
 			boolean setSessionGroup;
-			if (getDatabaseDAO().isSuperAdmin()) {
+			if (this.getDatabaseDao().isSuperAdmin()) {
 				group_id = user.getGroup_id();
 				setSessionGroup = false;
 			} else {
-				group_id = getDatabaseDAO().getGroupIdFromSession();
+				group_id = this.getDatabaseDao().getGroupIdFromSession();
 				setSessionGroup = true;
 			}
 			
-			Group group = (Group) getDatabaseDAO().getEntityById(group_id, Group.class, 0);
+			Group group = (Group) this.getDatabaseDao().getEntityById(group_id, Group.class, 0);
 			
-			long currentUsersOfGroup = getDatabaseDAO().getCurrentUserByGroup(group_id);
+			long currentUsersOfGroup = this.getDatabaseDao().getCurrentUserByGroup(group_id);
 			
 			// CREATE A NEW USER
 
 			// check if there is an existing user with the same name
 			// if there is --> ERROR
-			List<User> testUser = this.getDatabaseDAO().getUserByName(user.getUser_name(), group_id);
+			List<User> testUser = this.getDatabaseDao().getUserByName(user.getUser_name(), group_id);
 			if (testUser.size() > 0) {
 				throw new ShogunServiceException("User with name " + user.getUser_name()
 						+ " already exists!");
@@ -181,7 +181,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// TODO become more flexibel here, wrap to method
 			// set the default map conf
 			// TODO remove static ID !!!!!
-			MapConfig mapConfig = (MapConfig)getDatabaseDAO().getEntityById(1, MapConfig.class, 0);
+			MapConfig mapConfig = (MapConfig)this.getDatabaseDao().getEntityById(1, MapConfig.class, 0);
 			if (mapConfig != null) {
 //					Set newMapConfSet = new HashSet<MapConfig>();
 //					newMapConfSet.add(mapConfig);
@@ -193,7 +193,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// TODO become more flexibel here, wrap to method
 			// set the default wms proxy conf
 			// TODO remove static ID !!!!!
-			WmsProxyConfig defaultWmsProxy = (WmsProxyConfig)getDatabaseDAO().getEntityById(1, WmsProxyConfig.class, 0);
+			WmsProxyConfig defaultWmsProxy = (WmsProxyConfig)this.getDatabaseDao().getEntityById(1, WmsProxyConfig.class, 0);
 			if (defaultWmsProxy != null) {
 				user.setWmsProxyConfig(defaultWmsProxy);
 			}
@@ -201,7 +201,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// TODO become more flexibel here, wrap to method
 			// set the default wms proxy conf
 			// TODO remove static ID !!!!!
-			WfsProxyConfig defaultWfsProxy = (WfsProxyConfig)getDatabaseDAO().getEntityById(1, WfsProxyConfig.class, 0);
+			WfsProxyConfig defaultWfsProxy = (WfsProxyConfig)this.getDatabaseDao().getEntityById(1, WfsProxyConfig.class, 0);
 			if (defaultWfsProxy != null) {
 				user.setWfsProxyConfig(defaultWfsProxy);
 			}
@@ -213,11 +213,11 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			Mail.send("localhost", user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
 
-			user.transformSimpleModuleListToModuleObjects(getDatabaseDAO());
+			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			// write in DB
 			// do setSessionGroup only in case of beeing NO SuperAdmin
-			newuser = getDatabaseDAO().createUser(user, "ROLE_USER", setSessionGroup);
+			newuser = this.getDatabaseDao().createUser(user, "ROLE_USER", setSessionGroup);
 
 			LOGGER.debug(" USER RETURNED: " + newuser.getId());
 
@@ -254,13 +254,13 @@ public class UserAdministrationService extends AbstractShogunService {
 			List<Module> newModules = null;
 
 			// create module object list
-			user.transformSimpleModuleListToModuleObjects(getDatabaseDAO());
+			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			newModules = null;
 
 			// get current group of current logged in user
-			int group_id = getDatabaseDAO().getGroupIdFromSession();
-			List<User> oldUsers = this.getDatabaseDAO().getUserByName(user.getUser_name(), group_id);
+			int group_id = this.getDatabaseDao().getGroupIdFromSession();
+			List<User> oldUsers = this.getDatabaseDao().getUserByName(user.getUser_name(), group_id);
 			User oldUser = null;
 
 			// check if user, who should be updated is accessible by this group
@@ -309,7 +309,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			}
 
 			// write in DB
-			User updatedUser = getDatabaseDAO().updateUser(user);
+			User updatedUser = this.getDatabaseDao().updateUser(user);
 
 			returnUsers.add(updatedUser);
 
@@ -317,7 +317,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// objects
 			// when requesting again
 			// unfortunately sess.evict does not work
-			getDatabaseDAO().clearSession();
+			this.getDatabaseDao().clearSession();
 		}
 
 		return returnUsers;
@@ -336,7 +336,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 		// it is only one object - cast to object/bean
 		Integer id = new Integer(deleteId);
-		getDatabaseDAO().deleteUser(id);
+		this.getDatabaseDao().deleteUser(id);
 	}
 	
 
@@ -380,17 +380,17 @@ public class UserAdministrationService extends AbstractShogunService {
 			// check if there is an existing user with the same number
 			// if there is --> Exception
 			Group testGroup = null;
-			testGroup = (Group) getDatabaseDAO().getEntityByStringField(
+			testGroup = (Group) this.getDatabaseDao().getEntityByStringField(
 					Group.class, "group_nr", group.getGroup_nr());
 			if (testGroup != null) {
 				throw new ShogunServiceException("Group with number " + group.getGroup_nr()
 						+ " already exists!");
 			}
 
-			group.transformSimpleModuleListToModuleObjects(getDatabaseDAO());
+			group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			// write in DB
-			newGroup = (Group) getDatabaseDAO().createEntity(Group.class.getSimpleName(),
+			newGroup = (Group) this.getDatabaseDao().createEntity(Group.class.getSimpleName(),
 					group);
 
 			LOGGER.debug("GROUP CREATED: " + newGroup.getId());
@@ -406,12 +406,12 @@ public class UserAdministrationService extends AbstractShogunService {
 			subadmin.setUser_module_list(group.getGroup_module_list());
 			
 			// create ModuleArray from Module-comma-separated list
-			subadmin.transformSimpleModuleListToModuleObjects(getDatabaseDAO());
+			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 			
 			// TODO become more flexibel here, wrap to method
 			// set the default map conf
 			// TODO remove static ID !!!!!!!
-			MapConfig mapConfig = (MapConfig)getDatabaseDAO().getEntityById(1, MapConfig.class, 0);
+			MapConfig mapConfig = (MapConfig)this.getDatabaseDao().getEntityById(1, MapConfig.class, 0);
 			if (mapConfig != null) {
 //				Set newMapConfSet = new HashSet<MapConfig>();
 //				newMapConfSet.add(mapConfig);
@@ -421,14 +421,14 @@ public class UserAdministrationService extends AbstractShogunService {
 			}
 			// TODO become more flexibel here, wrap to method
 			// set the default wms proxy conf
-			WmsProxyConfig defaultWmsProxy = (WmsProxyConfig)getDatabaseDAO().getEntityById(1, WmsProxyConfig.class, 0);
+			WmsProxyConfig defaultWmsProxy = (WmsProxyConfig)this.getDatabaseDao().getEntityById(1, WmsProxyConfig.class, 0);
 			if (defaultWmsProxy != null) {
 				subadmin.setWmsProxyConfig(defaultWmsProxy);
 			}
 			
 			// TODO become more flexibel here, wrap to method
 			// set the default wms proxy conf
-			WfsProxyConfig defaultWfsProxy = (WfsProxyConfig)getDatabaseDAO().getEntityById(1, WfsProxyConfig.class, 0);
+			WfsProxyConfig defaultWfsProxy = (WfsProxyConfig)this.getDatabaseDao().getEntityById(1, WfsProxyConfig.class, 0);
 			if (defaultWfsProxy != null) {
 				subadmin.setWfsProxyConfig(defaultWfsProxy);
 			}
@@ -446,7 +446,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			subadmin.setUser_password(hashed);
 
 			// save sub-admin to database
-			User newuser = this.getDatabaseDAO().createUser(subadmin, "ROLE_ADMIN", false);
+			User newuser = this.getDatabaseDao().createUser(subadmin, "ROLE_ADMIN", false);
 
 			LOGGER.debug("GROUP CREATED: " + newGroup.getId());
 
@@ -490,23 +490,23 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			// transform the comma-separated list of module IDs to a list of
 			// Module objects
-			group.transformSimpleModuleListToModuleObjects(getDatabaseDAO());
+			group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			// write in DB
-			Group updatedGroup = (Group) getDatabaseDAO().updateEntity(
+			Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
 					Group.class.getSimpleName(), group);
 
 			// holen nach group_nr weil unveränderlich UND eindeutig
-			User subadmin = getDatabaseDAO().getUserByName(
+			User subadmin = this.getDatabaseDao().getUserByName(
 					"subadmin_" + updatedGroup.getGroup_nr(),
 					updatedGroup.getId()).get(0);
 
 			// überschreiben
 			subadmin.setUser_module_list(updatedGroup.getGroup_module_list());
-			subadmin.transformSimpleModuleListToModuleObjects(getDatabaseDAO());
+			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			// update
-			getDatabaseDAO().updateUser(subadmin);
+			this.getDatabaseDao().updateUser(subadmin);
 
 			returnGroups.add(updatedGroup);
 
@@ -514,7 +514,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// objects
 			// when requesting again
 			// unfortunately sess.evict does not work
-			getDatabaseDAO().clearSession();
+			this.getDatabaseDao().clearSession();
 
 		}
 
@@ -536,10 +536,10 @@ public class UserAdministrationService extends AbstractShogunService {
 
 		// delete all User records of the given group,
 		// which has to be deleted
-		getDatabaseDAO().deleteGroupUsers(deleteId);
+		this.getDatabaseDao().deleteGroupUsers(deleteId);
 
 		Integer id = new Integer(deleteId);
-		getDatabaseDAO().deleteEntity(Group.class, id);
+		this.getDatabaseDao().deleteEntity(Group.class, id);
 	}
 
 }

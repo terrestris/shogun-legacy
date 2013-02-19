@@ -18,14 +18,14 @@ public abstract class AbstractShogunService {
 	/**
 	 * Reference to an database DAO object
 	 */
-	private DatabaseDao databaseDAO;
+	private DatabaseDao databaseDao;
 	
 
 	/**
 	 * @return the databaseDAO
 	 */
-	public DatabaseDao getDatabaseDAO() {
-		return databaseDAO;
+	public DatabaseDao getDatabaseDao() {
+		return databaseDao;
 	}
 
 	/**
@@ -34,8 +34,8 @@ public abstract class AbstractShogunService {
 	 * @param databaseDAO the databaseDAO to set
 	 */
 	@Autowired
-	public void setDatabaseDAO(DatabaseDao databaseDAO) {
-		this.databaseDAO = databaseDAO;
+	public void setDatabaseDao(DatabaseDao databaseDao) {
+		this.databaseDao = databaseDao;
 	}
 
 }
