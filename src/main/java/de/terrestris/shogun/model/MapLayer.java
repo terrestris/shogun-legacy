@@ -7,8 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -55,6 +57,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private String transitionEffect = null;
 	
 	private Set<LayerMetadata> metadata;
+	private Set<User> users;
 	
 
 	/**
@@ -389,6 +392,23 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	public void setMetadata(Set<LayerMetadata> metadata) {
 		this.metadata = metadata;
+	}
+	
+	/**
+	 * @return the users
+	 */
+	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
+	@JsonIgnore
+	@Fetch(FetchMode.SELECT)
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	/**
+	 * @param users the users to set
+	 */
+	public void setUsers(Set<User> users) {
+		this.users = users;
 	}
 
 }
