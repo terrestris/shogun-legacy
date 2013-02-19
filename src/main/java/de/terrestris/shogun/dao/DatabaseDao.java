@@ -10,6 +10,7 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Projections;
@@ -658,6 +659,14 @@ public class DatabaseDao {
 			throw new ShogunDatabaseAccessException(
 					"Error while getting User by name: " + name, e);
 		}
+		
+		// we have to ensure that the modules are distinct
+		// @see http://docs.jboss.org/hibernate/orm/3.6/javadocs/org/hibernate/Criteria.html#createAlias(java.lang.String, java.lang.String, int)
+		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
+		
+		// this ensures that no cartesian product is returned when 
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			
 		return criteria.list();
 	}
