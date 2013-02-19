@@ -93,18 +93,18 @@ public class ShogunService extends AbstractShogunService {
 			hibernatePaging = HibernatePagingObject.create(clazz, paging);
 
 			// get total count
-			long total = getDatabaseDAO().getTotal(hibernateFilter, hibernateAdditionalFilter);
+			long total = this.getDatabaseDao().getTotal(hibernateFilter, hibernateAdditionalFilter);
 
 			// get the data
 			List<Object> dataList = null;
 
 			// treat GROUP as a special case because of sub entities
 			if (objectType.equals("Group")) {
-				dataList = this.getDatabaseDAO().getDataByFilter(hibernateSortObject,
+				dataList = this.getDatabaseDao().getDataByFilter(hibernateSortObject,
 						hibernateFilter, hibernatePaging,
 						hibernateAdditionalFilter);
 			} else {
-				dataList = this.getDatabaseDAO().getDataByFilter(hibernateSortObject,
+				dataList = this.getDatabaseDao().getDataByFilter(hibernateSortObject,
 						hibernateFilter, hibernatePaging,
 						hibernateAdditionalFilter);
 			}
@@ -161,11 +161,11 @@ public class ShogunService extends AbstractShogunService {
 			rightGetter = rightClazz.getMethod(associationProperties.get("assocGetter"));
 			
 			
-			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDAO().getEntityById(leftEntityId, leftClazz, 0);
+			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz, 0);
 			
-			List<Object> allUsers = this.getDatabaseDAO().getAllEntities(rightClazz);
+			List<Object> allUsers = this.getDatabaseDao().getAllEntities(rightClazz);
 			
-			List<? extends Object> allnewAssocedUsers = this.getDatabaseDAO().getEntitiesByIds(assocications.toArray(), rightClazz);
+			List<? extends Object> allnewAssocedUsers = this.getDatabaseDao().getEntitiesByIds(assocications.toArray(), rightClazz);
 			
 			for (Iterator iterator = allnewAssocedUsers.iterator(); iterator.hasNext();) {
 				
@@ -191,7 +191,7 @@ public class ShogunService extends AbstractShogunService {
 				
 			}
 			
-			List<? extends Object> allNotAssocedUsers = this.getDatabaseDAO().getEntitiesByExcludingIds(assocications.toArray(), rightClazz);
+			List<? extends Object> allNotAssocedUsers = this.getDatabaseDao().getEntitiesByExcludingIds(assocications.toArray(), rightClazz);
 			
 			for (Iterator iterator = allNotAssocedUsers.iterator(); iterator.hasNext();) {
 				
@@ -286,7 +286,7 @@ public class ShogunService extends AbstractShogunService {
 		// get the authorization context, incl. user name
 		Authentication authResult = SecurityContextHolder.getContext().getAuthentication();
 		// get the user object from database
-		List<User> users = getDatabaseDAO().getUserByName(authResult.getName());
+		List<User> users = this.getDatabaseDao().getUserByName(authResult.getName());
 
 		// user-check
 		User user = null;
@@ -326,7 +326,7 @@ public class ShogunService extends AbstractShogunService {
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 	public List<Module> getModulesByUser(String username) throws ShogunDatabaseAccessException {
 
-		List<User> users = getDatabaseDAO().getUserByName(username);
+		List<User> users = this.getDatabaseDao().getUserByName(username);
 
 		User user = null;
 
@@ -356,7 +356,7 @@ public class ShogunService extends AbstractShogunService {
 
 		try {
 			// get Objects from database
-			List<Object> dedicatedModules = getDatabaseDAO().getAllEntities(Module.class);
+			List<Object> dedicatedModules = this.getDatabaseDao().getAllEntities(Module.class);
 
 			// Cast from Object to Module
 			List<Module> allModules = new ArrayList<Module>(dedicatedModules.size());
@@ -401,7 +401,7 @@ public class ShogunService extends AbstractShogunService {
 		// TODO use param for entity MODEL_CLASS_MAP.get(objectType)
 		// List<String> codes = gmDAO.getDistinctEntitiesByField(Address.class,
 		// field, true);
-		List<String> codes = getDatabaseDAO().getDistinctEntitiesByField(
+		List<String> codes = this.getDatabaseDao().getDistinctEntitiesByField(
 				entityClass, field, true);
 		List returnList = new ArrayList();
 
@@ -545,7 +545,7 @@ public class ShogunService extends AbstractShogunService {
 		}
 		
 		// INSERT IN DB
-		this.getDatabaseDAO().createEntity("Module", module);
+		this.getDatabaseDao().createEntity("Module", module);
 	}
 	
 	/**
@@ -555,7 +555,7 @@ public class ShogunService extends AbstractShogunService {
 	 */
 	public void deleteModule(String module_name) {
 		
-		this.getDatabaseDAO().deleteEntityByValue(Module.class, "module_name", module_name);
+		this.getDatabaseDao().deleteEntityByValue(Module.class, "module_name", module_name);
 	}
 
 }
