@@ -343,7 +343,7 @@ public class DatabaseContentInitializer {
 				Module m = (Module) this.dbDao.getEntityByStringField(
 						Module.class, "module_name", anonModuleName);
 				modulesToAssign.add(m);
-				LOGGER.info("    - assigning module '" + anonModuleName + "'");
+				LOGGER.info("	- assigning module '" + anonModuleName + "'");
 			}
 			anon.setModules(modulesToAssign);
 
@@ -429,7 +429,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param autoCreateAnonymousUser
-	 *            the autoCreateAnonymousUser to set
+	 *			the autoCreateAnonymousUser to set
 	 */
 	public void setAutoCreateAnonymousUser(Boolean autoCreateAnonymousUser) {
 		this.autoCreateAnonymousUser = autoCreateAnonymousUser;
@@ -444,7 +444,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param defaultGroup
-	 *            the defaultGroup to set
+	 *			the defaultGroup to set
 	 */
 	public void setDefaultGroup(Group defaultGroup) {
 		this.defaultGroup = defaultGroup;
@@ -459,7 +459,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param superAdminName
-	 *            the superAdminName to set
+	 *			the superAdminName to set
 	 */
 	public void setSuperAdminName(String superAdminName) {
 		this.superAdminName = superAdminName;
@@ -474,7 +474,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param superAdminPw
-	 *            the superAdminPw to set
+	 *			the superAdminPw to set
 	 */
 	public void setSuperAdminPw(String superAdminPw) {
 		this.superAdminPw = superAdminPw;
@@ -489,7 +489,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param availableRoles
-	 *            the availableRoles to set
+	 *			the availableRoles to set
 	 */
 	public void setAvailableRoles(List<String> availableRoles) {
 		this.availableRoles = availableRoles;
@@ -504,7 +504,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param modulesForAnonymous
-	 *            the modulesForAnonymous to set
+	 *			the modulesForAnonymous to set
 	 */
 	public void setModulesForAnonymous(List<String> modulesForAnonymous) {
 		this.modulesForAnonymous = modulesForAnonymous;
@@ -519,7 +519,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param wmsMapLayer
-	 *            the wmsMapLayer to set
+	 *			the wmsMapLayer to set
 	 */
 	public void setWmsMapLayer(WmsMapLayer wmsMapLayer) {
 		this.wmsMapLayer = wmsMapLayer;
@@ -534,7 +534,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param mapConfig
-	 *            the mapConfig to set
+	 *			the mapConfig to set
 	 */
 	public void setMapConfig(MapConfig mapConfig) {
 		this.mapConfig = mapConfig;
@@ -549,7 +549,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param test
-	 *            the availableModules to set
+	 *			the availableModules to set
 	 */
 	public void setAvailableModules(List<Module> availableModules) {
 		this.availableModules = availableModules;
@@ -561,7 +561,7 @@ public class DatabaseContentInitializer {
 	 * @param dao
 	 */
 	@Autowired
-	public void setDAO(DatabaseDao dao) {
+	public void setDbDao(DatabaseDao dao) {
 		this.dbDao = dao;
 	}
 
