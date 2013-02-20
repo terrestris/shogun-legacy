@@ -44,52 +44,62 @@ public class DatabaseContentInitializer {
 	/**
 	 * a list of module objects for this applications
 	 */
-	List<Module> availableModules;
+	private List<Module> availableModules;
 
 	/**
-     * The name of the SUPERADMIN
-     */
-	String superAdminName;
+	 * The name of the SUPERADMIN
+	 */
+	private String superAdminName;
 
 	/**
-     * the password for the SUPERADMIN
-     */
-	String superAdminPw;
+	 * the password for the SUPERADMIN
+	 */
+	private String superAdminPw;
 
 	/**
-     * determines if an anonymous user should be created?
-     */
-	Boolean autoCreateAnonymousUser = true;
+	 * determines if an anonymous user should be created?
+	 */
+	private Boolean autoCreateAnonymousUser = true;
 
 	/**
-     * a default user group
-     */
-	Group defaultGroup;
+	 * a default user group
+	 */
+	private Group defaultGroup;
 
 	/**
-     * a list of available user roles
-     */
-	List<String> availableRoles;
+	 * a list of available user roles
+	 */
+	private List<String> availableRoles;
 
 	/**
-     * a default map configuration
-     */
-	MapConfig mapConfig;
+	 * a default map configuration
+	 */
+	private MapConfig mapConfig;
 
 	/**
-     * modules to be assigned to anonymous user
-     */
-	List<String> modulesForAnonymous;
+	 * modules to be assigned to anonymous user
+	 */
+	private List<String> modulesForAnonymous;
 
 	/**
-     * a default WMS map layer
-     */
-	WmsMapLayer wmsMapLayer;
+	 * a default WMS map layer
+	 */
+	private WmsMapLayer wmsMapLayer;
 
 	/**
-     * the DB dao to access database via Hibernate
-     */
-	DatabaseDao dbDao;
+	 * the DB dao to access database via Hibernate
+	 */
+	private DatabaseDao dbDao;
+
+	/**
+	 * The persistant representation of the standard WMS
+	 */
+	private WmsMapLayer persistantStdWmsLayer;
+
+	/**
+	 * The persistant representation of the standard map configuration
+	 */
+	private MapConfig persistantStdMapConfig;
 
 	/**
 	 * The method called on init.
@@ -100,13 +110,13 @@ public class DatabaseContentInitializer {
 		LOGGER.info("Initializing database content on servlet init.");
 
 		try {
-			WmsMapLayer stdWmsLayer = this.createStandardWmsMapLayer();
+			this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
 			this.createAvailableRoles();
 			this.createAvailableModules();
-			MapConfig stdMapConfig = this.createAvailableMapConfig();
+			this.persistantStdMapConfig = this.createAvailableMapConfig();
 			this.createDefaultGroup();
 			this.createSuperAdmin();
-			this.createAnonymousUser(stdWmsLayer, stdMapConfig, null);
+			this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
 		} catch (Exception e) {
 			LOGGER.error("Caught exception '" + e.getClass().getSimpleName()
 					+ "':", e);
@@ -333,7 +343,7 @@ public class DatabaseContentInitializer {
 				Module m = (Module) this.dbDao.getEntityByStringField(
 						Module.class, "module_name", anonModuleName);
 				modulesToAssign.add(m);
-				LOGGER.info("    - assigning module '" + anonModuleName + "'");
+				LOGGER.info("	- assigning module '" + anonModuleName + "'");
 			}
 			anon.setModules(modulesToAssign);
 
@@ -419,7 +429,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param autoCreateAnonymousUser
-	 *            the autoCreateAnonymousUser to set
+	 *			the autoCreateAnonymousUser to set
 	 */
 	public void setAutoCreateAnonymousUser(Boolean autoCreateAnonymousUser) {
 		this.autoCreateAnonymousUser = autoCreateAnonymousUser;
@@ -434,7 +444,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param defaultGroup
-	 *            the defaultGroup to set
+	 *			the defaultGroup to set
 	 */
 	public void setDefaultGroup(Group defaultGroup) {
 		this.defaultGroup = defaultGroup;
@@ -449,7 +459,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param superAdminName
-	 *            the superAdminName to set
+	 *			the superAdminName to set
 	 */
 	public void setSuperAdminName(String superAdminName) {
 		this.superAdminName = superAdminName;
@@ -464,7 +474,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param superAdminPw
-	 *            the superAdminPw to set
+	 *			the superAdminPw to set
 	 */
 	public void setSuperAdminPw(String superAdminPw) {
 		this.superAdminPw = superAdminPw;
@@ -479,7 +489,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param availableRoles
-	 *            the availableRoles to set
+	 *			the availableRoles to set
 	 */
 	public void setAvailableRoles(List<String> availableRoles) {
 		this.availableRoles = availableRoles;
@@ -494,7 +504,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param modulesForAnonymous
-	 *            the modulesForAnonymous to set
+	 *			the modulesForAnonymous to set
 	 */
 	public void setModulesForAnonymous(List<String> modulesForAnonymous) {
 		this.modulesForAnonymous = modulesForAnonymous;
@@ -509,7 +519,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param wmsMapLayer
-	 *            the wmsMapLayer to set
+	 *			the wmsMapLayer to set
 	 */
 	public void setWmsMapLayer(WmsMapLayer wmsMapLayer) {
 		this.wmsMapLayer = wmsMapLayer;
@@ -524,7 +534,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param mapConfig
-	 *            the mapConfig to set
+	 *			the mapConfig to set
 	 */
 	public void setMapConfig(MapConfig mapConfig) {
 		this.mapConfig = mapConfig;
@@ -539,7 +549,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * @param test
-	 *            the availableModules to set
+	 *			the availableModules to set
 	 */
 	public void setAvailableModules(List<Module> availableModules) {
 		this.availableModules = availableModules;
@@ -551,8 +561,22 @@ public class DatabaseContentInitializer {
 	 * @param dao
 	 */
 	@Autowired
-	public void setDAO(DatabaseDao dao) {
+	public void setDbDao(DatabaseDao dao) {
 		this.dbDao = dao;
+	}
+
+	/**
+	 * @return the persistantStdWmsLayer
+	 */
+	public WmsMapLayer getPersistantStdWmsLayer() {
+		return persistantStdWmsLayer;
+	}
+
+	/**
+	 * @return the persistantStdMapConfig
+	 */
+	public MapConfig getPersistantStdMapConfig() {
+		return persistantStdMapConfig;
 	}
 
 }
