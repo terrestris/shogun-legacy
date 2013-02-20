@@ -22,6 +22,7 @@ import org.hibernate.loader.OuterJoinLoader;
 import org.hibernate.loader.criteria.CriteriaLoader;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -52,6 +53,7 @@ import de.terrestris.shogun.model.User;
  */
 @Repository
 @Transactional
+@Primary
 public class DatabaseDao {
 	
 	/**
