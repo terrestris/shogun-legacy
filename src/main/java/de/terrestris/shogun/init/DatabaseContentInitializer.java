@@ -82,14 +82,24 @@ public class DatabaseContentInitializer {
 	private List<String> modulesForAnonymous;
 
 	/**
-     * a default WMS map layer
-     */
-	WmsMapLayer wmsMapLayer;
+	 * a default WMS map layer
+	 */
+	private WmsMapLayer wmsMapLayer;
 
 	/**
-     * the DB dao to access database via Hibernate
-     */
-	DatabaseDao dbDao;
+	 * the DB dao to access database via Hibernate
+	 */
+	private DatabaseDao dbDao;
+
+	/**
+	 * The persistant representation of the standard WMS
+	 */
+	private WmsMapLayer persistantStdWmsLayer;
+
+	/**
+	 * The persistant representation of the standard map configuration
+	 */
+	private MapConfig persistantStdMapConfig;
 
 	/**
 	 * The method called on init.
@@ -100,13 +110,13 @@ public class DatabaseContentInitializer {
 		LOGGER.info("Initializing database content on servlet init.");
 
 		try {
-			WmsMapLayer stdWmsLayer = this.createStandardWmsMapLayer();
+			this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
 			this.createAvailableRoles();
 			this.createAvailableModules();
-			MapConfig stdMapConfig = this.createAvailableMapConfig();
+			this.persistantStdMapConfig = this.createAvailableMapConfig();
 			this.createDefaultGroup();
 			this.createSuperAdmin();
-			this.createAnonymousUser(stdWmsLayer, stdMapConfig, null);
+			this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
 		} catch (Exception e) {
 			LOGGER.error("Caught exception '" + e.getClass().getSimpleName()
 					+ "':", e);
@@ -553,6 +563,20 @@ public class DatabaseContentInitializer {
 	@Autowired
 	public void setDAO(DatabaseDao dao) {
 		this.dbDao = dao;
+	}
+
+	/**
+	 * @return the persistantStdWmsLayer
+	 */
+	public WmsMapLayer getPersistantStdWmsLayer() {
+		return persistantStdWmsLayer;
+	}
+
+	/**
+	 * @return the persistantStdMapConfig
+	 */
+	public MapConfig getPersistantStdMapConfig() {
+		return persistantStdMapConfig;
 	}
 
 }
