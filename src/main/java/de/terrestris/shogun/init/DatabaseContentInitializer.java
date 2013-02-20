@@ -556,6 +556,13 @@ public class DatabaseContentInitializer {
 	}
 
 	/**
+	 * @return the dbDao
+	 */
+	public DatabaseDao getDbDao() {
+		return dbDao;
+	}
+
+	/**
 	 * Auto generation of an TsDAO instance via dependency injection.
 	 * 
 	 * @param dao
