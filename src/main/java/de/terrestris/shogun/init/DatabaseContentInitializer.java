@@ -44,42 +44,42 @@ public class DatabaseContentInitializer {
 	/**
 	 * a list of module objects for this applications
 	 */
-	List<Module> availableModules;
+	private List<Module> availableModules;
 
 	/**
-     * The name of the SUPERADMIN
-     */
-	String superAdminName;
+	 * The name of the SUPERADMIN
+	 */
+	private String superAdminName;
 
 	/**
-     * the password for the SUPERADMIN
-     */
-	String superAdminPw;
+	 * the password for the SUPERADMIN
+	 */
+	private String superAdminPw;
 
 	/**
-     * determines if an anonymous user should be created?
-     */
-	Boolean autoCreateAnonymousUser = true;
+	 * determines if an anonymous user should be created?
+	 */
+	private Boolean autoCreateAnonymousUser = true;
 
 	/**
-     * a default user group
-     */
-	Group defaultGroup;
+	 * a default user group
+	 */
+	private Group defaultGroup;
 
 	/**
-     * a list of available user roles
-     */
-	List<String> availableRoles;
+	 * a list of available user roles
+	 */
+	private List<String> availableRoles;
 
 	/**
-     * a default map configuration
-     */
-	MapConfig mapConfig;
+	 * a default map configuration
+	 */
+	private MapConfig mapConfig;
 
 	/**
-     * modules to be assigned to anonymous user
-     */
-	List<String> modulesForAnonymous;
+	 * modules to be assigned to anonymous user
+	 */
+	private List<String> modulesForAnonymous;
 
 	/**
      * a default WMS map layer
