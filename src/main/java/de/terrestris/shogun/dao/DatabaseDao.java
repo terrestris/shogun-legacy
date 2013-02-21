@@ -508,8 +508,8 @@ public class DatabaseDao {
 	 * @param objToCreate the new object to be created in the DB
 	 * @return the object that was created in the database
 	 */
-	public <T> T createEntity(Object objToCreate) {
-		Class clazz = objToCreate.getClass();
+	public <T> T createEntity(T objToCreate) {
+		Class<? extends Object> clazz = objToCreate.getClass();
 		Object createdObjectId = this.getSessionFactory().getCurrentSession().save(
 				clazz.getSimpleName(), objToCreate);
 		return (T)this.getEntityById((Integer)createdObjectId, clazz);
