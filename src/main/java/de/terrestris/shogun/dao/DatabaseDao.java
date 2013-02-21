@@ -499,7 +499,22 @@ public class DatabaseDao {
 		
 		return objToCreate;
 	}
-	
+
+	/**
+	 * Creates a record of a given Entity in the database. This method will return the
+	 * newly created object, whereas the createEntity(String entityClass, 
+	 * Object objToCreate) will return the originally passed object.
+	 * 
+	 * @param objToCreate the new object to be created in the DB
+	 * @return the object that was created in the database
+	 */
+	public <T> T createEntity(Object objToCreate) {
+		Class clazz = objToCreate.getClass();
+		Object createdObjectId = this.getSessionFactory().getCurrentSession().save(
+				clazz.getSimpleName(), objToCreate);
+		return (T)this.getEntityById((Integer)createdObjectId, clazz);
+	}
+
 	/**
 	 * Creates or updates a record of a given Entity in the database. <br>
 	 * Method checks automatically if the passed object has to be created or
