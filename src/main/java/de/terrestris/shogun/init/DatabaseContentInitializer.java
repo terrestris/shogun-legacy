@@ -40,6 +40,11 @@ public class DatabaseContentInitializer {
 	 */
 	private static Logger LOGGER = Logger
 			.getLogger(DatabaseContentInitializer.class);
+	
+	/** 
+	 * flag symbolizing if the database will be modified by this class 
+	 */
+	private Boolean databaseInitializationEnabled;
 
 	/**
 	 * a list of module objects for this applications
@@ -107,19 +112,23 @@ public class DatabaseContentInitializer {
 	 * Delegated the tasks to fill the database due to config
 	 */
 	public void initializeDatabaseContent() {
-		LOGGER.info("Initializing database content on servlet init.");
 
-		try {
-			this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
-			this.createAvailableRoles();
-			this.createAvailableModules();
-			this.persistantStdMapConfig = this.createAvailableMapConfig();
-			this.createDefaultGroup();
-			this.createSuperAdmin();
-			this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
-		} catch (Exception e) {
-			LOGGER.error("Caught exception '" + e.getClass().getSimpleName()
-					+ "':", e);
+		if (this.databaseInitializationEnabled == true) {
+			
+			LOGGER.info("Initializing database content on servlet init.");
+
+			try {
+				this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
+				this.createAvailableRoles();
+				this.createAvailableModules();
+				this.persistantStdMapConfig = this.createAvailableMapConfig();
+				this.createDefaultGroup();
+				this.createSuperAdmin();
+				this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
+			} catch (Exception e) {
+				LOGGER.error("Caught exception '" + e.getClass().getSimpleName()
+						+ "':", e);
+			}
 		}
 	}
 
@@ -418,6 +427,16 @@ public class DatabaseContentInitializer {
 		}
 
 		return target;
+	}
+	
+	/**
+	 * @param shogunDatabaseInitializationEnabled 
+	 * 			the shogunDatabaseInitializationEnabled to set
+	 */
+	@Autowired
+	public void setDatabaseInitializationEnabled(
+			Boolean databaseInitializationEnabled) {
+		this.databaseInitializationEnabled = databaseInitializationEnabled;
 	}
 
 	/**
