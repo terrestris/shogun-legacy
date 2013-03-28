@@ -642,39 +642,43 @@ public class DatabaseDao {
 	 * @param name the user_name of th record in the database
 	 * @param group_id  if this is valid (>0) the returned user has to be a child this group
 	 * @return
+	 * @throws ShogunDatabaseAccessException 
 	 */
 	@SuppressWarnings("unchecked")
-	public List<User> getUserByName(String name, int group_id) throws ShogunDatabaseAccessException {
-		
+	public List<User> getUserByName(String name, int groupId) 
+										throws ShogunDatabaseAccessException {
+
 		Criteria criteria = null;
 
 		try {
-			
+
 			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 			
 			criteria.add(Restrictions.ilike("user_name", name));
-			if(group_id > 0) {
-				//TODO CM refactor here
-//				criteria.add(Restrictions.eq("group_id", group_id));
+			
+			// by passing a groupId the query is filtered by this group 
+			if(groupId > 0) {
+				criteria.createCriteria("groups")
+					.add(Restrictions.eq("id", groupId));
 			}
-		
+
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
 					"Error while getting User by name: " + name, e);
 		}
-		
+
 		// we have to ensure that the modules are distinct
 		// @see http://docs.jboss.org/hibernate/orm/3.6/javadocs/org/hibernate/Criteria.html#createAlias(java.lang.String, java.lang.String, int)
 		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
-		
+
 		// this ensures that no cartesian product is returned when 
 		// having sub objects, e.g. User <-> Modules
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			
+
 		return criteria.list();
 	}
-	
-	
+
+
 	/**
 	 * Create a new User on the database or
 	 * update User
