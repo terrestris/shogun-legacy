@@ -352,6 +352,10 @@ public class DatabaseDao {
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		if (values.length > 0) {
 			criteria.add(Restrictions.in("id", values));
+		} else {
+			// we add a restriction that can never be fullfilled
+			// this is the case when e.g. an empty object has been passed
+			criteria.add(Restrictions.sqlRestriction("1 = 2"));
 		}
 		
 		// this ensures that no cartesian product is returned when 
