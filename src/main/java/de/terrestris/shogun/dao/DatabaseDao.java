@@ -1102,15 +1102,21 @@ public class DatabaseDao {
 	/**
 	 * Determines if the logged in User is a SuperAdmin.
 	 *
-	 * TODO eventually the logic here has to be improved.
-	 *
 	 * @return flag SuperAdmin=true/false
-	 * @throws ShogunDatabaseAccessException
 	 */
-	public boolean isSuperAdmin() throws ShogunDatabaseAccessException {
+	public boolean isSuperAdmin() {
 
-		//TODO CM change this to a more robust approach
-		return (this.getGroupIdFromSession() == 0) && (this.getUserIdFromSession() == 1);
+		// get the logged-in user and check if he has the SuperAdmin role
+		User sessionUser = this.getUserObjectFromSession();
+		Set<Role> roles = sessionUser.getRoles();
+
+		for (Role role : roles) {
+			if (role.getName().equals(User.ROLENAME_SUPERADMIN)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
