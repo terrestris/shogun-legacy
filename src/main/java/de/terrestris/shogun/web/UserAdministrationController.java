@@ -131,7 +131,7 @@ public class UserAdministrationController extends AbstractWebController {
 	 * send the new password to the user email 
 	 * 
 	 * @param user_id the user ID of the User who should get a new password 
-	 * @param response response A HttpServletResponse object in order to return the response
+	 * @param response A HttpServletResponse object in order to return the response
 	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
 	 * @throws Exception
 	 */
