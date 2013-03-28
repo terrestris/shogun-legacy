@@ -135,10 +135,10 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			// check if there is an existing user with the same name
 			// if there is --> ERROR
-			//TODO CM check the 0 here
-			List<User> testUser = this.getDatabaseDao().getUserByName(user.getUser_name(), 0);
+			List<User> testUser = this.getDatabaseDao().getUserByName(user.getUser_name());
 			if (testUser.size() > 0) {
-				throw new ShogunServiceException("User with name " + user.getUser_name()
+				throw new ShogunServiceException(
+						"User with name " + user.getUser_name()
 						+ " already exists!");
 			}
 
