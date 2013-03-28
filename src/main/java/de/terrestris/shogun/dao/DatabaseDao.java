@@ -636,11 +636,11 @@ public class DatabaseDao {
 
 	/**
 	 * Returns the {@link User} object defined by the passed user name. <br>
-	 * When passed a group_id greater than 0, the query will be additionally
+	 * When passed a groupId greater than 0, the query will be additionally
 	 * filtered with the given group.
 	 *
-	 * @param name the user_name of th record in the database
-	 * @param group_id  if this is valid (>0) the returned user has to be a child this group
+	 * @param name the user_name of the record in the database
+	 * @param groupId if this is valid (>0) the returned user has to be a child this group
 	 * @return
 	 * @throws ShogunDatabaseAccessException
 	 */
