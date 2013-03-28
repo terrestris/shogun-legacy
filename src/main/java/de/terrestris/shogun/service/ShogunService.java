@@ -168,7 +168,7 @@ public class ShogunService extends AbstractShogunService {
 			rightGetter = rightClazz.getMethod(associationProperties.get("assocGetter"));
 
 
-			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz, 0);
+			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz);
 
 			List<Object> allUsers = this.getDatabaseDao().getAllEntities(rightClazz);
 
