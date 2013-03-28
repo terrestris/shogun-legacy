@@ -1,6 +1,7 @@
 package de.terrestris.shogun.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,8 @@ import javax.persistence.Table;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import de.terrestris.shogun.annotation.RestrictedBy;
+import de.terrestris.shogun.annotation.RestrictionType;
 import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
@@ -37,8 +40,6 @@ public class User extends BaseModel {
 	public static final String ROLENAME_SUPERADMIN = "ROLE_SUPERADMIN";
 	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
 	
-	
-	private int group_id;
 	private String user_name;
 	private String user_longname;
 	private String user_email;
@@ -49,7 +50,8 @@ public class User extends BaseModel {
 	private String user_password;
 	private String user_lang;
 	
-	private List<Module> modules;
+	private Set<Group> groups;
+	private Set<Module> modules;
 	private Set<MapLayer> mapLayers;
 //	private Set<MapConfig> mapConfigs;
 	private MapConfig mapConfig;
@@ -58,22 +60,6 @@ public class User extends BaseModel {
 	private Set<Role> roles;
 	private String user_module_list;
 	
-	
-	/**
-	 * @return the group_id
-	 */
-	@Column(name="GROUP_ID", nullable=false)
-	public int getGroup_id() {
-		return group_id;
-	}
-
-	/**
-	 * @param group_id the group_id to set
-	 */
-	public void setGroup_id(int group_id) {
-		this.group_id = group_id;
-	}
- 
 	
 	/**
 	 * @return the user_name
@@ -220,7 +206,21 @@ public class User extends BaseModel {
 		this.user_lang = user_lang;
 	}
 	
-	
+	/**
+	 * @return the groups
+	 */
+	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+	@JsonIgnore
+	public Set<Group> getGroups() {
+		return groups;
+	}
+
+	/**
+	 * @param groups the groups to set
+	 */
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
+	}
 
 	/**
 	 * We probably should use a set in future, due to a know limitation
@@ -233,7 +233,7 @@ public class User extends BaseModel {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) }, 
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID", 
 					nullable = false, updatable = false) })
-	public List<Module> getModules() {
+	public Set<Module> getModules() {
 		return modules;
 	}
 
@@ -244,7 +244,7 @@ public class User extends BaseModel {
 	 * @param modules the modules to set
 	 */
 	@JsonIgnore
-	public void setModules(List<Module> modules) {
+	public void setModules(Set<Module> modules) {
 		this.modules = modules;
 	}
 	
@@ -413,7 +413,8 @@ public class User extends BaseModel {
 			newModules = new ArrayList<Module>();
 		}
 
-		this.setModules(newModules);
+		Set<Module> moduleSet = new HashSet<Module>(newModules);
+		this.setModules(moduleSet);
 	}
 	
 	/**

@@ -6,6 +6,7 @@ package de.terrestris.shogun.service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.terrestris.shogun.annotation.RestrictedByAnnotationParser;
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
 import de.terrestris.shogun.exception.ShogunServiceException;
 import de.terrestris.shogun.model.Group;
@@ -56,6 +58,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// create an integer out of the id-String
 			int iUserId = Integer.parseInt(user_id);
 
+			//TODO CM remove the group ID here
 			int group_id = this.getDatabaseDao().getGroupIdFromSession();
 			// get the User object
 			user = (User) this.getDatabaseDao().getEntityById(iUserId, User.class, group_id);
@@ -90,18 +93,7 @@ public class UserAdministrationService extends AbstractShogunService {
 					"Error while updating User in database or while sending email " + e.getMessage());
 		}
 	}
-	
-	/**
-	 * Returns the Group of the currently logged in user
-	 * 
-	 * @return the group-ID
-	 */
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	@Transactional
-	public Integer getGroupIdBySession() {
-		return this.getDatabaseDao().getGroupIdFromSession();
-	}
-	
+
 	/**
 	 * 
 	 * Inserts new {@link User} objects into the database. The new objects are
@@ -140,30 +132,12 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			User newuser = null;
 			
-			// get corresponding group object from database
-			int group_id;
-			
-			// a superadmin is allowed to post the group_id in case
-			// of adding a new user.
-			// subadmin/(normal)user are only allowed to add in their own group.
-			boolean setSessionGroup;
-			if (this.getDatabaseDao().isSuperAdmin()) {
-				group_id = user.getGroup_id();
-				setSessionGroup = false;
-			} else {
-				group_id = this.getDatabaseDao().getGroupIdFromSession();
-				setSessionGroup = true;
-			}
-			
-			Group group = (Group) this.getDatabaseDao().getEntityById(group_id, Group.class, 0);
-			
-			long currentUsersOfGroup = this.getDatabaseDao().getCurrentUserByGroup(group_id);
-			
 			// CREATE A NEW USER
 
 			// check if there is an existing user with the same name
 			// if there is --> ERROR
-			List<User> testUser = this.getDatabaseDao().getUserByName(user.getUser_name(), group_id);
+			//TODO CM check the 0 here
+			List<User> testUser = this.getDatabaseDao().getUserByName(user.getUser_name(), 0);
 			if (testUser.size() > 0) {
 				throw new ShogunServiceException("User with name " + user.getUser_name()
 						+ " already exists!");
@@ -176,7 +150,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			String hashed = pwencoder.encodePassword(pw, null);
 
 			user.setUser_password(hashed);
-			user.setGroup_id(group_id);
 			
 			// TODO become more flexibel here, wrap to method
 			// set the default map conf
@@ -217,10 +190,10 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			// write in DB
 			// do setSessionGroup only in case of beeing NO SuperAdmin
-			newuser = this.getDatabaseDao().createUser(user, "ROLE_USER", setSessionGroup);
+			newuser = this.getDatabaseDao().createUser(user, "ROLE_USER", true);
 
 			LOGGER.debug(" USER RETURNED: " + newuser.getId());
-
+			
 			returnUsers.add(newuser);
 		}
 
@@ -275,11 +248,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			if (user.getUser_password() == null) {
 				user.setUser_password(oldUser.getUser_password());
 			}
-			// if group_id is empty/null in request from client, keep the old
-			// one
-			if (user.getGroup_id() <= 0) {
-				user.setGroup_id(group_id);
-			}
+
 			
 			// TODO make this configurable
 			
@@ -389,15 +358,14 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
-			// write in DB
-			newGroup = (Group) this.getDatabaseDao().createEntity(Group.class.getSimpleName(),
-					group);
+			// write new Group in DB
+			newGroup = (Group) this.getDatabaseDao().createEntity(
+					Group.class.getSimpleName(), group);
 
 			LOGGER.debug("GROUP CREATED: " + newGroup.getId());
 
 			// create a USER as sub-admin
 			User subadmin = new User();
-			subadmin.setGroup_id(newGroup.getId());
 			subadmin.setUser_country(group.getCountry());
 			subadmin.setUser_email(group.getMail());
 			subadmin.setUser_name("subadmin_" + group.getGroup_nr());
@@ -446,10 +414,14 @@ public class UserAdministrationService extends AbstractShogunService {
 			subadmin.setUser_password(hashed);
 
 			// save sub-admin to database
-			User newuser = this.getDatabaseDao().createUser(subadmin, "ROLE_ADMIN", false);
+			User persistentSubadmin = this.getDatabaseDao().createUser(subadmin, "ROLE_ADMIN", false);
 
 			LOGGER.debug("GROUP CREATED: " + newGroup.getId());
 
+			// add new subadmin to the created group
+			newGroup.getUsers().add(persistentSubadmin);
+			this.getDatabaseDao().updateEntity("Group", newGroup);
+			
 			String mailtext = "Sehr geehrter Nutzer " + subadmin.getUser_name()
 					+ "\n\n";
 			mailtext += "Ihr Passwort zu SHOGun lautet \n\n";
@@ -475,7 +447,9 @@ public class UserAdministrationService extends AbstractShogunService {
 	 *            a list of {@link Group} objects which should be updated
 	 * @return a list of {@link Group} objects which have been successfully
 	 *         updated
-	 * @throws ShogunDatabaseAccessException 
+	 * @throws ShogunDatabaseAccessException
+	 * 
+	 * TODO CM refactor
 	 */
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
@@ -496,7 +470,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
 					Group.class.getSimpleName(), group);
 
-			// holen nach group_nr weil unveränderlich UND eindeutig
+			// fetch via group_nr because it is not changeable and unique
 			User subadmin = this.getDatabaseDao().getUserByName(
 					"subadmin_" + updatedGroup.getGroup_nr(),
 					updatedGroup.getId()).get(0);
@@ -534,9 +508,11 @@ public class UserAdministrationService extends AbstractShogunService {
 	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
 	public void deleteGroup(int deleteId) throws ShogunDatabaseAccessException {
 
-		// delete all User records of the given group,
-		// which has to be deleted
-		this.getDatabaseDao().deleteGroupUsers(deleteId);
+//		// delete all User records of the given group,
+//		// which has to be deleted
+//		this.getDatabaseDao().deleteGroupUsers(deleteId);
+		
+		//TODO CM ensure no users are delted here
 
 		Integer id = new Integer(deleteId);
 		this.getDatabaseDao().deleteEntity(Group.class, id);

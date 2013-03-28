@@ -1,8 +1,10 @@
 package de.terrestris.shogun.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -49,9 +51,17 @@ public class Group extends BaseModel{
 	private String notes;
 	private String language;
 
+	private Set<User> users;
 	private List<Module> modules;
 	private String group_module_list;
-    
+	
+	/**
+	 * 
+	 */
+	public Group() {
+		super();
+		this.setUsers(new HashSet<User>());
+	}
 
 	/**
 	 * @return the name
@@ -307,11 +317,29 @@ public class Group extends BaseModel{
 	public void setLanguage(String language) {
 		this.language = language;
 	}
+	
+	/**
+	 * @return the users
+	 */
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "TBL_GROUP_TBL_USER", joinColumns = { 
+			@JoinColumn(name = "GROUP_FK", nullable = true, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "USER_FK", 
+					nullable = true, updatable = false) })
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	/**
+	 * @param users the users to set
+	 */
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
 
 	/**
 	 * @return the modules
 	 */
-//	@Cache(usage = CacheConcurrencyStrategy.NONE)
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
 	@JoinTable(name = "TBL_GROUP_TBL_MODULE",  joinColumns = { 
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) }, 
@@ -374,7 +402,7 @@ public class Group extends BaseModel{
 			
 			// iterate to cast the returned Objects to Module
 			newModules = new ArrayList<Module>(modules.size());
-			for (Iterator iterator2 = modules.iterator(); iterator2.hasNext();) {
+			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
 				Module module = (Module)iterator2.next();
 				newModules.add(module);
 			}
@@ -387,7 +415,6 @@ public class Group extends BaseModel{
 			newModules = new ArrayList<Module>();
 		}
 
-//		this.setModules(newModules);
 		newModules = null;
 	}
 

@@ -293,8 +293,9 @@ public class DatabaseDao {
 	 * @param clazz
 	 * @param group_id
 	 * @return
+	 * @throws ShogunDatabaseAccessException 
 	 */
-	public Object getEntityById(int id, Class<?> clazz, int group_id) {
+	public Object getEntityById(int id, Class<?> clazz, int group_id) throws ShogunDatabaseAccessException {
 		
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -622,23 +623,6 @@ public class DatabaseDao {
 	// ---------------------------------------------------------------------------
 	
 	/**
-	 * TODO remove this by a many-to-many relation on group
-	 * TODO remove this method
-	 * 
-	 * @param groupId
-	 * @return
-	 */
-	public long getCurrentUserByGroup(int groupId) {
-		
-		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
-		criteria.setProjection(Projections.count("id"));
-		criteria.add(Restrictions.eq("group_id", groupId));
-		
-		return (Long)criteria.list().get(0);
-	}
-
-	/**
 	 * Returns the {@link User} object defined by the passed user name. 
 	 * 
 	 * @param name the user_name of the record in the database
@@ -667,9 +651,11 @@ public class DatabaseDao {
 		try {
 			
 			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+			
 			criteria.add(Restrictions.ilike("user_name", name));
 			if(group_id > 0) {
-				criteria.add(Restrictions.eq("group_id", group_id));
+				//TODO CM refactor here
+//				criteria.add(Restrictions.eq("group_id", group_id));
 			}
 		
 		} catch (Exception e) {
@@ -723,22 +709,30 @@ public class DatabaseDao {
 	 */
 	public User createUser(User user, String role, boolean setSessionGroup) throws ShogunDatabaseAccessException {
 		
-		if (setSessionGroup == true) {
-			
-			try {
-				
-				// set the current group ID of logged in user
-				int group_id = this.getGroupIdFromSession();
-				user.setGroup_id(group_id);
-			} catch (Exception e) {
-				throw new ShogunDatabaseAccessException(
-						"Error getting group from session. " + e.getMessage());
-			}
-		}
-
 		try {
 			
 			this.sessionFactory.getCurrentSession().save(user);
+			
+			if (setSessionGroup == true) {
+				
+				try {
+					
+					// add the saved user to current session group
+					Group sessionGroup = this.getGroupObjectFromSession();
+					
+					if (sessionGroup != null) {
+						
+						sessionGroup.getUsers().add(user);
+						
+						// persist the changes of the group object
+						this.updateEntity("Group", sessionGroup);
+					}
+					
+				} catch (Exception e) {
+					throw new ShogunDatabaseAccessException(
+							"Error adding the saved user to current session group. " + e.getMessage());
+				}
+			}
 			
 			// create the mapping of new user and its role
 			Role oRole = (Role)this.getEntityByStringField(Role.class, "name", role);
@@ -782,6 +776,8 @@ public class DatabaseDao {
 		// user to be deleted is a child of the current group
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 		criteria.add(Restrictions.eq("id", id));
+		
+		//TODO refactor
 		criteria.add(Restrictions.eq(this.getGroupFieldName(User.class), this.getGroupIdFromSession()));
 		List<User> users = criteria.list();
 		
@@ -830,27 +826,27 @@ public class DatabaseDao {
 		}
 	}
 	
-	/**
-	 * Deletes all User records of the given group (defined by group-ID)
-	 * 
-	 * @param groupId the ID of the group containing the Users to be deleted
-	 * @throws ShogunDatabaseAccessException 
-	 * @throws Exception 
-	 */
-	public void deleteGroupUsers(int groupId) throws ShogunDatabaseAccessException {
-
-		// fetch all User records with the given group-ID
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
-		criteria.add(Restrictions.eq("group_id", groupId));
-		criteria.setProjection(Projections.property("id"));
-		List<Integer> users = criteria.list();
-
-		for (Iterator<Integer> iterator = users.iterator(); iterator.hasNext();) {
-			Integer userId = (Integer) iterator.next();
-
-			this.deleteUserGroupIndependent(userId);
-		}
-	}
+//	/**
+//	 * Deletes all User records of the given group (defined by group-ID)
+//	 * 
+//	 * @param groupId the ID of the group containing the Users to be deleted
+//	 * @throws ShogunDatabaseAccessException 
+//	 * @throws Exception 
+//	 */
+//	public void deleteGroupUsers(int groupId) throws ShogunDatabaseAccessException {
+//
+//		// fetch all User records with the given group-ID
+//		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+//		criteria.add(Restrictions.eq("group_id", groupId));
+//		criteria.setProjection(Projections.property("id"));
+//		List<Integer> users = criteria.list();
+//
+//		for (Iterator<Integer> iterator = users.iterator(); iterator.hasNext();) {
+//			Integer userId = (Integer) iterator.next();
+//
+//			this.deleteUserGroupIndependent(userId);
+//		}
+//	}
 	
 
 	/**
@@ -1059,33 +1055,44 @@ public class DatabaseDao {
 	 * Returns the group ID of the logged in user
 	 * 
 	 * @return
+	 * @throws ShogunDatabaseAccessException 
 	 * @throws Exception 
 	 */
 	public int getGroupIdFromSession() {
+		
+		Group sessionGroup = this.getGroupObjectFromSession();
+		int sessionUserGroupId = 0;
+		
+		if (sessionGroup != null && sessionGroup.getId() != 0) {
+			sessionUserGroupId  = sessionGroup.getId();
+		}
+		
+		return sessionUserGroupId;
+	}
+
+	/**
+	 * Returns the {@link Group} object of the logged in user
+	 * 
+	 * @return the {@link Group} object of the logged in user or NULL if not found
+	 * @throws ShogunDatabaseAccessException 
+	 */
+	public Group getGroupObjectFromSession() {
 		
 		// get the authorization context, incl. user name
 		Authentication authResult = SecurityContextHolder.getContext().getAuthentication();
 		
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
-		
-		criteria.setProjection(Projections.property("group_id"));
 		criteria.add(Restrictions.ilike("user_name", authResult.getName()));
 		
-		Integer group_id = (Integer)criteria.list().get(0);
+		User sessionUser = (User)criteria.uniqueResult();
 		
-		return group_id;
-	}
-	
-	/**
-	 * Returns the {@link Group} object of the logged in user
-	 * 
-	 * @return the {@link Group} object of the logged in user or NULL if not found
-	 */
-	public Group getGroupObjectFromSession() {
-		
-		Integer id = this.getGroupIdFromSession();
-		
-		return (Group)this.getEntityById(id, Group.class, 0);
+		//TODO CM rework the static access to the first group
+		//		and return the list of groups 
+		if (sessionUser != null && sessionUser.getGroups() != null) {
+			return sessionUser.getGroups().iterator().next();
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -1094,9 +1101,11 @@ public class DatabaseDao {
 	 * TODO eventually the logic here has to be improved.
 	 * 
 	 * @return flag SuperAdmin=true/false
+	 * @throws ShogunDatabaseAccessException 
 	 */
-	public boolean isSuperAdmin() {
+	public boolean isSuperAdmin() throws ShogunDatabaseAccessException {
 		
+		//TODO CM change this to a more robust approach
 		return (this.getGroupIdFromSession() == 0) && (this.getUserIdFromSession() == 1);
 	}
 	
@@ -1109,8 +1118,9 @@ public class DatabaseDao {
 	 * 
 	 * @param model
 	 * @return
+	 * @throws ShogunDatabaseAccessException 
 	 */
-	private boolean isGroupDependent(Class model) {
+	private boolean isGroupDependent(Class model) throws ShogunDatabaseAccessException {
 		
 		// let's assume that the super user never wants group dependent models:
 		if (this.getGroupIdFromSession() == 0) {
