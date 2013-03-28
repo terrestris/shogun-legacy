@@ -96,8 +96,19 @@ public class UserAdministrationController extends AbstractWebController {
 			return getModelMapError("Error trying to update user: " + e.getMessage());
 		}
 	}
-	
-	
+
+	/**
+	 * Gets the ID of the currently logged in user.
+	 *
+	 * @return the userId of the currently logged in user
+	 */
+	@RequestMapping(value = "/user/getLoggedInUserId.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getLoggedInUserId() {
+		Integer userId = this.shogunService.getDatabaseDao().getUserIdFromSession();
+		return this.getModelMapSuccess(userId);
+	}
+
 	/**
 	 * Web-interface deleting a User objects in the database
 	 * 
