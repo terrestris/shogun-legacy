@@ -472,19 +472,33 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @param deleteId
 	 *            the ID of the record to be deleted
 	 * @throws ShogunDatabaseAccessException
+	 * @throws ShogunServiceException 
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
-	public void deleteGroup(int deleteId) throws ShogunDatabaseAccessException {
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	public void deleteGroup(Integer deleteId) throws ShogunServiceException {
 
-//		// delete all User records of the given group,
-//		// which has to be deleted
-//		this.getDatabaseDao().deleteGroupUsers(deleteId);
+		// check if the logged in user has the ROLE_ADMIN,
+		// so we have to check if has the right to delete this group
+		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
+		if (sessionUser.hasAdminRole() == true) {
 
-		//TODO CM ensure no users are delted here
+			boolean isAllowed = false;
+			Set<Group> groupsOfSessionUser = sessionUser.getGroups();
+			for (Group group : groupsOfSessionUser) {
+				if (group.getId() == deleteId) {
+					isAllowed = true;
+				}
+			}
 
-		Integer id = new Integer(deleteId);
-		this.getDatabaseDao().deleteEntity(Group.class, id);
+			if (isAllowed == false) {
+				throw new ShogunServiceException(
+						"Access denied: User not allowed to delete this group");
+			}
+
+		}
+
+		this.getDatabaseDao().deleteEntity(Group.class, deleteId);
 	}
 
 	/**

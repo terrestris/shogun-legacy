@@ -1,6 +1,7 @@
 package de.terrestris.shogun.web;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.terrestris.shogun.jsonmodel.GroupList;
 import de.terrestris.shogun.jsonmodel.UserList;
+import de.terrestris.shogun.model.BaseModel;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.service.UserAdministrationService;
@@ -203,8 +205,7 @@ public class UserAdministrationController extends AbstractWebController {
 	 */
 	@RequestMapping(value = "/group/update.action", method=RequestMethod.POST)
 	public @ResponseBody
-	Map<String, ? extends Object> updateGroup(@RequestBody Group group)
-			throws Exception {
+	Map<String, ? extends Object> updateGroup(@RequestBody Group group) {
 
 		try {
 
@@ -222,21 +223,19 @@ public class UserAdministrationController extends AbstractWebController {
 
 
 	/**
-	 * Web-interface deleting a Group objects in the database
+	 * Web-interface deleting a Group object in the database.
 	 *
-	 * @param the_id an ID of the {@link Group} to be deleted
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param groupId the ID of the {@link Group} to be deleted
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/deleteGroup.action", method=RequestMethod.POST, headers="Accept=application/json,plain/text")
+	@RequestMapping(value = "/group/delete.action", method=RequestMethod.GET)
 	public @ResponseBody
-	Map<String, ? extends Object> deleteGroup(@RequestBody int the_id, HttpServletResponse response)
-			throws Exception {
+	Map<String, ? extends Object> deleteGroup(Integer groupId) {
 
 		try {
 
-			this.getShogunService().deleteGroup(the_id);
+			this.getShogunService().deleteGroup(groupId);
 
 			Map<String, Object> modelMap = new HashMap<String, Object>(3);
 			modelMap.put("success", true);
@@ -244,10 +243,11 @@ public class UserAdministrationController extends AbstractWebController {
 			return modelMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in deleteGroup", e);
+			LOGGER.error("Error trying to delete group.", e);
 			return getModelMapError("Error trying to delete group: " + e.getMessage());
 		}
 	}
+
 
 	/**
 	 * @return the shogunService
