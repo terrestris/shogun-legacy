@@ -25,21 +25,22 @@ import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
  * User POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO check for the deprecated org.hibernate.cache.CacheConcurrencyStrategy;
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_USER")
 @Embeddable
 public class User extends BaseModel {
-	
+
 	public static final String ROLENAME_SUPERADMIN = "ROLE_SUPERADMIN";
+	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
 	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
-	
+
 	private String user_name;
 	private String user_longname;
 	private String user_email;
@@ -49,7 +50,7 @@ public class User extends BaseModel {
 	private String user_country;
 	private String user_password;
 	private String user_lang;
-	
+
 	private Set<Group> groups;
 	private Set<Module> modules;
 	private Set<MapLayer> mapLayers;
@@ -59,8 +60,8 @@ public class User extends BaseModel {
 	private WmsProxyConfig wmsProxyConfig;
 	private Set<Role> roles;
 	private String user_module_list;
-	
-	
+
+
 	/**
 	 * @return the user_name
 	 */
@@ -76,7 +77,7 @@ public class User extends BaseModel {
 		this.user_name = user_name;
 	}
 
-	
+
 	/**
 	 * @return the user_longname
 	 */
@@ -92,7 +93,7 @@ public class User extends BaseModel {
 		this.user_longname = user_longname;
 	}
 
-	
+
 	/**
 	 * @return the user_email
 	 */
@@ -108,7 +109,7 @@ public class User extends BaseModel {
 		this.user_email = user_email;
 	}
 
-	
+
 	/**
 	 * @return the user_street
 	 */
@@ -124,7 +125,7 @@ public class User extends BaseModel {
 		this.user_street = user_street;
 	}
 
-	
+
 	/**
 	 * @return the user_postcode
 	 */
@@ -140,7 +141,7 @@ public class User extends BaseModel {
 		this.user_postcode = user_postcode;
 	}
 
-	
+
 	/**
 	 * @return the user_city
 	 */
@@ -156,7 +157,7 @@ public class User extends BaseModel {
 		this.user_city = user_city;
 	}
 
-	
+
 	/**
 	 * @return the user_country
 	 */
@@ -172,7 +173,7 @@ public class User extends BaseModel {
 		this.user_country = user_country;
 	}
 
-	
+
 	/**
 	 * @return the user_password
 	 */
@@ -189,8 +190,8 @@ public class User extends BaseModel {
 	public void setUser_password(String user_password) {
 		this.user_password = user_password;
 	}
-	
-	
+
+
 	/**
 	 * @return the user_lang
 	 */
@@ -205,7 +206,7 @@ public class User extends BaseModel {
 	public void setUser_lang(String user_lang) {
 		this.user_lang = user_lang;
 	}
-	
+
 	/**
 	 * @return the groups
 	 */
@@ -225,13 +226,13 @@ public class User extends BaseModel {
 	/**
 	 * We probably should use a set in future, due to a know limitation
 	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-	 * 
+	 *
 	 * @return the modules
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
-	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = { 
-			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) }, 
-			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID", 
+	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = {
+			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
+			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
 	public Set<Module> getModules() {
 		return modules;
@@ -240,14 +241,14 @@ public class User extends BaseModel {
 	/**
 	 * We probably should use a set in future, due to a know limitation
 	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-	 * 
+	 *
 	 * @param modules the modules to set
 	 */
 	@JsonIgnore
 	public void setModules(Set<Module> modules) {
 		this.modules = modules;
 	}
-	
+
 
 	/**
 	 * @return the mapLayers
@@ -271,7 +272,7 @@ public class User extends BaseModel {
 //	/**
 //	 * We have to use a Set instead of List, due to a know limitation
 //	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-//	 * 
+//	 *
 //	 * @return the mapConfigs
 //	 */
 //	@OneToMany(fetch = FetchType.EAGER, targetEntity=MapConfig.class)
@@ -283,7 +284,7 @@ public class User extends BaseModel {
 //	/**
 //	 * We have to use a Set instead of List, due to a know limitation
 //	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-//	 * 
+//	 *
 //	 * @param mapConfigs the mapConfigs to set
 //	 */
 //	@JsonIgnore
@@ -291,7 +292,7 @@ public class User extends BaseModel {
 //		this.mapConfigs = mapConfigs;
 //	}
 
-	
+
 	/**
 	 * @return the mapConfig
 	 */
@@ -322,8 +323,8 @@ public class User extends BaseModel {
 	public void setUser_module_list(String simpleModuleList) {
 		this.user_module_list = simpleModuleList;
 	}
-	
-	
+
+
 	/**
 	 * @return the wfsProxyConfig
 	 */
@@ -340,8 +341,8 @@ public class User extends BaseModel {
 	public void setWfsProxyConfig(WfsProxyConfig wfsProxyConfig) {
 		this.wfsProxyConfig = wfsProxyConfig;
 	}
-	
-	
+
+
 	/**
 	 * @return the wmsProxyConfig
 	 */
@@ -358,8 +359,8 @@ public class User extends BaseModel {
 	public void setWmsProxyConfig(WmsProxyConfig wmsProxyConfig) {
 		this.wmsProxyConfig = wmsProxyConfig;
 	}
-	
-	
+
+
 	/**
 	 * @return the roles
 	 */
@@ -374,19 +375,19 @@ public class User extends BaseModel {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-	
-	
+
+
 	// ----------------------------------------------------------------
-	
+
 
 	/**
-	 * 
+	 *
 	 * @param databaseDAO
 	 */
 	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
 		// create module object list from comma-separated list
 		List<Module> newModules = null;
-		
+
 		if (this.getUser_module_list() != null
 				&& this.getUser_module_list().equals("") == false) {
 
@@ -416,40 +417,52 @@ public class User extends BaseModel {
 		Set<Module> moduleSet = new HashSet<Module>(newModules);
 		this.setModules(moduleSet);
 	}
-	
+
 	/**
 	 * Returns whether the user has role User.ROLENAME_SUPERADMIN in his set of
-	 * roles by comparing the name of all roles to the given string using 
+	 * roles by comparing the name of all roles to the given string using
 	 * the private hasRole-method.
-	 * 
+	 *
 	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
 	 */
 	public boolean hasSuperAdminRole() {
 		return this.hasRole(User.ROLENAME_SUPERADMIN);
 	}
-	
+
+
+	/**
+	 * Returns whether the user has role User.ROLENAME_ADMIN in his set of
+	 * roles by comparing the name of all roles to the given string using
+	 * the private hasRole-method.
+	 *
+	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
+	 */
+	public boolean hasAdminRole() {
+		return this.hasRole(User.ROLENAME_ADMIN);
+	}
+
 	/**
 	 * Returns whether the user has role User.ROLENAME_ANONYMOUS in his set of
-	 * roles by comparing the name of all roles to the given string using 
+	 * roles by comparing the name of all roles to the given string using
 	 * the private hasRole-method.
-	 * 
+	 *
 	 * @return whether the user has the queried role User.ROLENAME_ANONYMOUS.
 	 */
 	public boolean hasAnonymousRole() {
 		return this.hasRole(User.ROLENAME_ANONYMOUS);
 	}
-	
+
 	/**
-	 * Returns whether the user has the given role in his set of roles by 
+	 * Returns whether the user has the given role in his set of roles by
 	 * Comparing the name of all roles to the given string.
-	 * 
+	 *
 	 * @param rolename The rolename to check this users set of roles for
 	 * @return whether the user has the queried role or not.
 	 */
 	private boolean hasRole(String rolename) {
 		for (Iterator<Role> iterator = this.getRoles().iterator(); iterator.hasNext();) {
 			Role role = (Role) iterator.next();
-			
+
 			if (role.getName().equals(rolename)) {
 				return true;
 			}

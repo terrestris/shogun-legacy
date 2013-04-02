@@ -372,17 +372,8 @@ public class UserAdministrationService extends AbstractShogunService {
 		// so we do not need to create an admin as group leader,
 		// the logged in User is the group leader
 		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
-		Set<Role> rolesOfSessionUser = sessionUser.getRoles();
-		boolean isAdmin = false;
-		for (Role role : rolesOfSessionUser) {
-			if (role.getName().equals(User.ROLENAME_ADMIN) == true) {
-				isAdmin = true;
-				break;
-			}
-		}
-
 		User persistentSubadmin = null;
-		if (isAdmin == true) {
+		if (sessionUser.hasAdminRole() == true) {
 			persistentSubadmin = sessionUser;
 		} else {
 			persistentSubadmin = this.createSubadminForGroup(newGroup);
@@ -421,16 +412,7 @@ public class UserAdministrationService extends AbstractShogunService {
 		// check if the logged in user has the ROLE_ADMIN,
 		// so we have to check if has the right to update this group
 		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
-		Set<Role> rolesOfSessionUser = sessionUser.getRoles();
-		boolean isAdmin = false;
-		for (Role role : rolesOfSessionUser) {
-			if (role.getName().equals(User.ROLENAME_ADMIN) == true) {
-				isAdmin = true;
-				break;
-			}
-		}
-
-		if (isAdmin == true) {
+		if (sessionUser.hasAdminRole() == true) {
 
 			boolean isAllowed = false;
 			Set<Group> groupsOfSessionUser = sessionUser.getGroups();
