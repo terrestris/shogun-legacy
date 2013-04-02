@@ -1,10 +1,8 @@
 package de.terrestris.shogun.web;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.terrestris.shogun.jsonmodel.GroupList;
 import de.terrestris.shogun.jsonmodel.UserList;
-import de.terrestris.shogun.model.BaseModel;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.service.UserAdministrationService;
