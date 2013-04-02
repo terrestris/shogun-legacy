@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -245,6 +246,30 @@ public class UserAdministrationController extends AbstractWebController {
 		} catch (Exception e) {
 			LOGGER.error("Error trying to delete group.", e);
 			return getModelMapError("Error trying to delete group: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Web-interface for reading all own {@link Group} objects from the
+	 * database.
+	 *
+	 * If the logged in user is a SUPERADMIN, so all groups are returned.
+	 *
+	 * @return A JSON representation of all owned group objects
+	 */
+	@RequestMapping(value = "/group/get-all-own.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getAllOwnedGroups() {
+
+		try {
+
+			List<Group> ownedGroups = this.getShogunService().getAllOwnedGroups();
+
+			return this.getModelMapSuccess(ownedGroups);
+
+		} catch (Exception e) {
+			LOGGER.error("Error trying to read groups.", e);
+			return getModelMapError("Error trying to read groups: " + e.getMessage());
 		}
 	}
 

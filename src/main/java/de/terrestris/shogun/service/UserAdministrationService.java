@@ -4,6 +4,7 @@
 package de.terrestris.shogun.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -472,7 +473,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @param deleteId
 	 *            the ID of the record to be deleted
 	 * @throws ShogunDatabaseAccessException
-	 * @throws ShogunServiceException 
+	 * @throws ShogunServiceException
 	 */
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
@@ -499,6 +500,38 @@ public class UserAdministrationService extends AbstractShogunService {
 		}
 
 		this.getDatabaseDao().deleteEntity(Group.class, deleteId);
+	}
+
+	/**
+	 * Returns all related groups for the logged in User.
+	 * If the logged in user is a SUPERADMIN so all groups are returned.
+	 * Otherwise only the own groups are returned.
+	 *
+	 * @return
+	 */
+	@Transactional
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	public List<Group> getAllOwnedGroups() {
+
+		// check if the logged in user has the ROLE_SUPERADMIN,
+		// so we have to return all groups
+		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
+		List<Group> ownedGroups = null;
+		if (sessionUser.hasSuperAdminRole() == true) {
+
+			List<Object> allGroupsAsObject = this.getDatabaseDao().getAllEntities(Group.class);
+			ownedGroups = new ArrayList<Group>();
+			for (Object object : allGroupsAsObject) {
+				Group group = (Group) object;
+				ownedGroups.add(group);
+			}
+
+		} else {
+
+			ownedGroups = new ArrayList<Group>(sessionUser.getGroups());
+		}
+
+		return ownedGroups;
 	}
 
 	/**
@@ -578,7 +611,6 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			Mail.send("localhost", subadmin.getUser_email(), "admin",
 					"Registrierung bei SHOGun", mailtext);
-
 
 			return persistentSubadmin;
 
