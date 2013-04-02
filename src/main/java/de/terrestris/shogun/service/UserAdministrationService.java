@@ -396,63 +396,75 @@ public class UserAdministrationService extends AbstractShogunService {
 	}
 
 	/**
-	 * Updates Group objects in the database. <br>
-	 * <b>CAUTION: Only if the logged in user has the role ROLE_SUPERADMIN the
+	 * Updates a Group object in the database. <br><br>
+	 *
+	 * This method only updates the plain group information in the database.
+	 *
+	 * <b>CAUTION: Only if the logged in user has the role ROLE_ADMIN or
+	 * the role ROLE_SUPERADMIN the
 	 * function is accessible, otherwise access is denied.</b>
 	 *
 	 *
-	 * @param updatedGroups
-	 *            a list of {@link Group} objects which should be updated
-	 * @return a list of {@link Group} objects which have been successfully
+	 * @param groupToUpdate
+	 *            a {@link Group} object which should be updated
+	 * @return the persistent {@link Group} object which have been successfully
 	 *         updated
 	 * @throws ShogunDatabaseAccessException
-	 *
-	 * TODO CM refactor
+	 * @throws ShogunServiceException
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
-	public List<Group> updateGroup(List<Group> updatedGroups) throws ShogunDatabaseAccessException {
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	public Group updateGroup(Group groupToUpdate) throws ShogunDatabaseAccessException, ShogunServiceException {
 
-		List<Group> returnGroups = new ArrayList<Group>();
+		// transform the comma-separated list of module IDs to a list of
+		// Module objects
+		groupToUpdate.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
-		// iterate over Group delivered by client request
-		for (Iterator<Group> iterator = updatedGroups.iterator(); iterator
-				.hasNext();) {
-			Group group = iterator.next();
+		// write in DB
+		Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
+				Group.class.getSimpleName(), groupToUpdate);
 
-			// transform the comma-separated list of module IDs to a list of
-			// Module objects
-			group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+		// check if the logged in user has the ROLE_ADMIN,
+		// so we do not need to create an admin as group leader,
+		// the logged in User is the group leader
+		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
+		Set<Role> rolesOfSessionUser = sessionUser.getRoles();
+		boolean isAdmin = false;
+		for (Role role : rolesOfSessionUser) {
+			if (role.getName().equals(User.ROLENAME_ADMIN) == true) {
+				isAdmin = true;
+				break;
+			}
+		}
 
-			// write in DB
-			Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
-					Group.class.getSimpleName(), group);
+		User subadmin = null;
+		if (isAdmin == true) {
+			subadmin = sessionUser;
+
+		} else {
 
 			// fetch via group_nr because it is not changeable and unique
 			// restrict the access to the given group
-			User subadmin = this.getDatabaseDao().getUserByName(
+			subadmin = this.getDatabaseDao().getUserByName(
 					"subadmin_" + updatedGroup.getGroup_nr(),
 					"groups",
 					Restrictions.eq("id", updatedGroup.getId()));
 
-			// Overwrite
-			subadmin.setUser_module_list(updatedGroup.getGroup_module_list());
-			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
-			// update
-			this.getDatabaseDao().updateUser(subadmin);
-
-			returnGroups.add(updatedGroup);
-
-			// clear the session cache in order to have to current updated
-			// objects
-			// when requesting again
-			// unfortunately sess.evict does not work
-			this.getDatabaseDao().clearSession();
-
+			if (subadmin == null) {
+				throw new ShogunServiceException(
+						"No sub-admin found for the group with ID " +
+						updatedGroup.getId());
+			}
 		}
 
-		return returnGroups;
+		// Overwrite sub-admin settings
+		subadmin.setUser_module_list(updatedGroup.getGroup_module_list());
+		subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+
+		// update the sub-admin
+		this.getDatabaseDao().updateUser(subadmin);
+
+		return updatedGroup;
 	}
 
 	/**

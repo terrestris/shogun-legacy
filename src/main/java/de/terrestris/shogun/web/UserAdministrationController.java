@@ -194,29 +194,28 @@ public class UserAdministrationController extends AbstractWebController {
 
 
 	/**
-	 * Web-interface updating Group objects in the database
+	 * Web-interface updating a Group object in the database
 	 *
-	 * @param users A list of {@link Group} objects to be updated,
+	 * @param group A {@link Group} object to be updated,
 	 *   which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/updateGroup.action", method=RequestMethod.POST, headers="Accept=application/json,plain/text")
+	@RequestMapping(value = "/group/update.action", method=RequestMethod.POST)
 	public @ResponseBody
-	Map<String, ? extends Object> updateGroup(@RequestBody GroupList groups, HttpServletResponse response)
+	Map<String, ? extends Object> updateGroup(@RequestBody Group group)
 			throws Exception {
 
 		try {
 
-			List<Group> returnedgroups = this.getShogunService().updateGroup(groups.getGroups());
+			Group updatedGroup = this.getShogunService().updateGroup(group);
 			// Wrap to classical return object containing total, data, success
-			Map<String, Object> returnMap = this.getModelMapSuccess(returnedgroups);
+			Map<String, Object> returnMap = this.getModelMapSuccess(updatedGroup);
 
 			return returnMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in updateGroup", e);
+			LOGGER.error("Error trying to update Group.", e);
 			return getModelMapError("Error trying to update Group: " + e.getMessage());
 		}
 	}
