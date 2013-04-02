@@ -164,28 +164,34 @@ public class UserAdministrationController extends AbstractWebController {
 	/**
 	 * Web-interface creating a new Group instance in the database
 	 * 
-	 * @param users A list of new {@link Group} objects, 
-	 *   which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param users
+	 *            A list of new {@link Group} objects, which is delivered as
+	 *            JSON and automatically deserialized
+	 * @param response
+	 *            A HttpServletResponse object in order to return the response
 	 * 
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse 
+	 * @return A Map object representing the JSON structure of the returned
+	 *         HttpServletResponse
 	 */
-	@RequestMapping(value = "/user/createGroup.action", method=RequestMethod.POST, headers="Accept=application/json, plain/text")
-	public @ResponseBody Map<String, ? extends Object> createGroup(@RequestBody GroupList groups, HttpServletResponse response) {
-	    	
-    	try {
-    	
-	    	List<Group> returnGroups = this.getShogunService().createGroups(groups.getGroups());
-	    	// Wrap to classical return object containing total, data, success
-	    	Map<String, Object> returnMap = this.getModelMapSuccess(returnGroups);
+	@RequestMapping(value = "/group/create.action", method = RequestMethod.POST)
+	public @ResponseBody
+	Map<String, ? extends Object> createGroup(@RequestBody Group group) {
+
+		try {
+
+			Group persistentGroup = this.getShogunService().createGroup(group);
+			// Wrap to classical return object containing total, data, success
+			Map<String, Object> returnMap = this
+					.getModelMapSuccess(persistentGroup);
 
 			return returnMap;
-    	}
-    	catch (Exception e) {
-    		LOGGER.error("Error in createGroup", e);
-    		return getModelMapError("Error trying to create Group: " + e.getMessage());
+
+		} catch (Exception e) {
+			LOGGER.error("Error trying to create Group", e);
+			return getModelMapError("Error trying to create Group: "
+					+ e.getMessage());
 		}
-	    	 
+
 	}
 	
 	

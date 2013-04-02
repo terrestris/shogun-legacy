@@ -6,6 +6,7 @@ package de.terrestris.shogun.service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
@@ -20,6 +21,7 @@ import de.terrestris.shogun.exception.ShogunServiceException;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.MapConfig;
 import de.terrestris.shogun.model.Module;
+import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.model.WfsProxyConfig;
 import de.terrestris.shogun.model.WmsProxyConfig;
@@ -320,135 +322,77 @@ public class UserAdministrationService extends AbstractShogunService {
 
 
 	/**
-	 * Inserts new {@link Group} objects into the database. The new objects are
-	 * send to the DAO to save them into the DB. <br>
+	 * Inserts a new {@link Group} object into the database. <br>
 	 * It is checked if there is no other Group with the same number. <br>
 	 * Before saving the Group object:
 	 * <ul>
 	 * <li>create a {@link Module} object list from the comma-separated list of
 	 * module IDs (user_module_list)</li>
 	 * <li>a sub-admin as {@link User} instance is created with the base values
-	 * of the Group instance (street, etc.)</li>
+	 * of the Group instance (street, etc.) in case of triggering this method 
+	 * as SUPER_ADMIN</li>
 	 * <li>a random password is generated and save in the sub-admin instance</li>
 	 * <li>the new password is sent to the sub-admin via email</li>
 	 * </ul>
 	 *
-	 * <b>CAUTION: Only if the logged in user has the role ROLE_SUPERADMIN the
+	 * <b>CAUTION: Only if the logged in user has the role ROLE_ADMIN or 
+	 * ROLE_SUPERADMIN the
 	 * function is accessible, otherwise access is denied.</b>
 	 *
-	 * @param newGroups a list of {@link Group} objects to be inserted
-	 * @return a list of {@link Group} objects which have been inserted
-	 * @throws ShogunServiceException
-	 * @throws ShogunDatabaseAccessException
-	 * @throws Exception if a Group with the same group_nr already exists
+	 * @param group a {@link Group} object to be inserted
+	 * @return the {@link Group} object which has been inserted
+	 * @throws ShogunServiceException if a Group with the same group_nr already exists
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
-	public List<Group> createGroups(List<Group> newGroups) throws ShogunServiceException, ShogunDatabaseAccessException {
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	public Group createGroup(Group group) throws ShogunServiceException, ShogunDatabaseAccessException {
 
-		List<Group> returnGroups = new ArrayList<Group>();
+		Group newGroup = null;
 
-		// iterate over group delivered by client request
-		for (Iterator<Group> iterator = newGroups.iterator(); iterator.hasNext();) {
-			Group group = iterator.next();
-
-			Group newGroup = null;
-
-			// CREATE A NEW GROUP
-
-			// check if there is an existing user with the same number
-			// if there is --> Exception
-			Group testGroup = null;
-			testGroup = (Group) this.getDatabaseDao().getEntityByStringField(
-					Group.class, "group_nr", group.getGroup_nr());
-			if (testGroup != null) {
-				throw new ShogunServiceException("Group with number " + group.getGroup_nr()
-						+ " already exists!");
-			}
-
-			group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
-			// write new Group in DB
-			newGroup = (Group) this.getDatabaseDao().createEntity(
-					Group.class.getSimpleName(), group);
-
-			LOGGER.debug("GROUP CREATED: " + newGroup.getId());
-
-			// create a USER as sub-admin
-			User subadmin = new User();
-			subadmin.setUser_country(group.getCountry());
-			subadmin.setUser_email(group.getMail());
-			subadmin.setUser_name("subadmin_" + group.getGroup_nr());
-			subadmin.setUser_street(group.getStreet());
-			subadmin.setUser_lang(group.getLanguage());
-			subadmin.setUser_module_list(group.getGroup_module_list());
-
-			// create ModuleArray from Module-comma-separated list
-			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
-			// TODO become more flexibel here, wrap to method
-			// set the default map conf
-			// TODO remove static ID !!!!!!!
-			MapConfig mapConfig =
-				(MapConfig)this.getDatabaseDao().getEntityById(1, MapConfig.class);
-			if (mapConfig != null) {
-//				Set newMapConfSet = new HashSet<MapConfig>();
-//				newMapConfSet.add(mapConfig);
-//				subadmin.setMapConfigs(newMapConfSet);
-
-				subadmin.setMapConfig(mapConfig);
-			}
-			// TODO become more flexibel here, wrap to method
-			// set the default wms proxy conf
-			WmsProxyConfig defaultWmsProxy =
-				(WmsProxyConfig)this.getDatabaseDao().getEntityById(1, WmsProxyConfig.class);
-			if (defaultWmsProxy != null) {
-				subadmin.setWmsProxyConfig(defaultWmsProxy);
-			}
-
-			// TODO become more flexibel here, wrap to method
-			// set the default wms proxy conf
-			WfsProxyConfig defaultWfsProxy =
-				(WfsProxyConfig)this.getDatabaseDao().getEntityById(1, WfsProxyConfig.class);
-			if (defaultWfsProxy != null) {
-				subadmin.setWfsProxyConfig(defaultWfsProxy);
-			}
-
-			subadmin.setApp_user(group.getApp_user());
-			subadmin.setCreated_at(group.getCreated_at());
-			subadmin.setUpdated_at(group.getUpdated_at());
-
-			// create a new random password and send it per mail to new user
-			String pw = Password.getRandomPassword(8);
-
-			PasswordEncoder pwencoder = new Md5PasswordEncoder();
-			String hashed = pwencoder.encodePassword(pw, null);
-
-			subadmin.setUser_password(hashed);
-
-			// save sub-admin to database
-			User persistentSubadmin =
-				this.getDatabaseDao().createUser(subadmin, "ROLE_ADMIN", false);
-
-			LOGGER.debug("GROUP CREATED: " + newGroup.getId());
-
-			// add new subadmin to the created group
-			newGroup.getUsers().add(persistentSubadmin);
-			this.getDatabaseDao().updateEntity("Group", newGroup);
-
-			String mailtext = "Sehr geehrter Nutzer " + subadmin.getUser_name()
-					+ "\n\n";
-			mailtext += "Ihr Passwort zu SHOGun lautet \n\n";
-			mailtext += pw + "\n\n";
-
-			Mail.send("localhost", subadmin.getUser_email(), "admin",
-					"Registrierung bei SHOGun", mailtext);
-
-			// add to return list
-			returnGroups.add(newGroup);
+		// check if there is an existing user with the same number
+		// if there is --> Exception
+		Group testGroup = null;
+		testGroup = (Group) this.getDatabaseDao().getEntityByStringField(
+				Group.class, "group_nr", group.getGroup_nr());
+		if (testGroup != null) {
+			throw new ShogunServiceException(
+					"Group with number " + group.getGroup_nr()
+					+ " already exists!");
 		}
 
-		return returnGroups;
+		group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+
+		// write new Group in DB
+		newGroup = (Group) this.getDatabaseDao().createEntity(
+				Group.class.getSimpleName(), group);
+
+		LOGGER.debug("Group created in database with ID: " + newGroup.getId());
+		
+		// check if the logged in user has the ROLE_ADMIN,
+		// so we do not need to create an admin as group leader, 
+		// the logged in User is the group leader
+		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
+		Set<Role> rolesOfSessionUser = sessionUser.getRoles();
+		boolean isAdmin = false;
+		for (Role role : rolesOfSessionUser) {
+			if (role.getName().equals(User.ROLENAME_ADMIN) == true) {
+				isAdmin = true;
+				break;
+			}
+		}
+		
+		User persistentSubadmin = null;
+		if (isAdmin == true) {
+			persistentSubadmin = sessionUser;
+		} else {
+			persistentSubadmin = this.createSubadminForGroup(newGroup);
+		}
+		
+		// add sub-admin to the created group
+		newGroup.getUsers().add(persistentSubadmin);
+		this.getDatabaseDao().updateEntity("Group", newGroup);
+
+		return newGroup;
 	}
 
 	/**
@@ -532,5 +476,92 @@ public class UserAdministrationService extends AbstractShogunService {
 
 		Integer id = new Integer(deleteId);
 		this.getDatabaseDao().deleteEntity(Group.class, id);
+	}
+	
+	/**
+	 * Creates a {@link User} object which acts a sub-admin (= group leader) for
+	 * the given Group.
+	 * 
+	 * @param group A persistent {@link Group} object to create a sub-admin for
+	 * @return the persistent {@link User} object which acts a sub-admin
+	 * @throws ShogunServiceException 
+	 */
+	private User createSubadminForGroup(Group group) throws ShogunServiceException {
+		
+		try {
+			
+			// create a USER object as sub-admin
+			User subadmin = new User();
+			subadmin.setUser_country(group.getCountry());
+			subadmin.setUser_email(group.getMail());
+			subadmin.setUser_name("subadmin_" + group.getGroup_nr());
+			subadmin.setUser_street(group.getStreet());
+			subadmin.setUser_lang(group.getLanguage());
+			subadmin.setUser_module_list(group.getGroup_module_list());
+	
+			// create ModuleArray from Module-comma-separated list
+			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+	
+			// TODO become more flexibel here, wrap to method
+			// set the default map conf
+			// TODO remove static ID !!!!!!!
+			MapConfig mapConfig =
+				(MapConfig)this.getDatabaseDao().getEntityById(1, MapConfig.class);
+			if (mapConfig != null) {
+	//				Set newMapConfSet = new HashSet<MapConfig>();
+	//				newMapConfSet.add(mapConfig);
+	//				subadmin.setMapConfigs(newMapConfSet);
+	
+				subadmin.setMapConfig(mapConfig);
+			}
+			// TODO become more flexibel here, wrap to method
+			// set the default wms proxy conf
+			WmsProxyConfig defaultWmsProxy =
+				(WmsProxyConfig)this.getDatabaseDao().getEntityById(1, WmsProxyConfig.class);
+			if (defaultWmsProxy != null) {
+				subadmin.setWmsProxyConfig(defaultWmsProxy);
+			}
+	
+			// TODO become more flexibel here, wrap to method
+			// set the default wms proxy conf
+			WfsProxyConfig defaultWfsProxy =
+				(WfsProxyConfig)this.getDatabaseDao().getEntityById(1, WfsProxyConfig.class);
+			if (defaultWfsProxy != null) {
+				subadmin.setWfsProxyConfig(defaultWfsProxy);
+			}
+	
+			subadmin.setApp_user(group.getApp_user());
+			subadmin.setCreated_at(group.getCreated_at());
+			subadmin.setUpdated_at(group.getUpdated_at());
+	
+			// create a new random password and send it per mail to new user
+			String pw = Password.getRandomPassword(8);
+	
+			PasswordEncoder pwencoder = new Md5PasswordEncoder();
+			String hashed = pwencoder.encodePassword(pw, null);
+	
+			subadmin.setUser_password(hashed);
+	
+			// save sub-admin to database
+			User persistentSubadmin =
+				this.getDatabaseDao().createUser(
+						subadmin, User.ROLENAME_ADMIN, false);
+			
+			// send a mail with the new password
+			String mailtext = "Sehr geehrter Nutzer " + subadmin.getUser_name()
+					+ "\n\n";
+			mailtext += "Ihr Passwort zu SHOGun lautet \n\n";
+			mailtext += pw + "\n\n";
+			
+			Mail.send("localhost", subadmin.getUser_email(), "admin",
+					"Registrierung bei SHOGun", mailtext);
+	
+			
+			return persistentSubadmin;
+		
+		} catch (Exception e) {
+			throw new ShogunServiceException(
+					"Error while creating sub-admin for group: " + e.getMessage(), e);
+		}
 	}
 }
