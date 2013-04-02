@@ -361,7 +361,26 @@ public class UserAdministrationService extends AbstractShogunService {
 					+ " already exists!");
 		}
 
+		// transform the comma-separated list of module IDs to a list of
+		// Module objects
 		group.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+
+
+		/*
+		 * convert the transmitted user IDs to real user objects
+		 */
+		Set<Integer> userIds = group.getGrantedUsers();
+		if (userIds != null && userIds.size() > 0) {
+
+			Object[] aUserIds = userIds.toArray();
+			@SuppressWarnings("unchecked")
+			List<User> usersToGrantList = (List<User>) this.getDatabaseDao().getEntitiesByIds(aUserIds, User.class);
+
+			// convert to a set
+			Set<User> usersToGrantSet = new HashSet<User>(usersToGrantList);
+
+			group.setUsers(usersToGrantSet);
+		}
 
 		// write new Group in DB
 		newGroup = (Group) this.getDatabaseDao().createEntity(
@@ -433,12 +452,18 @@ public class UserAdministrationService extends AbstractShogunService {
 
 		} else {
 
-			// fetch via group_nr because it is not changeable and unique
-			// restrict the access to the given group
-			subadmin = this.getDatabaseDao().getUserByName(
-					"subadmin_" + groupToUpdate.getGroup_nr(),
-					"groups",
-					Restrictions.eq("id", groupToUpdate.getId()));
+			Group persistentGroup = (Group) this.getDatabaseDao().getEntityById(
+					groupToUpdate.getId(), Group.class);
+
+			// detect a sub-admin of this group, because the logged in user
+			// is the super-admin
+			Set<User> usersOfExistingGroup = persistentGroup.getUsers();
+			for (User user : usersOfExistingGroup) {
+				if (user.hasAdminRole()) {
+					subadmin = user;
+					break;
+				}
+			}
 
 			if (subadmin == null) {
 				throw new ShogunServiceException(
@@ -450,6 +475,22 @@ public class UserAdministrationService extends AbstractShogunService {
 		// transform the comma-separated list of module IDs to a list of
 		// Module objects
 		groupToUpdate.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+
+		/*
+		 * convert the transmitted user IDs to real user objects
+		 */
+		Set<Integer> userIds = groupToUpdate.getGrantedUsers();
+		if (userIds != null && userIds.size() > 0) {
+
+			Object[] aUserIds = userIds.toArray();
+			@SuppressWarnings("unchecked")
+			List<User> usersToGrantList = (List<User>) this.getDatabaseDao().getEntitiesByIds(aUserIds, User.class);
+
+			// convert to a set
+			Set<User> usersToGrantSet = new HashSet<User>(usersToGrantList);
+
+			groupToUpdate.setUsers(usersToGrantSet);
+		}
 
 		// write in DB
 		Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
@@ -542,6 +583,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @return the persistent {@link User} object which acts a sub-admin
 	 * @throws ShogunServiceException
 	 */
+	@Transactional
 	private User createSubadminForGroup(Group group) throws ShogunServiceException {
 
 		try {

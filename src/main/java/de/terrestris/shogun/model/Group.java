@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
@@ -53,7 +54,9 @@ public class Group extends BaseModel{
 
 	private Set<User> users;
 	private List<Module> modules;
+	
 	private String group_module_list;
+	private Set<Integer> grantedUsers;
 	
 	/**
 	 * 
@@ -371,8 +374,22 @@ public class Group extends BaseModel{
 		this.group_module_list = group_module_list;
 	}
 	
+	/**
+	 * @return the grantedUsers
+	 */
+	@Transient
+	public Set<Integer> getGrantedUsers() {
+		return grantedUsers;
+	}
 	
-	
+	/**
+	 * @param grantedUsers the grantedUsers to set
+	 */
+	@Transient
+	public void setGrantedUsers(Set<Integer> grantedUsers) {
+		this.grantedUsers = grantedUsers;
+	}
+
 	
 	/**
 	 * The method transforms the comma-separated list of module IDs stored in
