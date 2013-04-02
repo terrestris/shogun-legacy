@@ -416,17 +416,10 @@ public class UserAdministrationService extends AbstractShogunService {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public Group updateGroup(Group groupToUpdate) throws ShogunDatabaseAccessException, ShogunServiceException {
 
-		// transform the comma-separated list of module IDs to a list of
-		// Module objects
-		groupToUpdate.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
-		// write in DB
-		Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
-				Group.class.getSimpleName(), groupToUpdate);
+		User subadmin = null;
 
 		// check if the logged in user has the ROLE_ADMIN,
-		// so we do not need to create an admin as group leader,
-		// the logged in User is the group leader
+		// so we have to check if has the right to update this group
 		User sessionUser = this.getDatabaseDao().getUserObjectFromSession();
 		Set<Role> rolesOfSessionUser = sessionUser.getRoles();
 		boolean isAdmin = false;
@@ -437,8 +430,22 @@ public class UserAdministrationService extends AbstractShogunService {
 			}
 		}
 
-		User subadmin = null;
 		if (isAdmin == true) {
+
+			boolean isAllowed = false;
+			Set<Group> groupsOfSessionUser = sessionUser.getGroups();
+			for (Group group : groupsOfSessionUser) {
+				if (group.getId() == groupToUpdate.getId()) {
+					isAllowed = true;
+				}
+			}
+
+			if (isAllowed == false) {
+				throw new ShogunServiceException(
+						"Access denied: User not allowed to update this group");
+			}
+
+			// set the logged in user as subadmin
 			subadmin = sessionUser;
 
 		} else {
@@ -446,16 +453,24 @@ public class UserAdministrationService extends AbstractShogunService {
 			// fetch via group_nr because it is not changeable and unique
 			// restrict the access to the given group
 			subadmin = this.getDatabaseDao().getUserByName(
-					"subadmin_" + updatedGroup.getGroup_nr(),
+					"subadmin_" + groupToUpdate.getGroup_nr(),
 					"groups",
-					Restrictions.eq("id", updatedGroup.getId()));
+					Restrictions.eq("id", groupToUpdate.getId()));
 
 			if (subadmin == null) {
 				throw new ShogunServiceException(
-						"No sub-admin found for the group with ID " +
-						updatedGroup.getId());
+						"No sub-admin found for given group.");
 			}
 		}
+
+
+		// transform the comma-separated list of module IDs to a list of
+		// Module objects
+		groupToUpdate.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+
+		// write in DB
+		Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
+				Group.class.getSimpleName(), groupToUpdate);
 
 		// Overwrite sub-admin settings
 		subadmin.setUser_module_list(updatedGroup.getGroup_module_list());
