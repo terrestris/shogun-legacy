@@ -48,6 +48,7 @@ public class User extends BaseModel {
 	private String user_country;
 	private String user_password;
 	private String user_lang;
+	private Boolean active = true;
 	
 	private List<Module> modules;
 	private Set<MapLayer> mapLayers;
@@ -220,6 +221,20 @@ public class User extends BaseModel {
 		this.user_lang = user_lang;
 	}
 	
+	/**
+	 * @return the active
+	 */
+	@Column(name="ACTIVE")
+	public Boolean getActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 	
 
 	/**
