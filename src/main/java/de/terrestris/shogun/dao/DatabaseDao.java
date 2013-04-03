@@ -491,6 +491,28 @@ public class DatabaseDao {
 	}
 
 	/**
+	 * Returns a set of Objects from database by a Boolean comparison
+	 * of a specified field <br>
+	 *
+	 * @param clazz
+	 * @param fieldname
+	 * @param value
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object> getEntitiesByBooleanField(Class<?> clazz, String fieldname, Boolean value) {
+
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria.add(Restrictions.eq(fieldname, value));
+
+		// this ensures that no cartesian product is returned when
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return criteria.list();
+	}
+
+	/**
 	 * Creates a record of a given Entity in the database
 	 * 
 	 * @param entityClass Entity class of the new object
