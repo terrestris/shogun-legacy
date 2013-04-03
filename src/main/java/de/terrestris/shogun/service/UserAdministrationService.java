@@ -347,12 +347,8 @@ public class UserAdministrationService extends AbstractShogunService {
 	@Transactional
 	@PreAuthorize("isAuthenticated()")
 	public List<User> getActiveUsers() {
-		List<User> activeUsers = new ArrayList<User>();
-		List<Object> activeUsersAsObject = this.getDatabaseDao().getEntitiesByBooleanField(User.class, "active", true);
-		for (Object object : activeUsersAsObject) {
-			User activeUser = (User) object;
-			activeUsers.add(activeUser);
-		}
+		List<User> activeUsers = this.getDatabaseDao()
+				.getEntitiesByBooleanField(User.class, "active", true);
 
 		return activeUsers;
 	}

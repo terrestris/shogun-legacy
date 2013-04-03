@@ -500,7 +500,7 @@ public class DatabaseDao {
 	 * @return The objects fulfilling the filter request
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> getEntitiesByBooleanField(Class<?> clazz, String fieldname, Boolean value) {
+	public <T> List<T> getEntitiesByBooleanField(Class<T> clazz, String fieldname, Boolean value) {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(fieldname, value));
@@ -509,7 +509,7 @@ public class DatabaseDao {
 		// having sub objects, e.g. User <-> Modules
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
-		return criteria.list();
+		return (List<T>)criteria.list();
 	}
 
 	/**
