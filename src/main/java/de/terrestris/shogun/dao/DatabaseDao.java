@@ -494,10 +494,10 @@ public class DatabaseDao {
 	 * Returns a set of Objects from database by a Boolean comparison
 	 * of a specified field <br>
 	 *
-	 * @param clazz
-	 * @param fieldname
-	 * @param value
-	 * @return
+	 * @param clazz The class of the object model to be used
+	 * @param fieldname the column which should be filtered
+	 * @param value the value to filter (type Boolean)
+	 * @return The objects fulfilling the filter request
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Object> getEntitiesByBooleanField(Class<?> clazz, String fieldname, Boolean value) {
