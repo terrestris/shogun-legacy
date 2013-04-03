@@ -338,7 +338,24 @@ public class UserAdministrationService extends AbstractShogunService {
 		Integer id = new Integer(deleteId);
 		this.getDatabaseDao().deleteUser(id);
 	}
-	
+
+	/**
+	 * Returns a list of all active users from database.
+	 *
+	 * @return list of active {@link User} objects
+	 */
+	@Transactional
+	@PreAuthorize("isAuthenticated()")
+	public List<User> getActiveUsers() {
+		List<User> activeUsers = new ArrayList<User>();
+		List<Object> activeUsersAsObject = this.getDatabaseDao().getEntitiesByBooleanField(User.class, "active", true);
+		for (Object object : activeUsersAsObject) {
+			User activeUser = (User) object;
+			activeUsers.add(activeUser);
+		}
+
+		return activeUsers;
+	}
 
 	/**
 	 * Inserts new {@link Group} objects into the database. The new objects are
