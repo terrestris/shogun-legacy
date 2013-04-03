@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
@@ -345,7 +346,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @return the {@link Group} object which has been inserted
 	 * @throws ShogunServiceException if a Group with the same group_nr already exists
 	 */
-	@Transactional
+	@Transactional(rollbackFor = ShogunServiceException.class)
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public Group createGroup(Group group) throws ShogunServiceException, ShogunDatabaseAccessException {
 
@@ -616,7 +617,6 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @return the persistent {@link User} object which acts a sub-admin
 	 * @throws ShogunServiceException
 	 */
-	@Transactional
 	private User createSubadminForGroup(Group group) throws ShogunServiceException {
 
 		try {
@@ -684,8 +684,12 @@ public class UserAdministrationService extends AbstractShogunService {
 			mailtext += "Ihr Passwort zu SHOGun lautet \n\n";
 			mailtext += pw + "\n\n";
 
-			Mail.send("localhost", subadmin.getUser_email(), "admin",
-					"Registrierung bei SHOGun", mailtext);
+			try {
+				Mail.send("localhost", subadmin.getUser_email(), "admin",
+						"Registrierung bei SHOGun", mailtext);
+			} catch (Exception e) {
+				throw new ShogunServiceException(e.getMessage());
+			}
 
 			return persistentSubadmin;
 
