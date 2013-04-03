@@ -17,18 +17,18 @@ import org.hibernate.annotations.FetchMode;
 
 /**
  * MapLayer POJO
- * 
- * Please note that we extend the class BaseModelInheritance here to have 
+ *
+ * Please note that we extend the class BaseModelInheritance here to have
  * DB-inheritance (that class has the correct id-strategy) needed here.<br><br>
- * 
+ *
  * Instead of @MappedSuperclass we use an abstract class acting as entity (@Entity).
  * This way we can use MapLayer as type of Sets when using one-to-many-relations
- * (see e.g {@link User}). 
- * 
+ * (see e.g {@link User}).
+ *
  * @see http://stackoverflow.com/questions/2912988/persist-collection-of-interface-using-hibernate
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -55,10 +55,11 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private Integer numZoomLevels = null;
 	private Boolean displayOutsideMaxExtent = false;
 	private String transitionEffect = null;
-	
+
 	private Set<LayerMetadata> metadata;
 	private Set<User> users;
-	
+	private Set<Group> groups;
+
 
 	/**
 	 * @return the name
@@ -67,15 +68,15 @@ public abstract class MapLayer extends BaseModelInheritance {
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+
+
 	/**
 	 * @return the type
 	 */
@@ -83,15 +84,15 @@ public abstract class MapLayer extends BaseModelInheritance {
 	public String getType() {
 		return type;
 	}
-	
+
 	/**
 	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	
+
+
 	/**
 	 * @return the isBaseLayer
 	 */
@@ -99,15 +100,15 @@ public abstract class MapLayer extends BaseModelInheritance {
 	public Boolean getIsBaseLayer() {
 		return isBaseLayer;
 	}
-	
+
 	/**
 	 * @param isBaseLayer the isBaseLayer to set
 	 */
 	public void setIsBaseLayer(Boolean isBaseLayer) {
 		this.isBaseLayer = isBaseLayer;
 	}
-	
-	
+
+
 	/**
 	 * @return the visibility
 	 */
@@ -115,7 +116,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	public Boolean getVisibility() {
 		return visibility;
 	}
-	
+
 	/**
 	 * @param visibility the visibility to set
 	 */
@@ -393,7 +394,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	public void setMetadata(Set<LayerMetadata> metadata) {
 		this.metadata = metadata;
 	}
-	
+
 	/**
 	 * @return the users
 	 */
@@ -409,6 +410,23 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	public void setUsers(Set<User> users) {
 		this.users = users;
+	}
+
+	/**
+	 * @return the groups
+	 */
+	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
+	@JsonIgnore
+	@Fetch(FetchMode.SELECT)
+	public Set<Group> getGroups() {
+		return groups;
+	}
+
+	/**
+	 * @param groups the groups to set
+	 */
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
 	}
 
 }

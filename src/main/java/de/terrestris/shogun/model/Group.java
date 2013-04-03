@@ -22,18 +22,18 @@ import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
  * Group POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO check for the deprecated org.hibernate.cache.CacheConcurrencyStrategy;
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_GROUP")
 @Embeddable
 public class Group extends BaseModel{
-	
+
 	private String name;
 	private String group_nr;
 	private String company;
@@ -54,12 +54,14 @@ public class Group extends BaseModel{
 
 	private Set<User> users;
 	private List<Module> modules;
-	
+	private Set<MapLayer> mapLayers;
+
 	private String group_module_list;
 	private Set<Integer> grantedUsers;
-	
+	private Set<Integer> grantedMapLayers;
+
 	/**
-	 * 
+	 *
 	 */
 	public Group() {
 		super();
@@ -320,14 +322,14 @@ public class Group extends BaseModel{
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	
+
 	/**
 	 * @return the users
 	 */
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "TBL_GROUP_TBL_USER", joinColumns = { 
-			@JoinColumn(name = "GROUP_FK", nullable = true, updatable = false) }, 
-			inverseJoinColumns = { @JoinColumn(name = "USER_FK", 
+	@JoinTable(name = "TBL_GROUP_TBL_USER", joinColumns = {
+			@JoinColumn(name = "GROUP_FK", nullable = true, updatable = false) },
+			inverseJoinColumns = { @JoinColumn(name = "USER_FK",
 					nullable = true, updatable = false) })
 	public Set<User> getUsers() {
 		return users;
@@ -344,9 +346,9 @@ public class Group extends BaseModel{
 	 * @return the modules
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
-	@JoinTable(name = "TBL_GROUP_TBL_MODULE",  joinColumns = { 
-			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) }, 
-			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID", 
+	@JoinTable(name = "TBL_GROUP_TBL_MODULE",  joinColumns = {
+			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
+			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
 	public List<Module> getModules() {
 		return modules;
@@ -358,7 +360,25 @@ public class Group extends BaseModel{
 	public void setModules(List<Module> modules) {
 		this.modules = modules;
 	}
-	
+
+	/**
+	 * @return the mapLayers
+	 */
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=MapLayer.class)
+	@JoinTable(name = "TBL_GROUP_TBL_MAPLAYER",  joinColumns = {
+			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
+			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
+					nullable = false, updatable = false) })
+	public Set<MapLayer> getMapLayers() {
+		return mapLayers;
+	}
+
+	/**
+	 * @param mapLayers the mapLayers to set
+	 */
+	public void setMapLayers(Set<MapLayer> mapLayers) {
+		this.mapLayers = mapLayers;
+	}
 
 	/**
 	 * @return the group_module_list
@@ -373,7 +393,7 @@ public class Group extends BaseModel{
 	public void setGroup_module_list(String group_module_list) {
 		this.group_module_list = group_module_list;
 	}
-	
+
 	/**
 	 * @return the grantedUsers
 	 */
@@ -381,7 +401,7 @@ public class Group extends BaseModel{
 	public Set<Integer> getGrantedUsers() {
 		return grantedUsers;
 	}
-	
+
 	/**
 	 * @param grantedUsers the grantedUsers to set
 	 */
@@ -390,17 +410,33 @@ public class Group extends BaseModel{
 		this.grantedUsers = grantedUsers;
 	}
 
-	
+	/**
+	 * @return the grantedMapLayers
+	 */
+	@Transient
+	public Set<Integer> getGrantedMapLayers() {
+		return grantedMapLayers;
+	}
+
+	/**
+	 * @param grantedMapLayers the grantedMapLayers to set
+	 */
+	@Transient
+	public void setGrantedMapLayers(Set<Integer> grantedMapLayers) {
+		this.grantedMapLayers = grantedMapLayers;
+	}
+
+
 	/**
 	 * The method transforms the comma-separated list of module IDs stored in
-	 * the member variable <i>user_module_list</i> into a list with 
-	 * {@link Module} objects. This list is set to the <i>modules</i> variable 
+	 * the member variable <i>user_module_list</i> into a list with
+	 * {@link Module} objects. This list is set to the <i>modules</i> variable
 	 * of the calling {@link Group} instance
-	 * 
+	 *
 	 * @param databaseDAO a {@link DatabaseDao} instance in order to access the database
 	 */
 	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
-		
+
 		// create Module object list from comma separated string (user_module_list)
 		List<Module> newModules = null;
 		if (this.getGroup_module_list() != null
@@ -413,10 +449,10 @@ public class Group extends BaseModel{
 				Integer inte = new Integer(moduleIdArray[i]);
 				intArray.add(inte);
 			}
-			
+
 			// get the module objects from the database
 			List<? extends Object> modules = databaseDAO.getEntitiesByIds(intArray.toArray(), Module.class);
-			
+
 			// iterate to cast the returned Objects to Module
 			newModules = new ArrayList<Module>(modules.size());
 			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
@@ -427,7 +463,7 @@ public class Group extends BaseModel{
 			modules = null;
 
 		} else {
-			
+
 			// return an empty list
 			newModules = new ArrayList<Module>();
 		}

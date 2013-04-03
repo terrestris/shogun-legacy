@@ -21,6 +21,7 @@ import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
 import de.terrestris.shogun.exception.ShogunServiceException;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.MapConfig;
+import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.Module;
 import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
@@ -382,6 +383,22 @@ public class UserAdministrationService extends AbstractShogunService {
 			group.setUsers(usersToGrantSet);
 		}
 
+		/*
+		 * convert the transmitted MapLayer IDs to real MapLayer objects
+		 */
+		Set<Integer> mapLayers = group.getGrantedMapLayers();
+		if (mapLayers != null && mapLayers.size() > 0) {
+
+			Object[] aMapLayerIds = mapLayers.toArray();
+			@SuppressWarnings("unchecked")
+			List<MapLayer> wmsMapLayers = (List<MapLayer>) this
+					.getDatabaseDao().getEntitiesByIds(aMapLayerIds,
+							MapLayer.class);
+
+			Set<MapLayer> layers = new HashSet<MapLayer>(wmsMapLayers);
+			group.setMapLayers(layers);
+		}
+
 		// write new Group in DB
 		newGroup = (Group) this.getDatabaseDao().createEntity(
 				Group.class.getSimpleName(), group);
@@ -490,6 +507,22 @@ public class UserAdministrationService extends AbstractShogunService {
 			Set<User> usersToGrantSet = new HashSet<User>(usersToGrantList);
 
 			groupToUpdate.setUsers(usersToGrantSet);
+		}
+
+		/*
+		 * convert the transmitted MapLayer IDs to real MapLayer objects
+		 */
+		Set<Integer> mapLayers = groupToUpdate.getGrantedMapLayers();
+		if (mapLayers != null && mapLayers.size() > 0) {
+
+			Object[] aMapLayerIds = mapLayers.toArray();
+			@SuppressWarnings("unchecked")
+			List<MapLayer> wmsMapLayers = (List<MapLayer>) this
+					.getDatabaseDao().getEntitiesByIds(aMapLayerIds,
+							MapLayer.class);
+
+			Set<MapLayer> layers = new HashSet<MapLayer>(wmsMapLayers);
+			groupToUpdate.setMapLayers(layers);
 		}
 
 		// write in DB
