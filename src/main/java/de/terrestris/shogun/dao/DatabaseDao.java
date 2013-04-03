@@ -736,19 +736,6 @@ public class DatabaseDao {
 		return user;
 	}
 
-
-	/**
-	 * Deletes a user instance given by its user-id
-	 *
-	 * @throws ShogunDatabaseAccessException
-	 *
-	 */
-	public void deleteUserOldDeleteme(int id) throws ShogunDatabaseAccessException {
-
-		this.deleteEntityGroupDependent(User.class, id);
-	}
-
-
 	/**
 	 * Deletes a user instance given by its user id. <br>
 	 *
@@ -765,7 +752,6 @@ public class DatabaseDao {
 		criteria.add(Restrictions.eq("id", id));
 		User userToDelete = (User) criteria.uniqueResult();
 
-		// group check --> user allowed to delete this instance?
 		if (userToDelete != null) {
 
 			// delete the user instance
