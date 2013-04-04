@@ -110,6 +110,27 @@ public class UserAdministrationController extends AbstractWebController {
 	}
 
 	/**
+	 * Web-interface returning all active users. <br><br>
+	 *
+	 * CAUTION: this is only accessible as authenticated user.
+	 *
+	 * @return a JSON representation of the response
+	 */
+	@RequestMapping(value = "/user/get-active.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getActiveUsers() {
+
+		try {
+			List<User> activeUsers = this.shogunService.getActiveUsers();
+
+			return this.getModelMapSuccess(activeUsers);
+		} catch (Exception e) {
+			LOGGER.error("Error while returning active Users.", e);
+			return this.getModelMapError("Error while returning active Users: " + e.getMessage());
+		}
+	}
+
+	/**
 	 * Web-interface deleting a User objects in the database
 	 *
 	 * @param the_id an ID of the User to be deleted
