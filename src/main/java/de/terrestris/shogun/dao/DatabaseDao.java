@@ -491,8 +491,8 @@ public class DatabaseDao {
 	}
 
 	/**
-	 * Returns a set of Objects from database by a Boolean comparison
-	 * of a specified field <br>
+	 * Returns a set of objects from database by a boolean comparison
+	 * with a specified field. <br>
 	 *
 	 * @param clazz The class of the object model to be used
 	 * @param fieldname the column which should be filtered
@@ -502,7 +502,8 @@ public class DatabaseDao {
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getEntitiesByBooleanField(Class<T> clazz, String fieldname, Boolean value) {
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		Criteria criteria =
+			this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(fieldname, value));
 
 		// this ensures that no cartesian product is returned when
