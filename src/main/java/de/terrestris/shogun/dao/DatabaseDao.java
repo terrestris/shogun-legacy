@@ -36,6 +36,7 @@ import de.terrestris.shogun.hibernatecriteria.filter.HibernateFilterItem;
 import de.terrestris.shogun.hibernatecriteria.paging.HibernatePagingObject;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortItem;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortObject;
+import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
@@ -503,6 +504,16 @@ public class DatabaseDao {
 	}
 
 	/**
+	 *
+	 * @param <T>
+	 * @param clazz
+	 * @param objectToDelete
+	 */
+	public <T> void deleteEntity(Class<T> clazz, BaseModelInterface objectToDelete) {
+		this.sessionFactory.getCurrentSession().delete(objectToDelete);
+	}
+
+	/**
 	 * Deletes a record of a given Entity in the database. The record to be
 	 * deleted is defined by a certain value of one its data columns.
 	 * (For example WHERE name='Peter')
@@ -649,7 +660,43 @@ public class DatabaseDao {
 		return (User) criteria.uniqueResult();
 	}
 
+	/**
+	 * Returns a User object defined by its ID in the database.
+	 * <br>
+	 * <br>
+	 * Can be filtered by a further criterion (additionalCriterion) put on a
+	 * specific path (additionalCriteriaPath). This could model a filter like
+	 * <br>
+	 * <code>
+	 * criteria.createCriteria("groups")
+				.add(Restrictions.in("id", groupIdsOfSessionUser));
+	 * <code>
+	 *
+	 * @param id the ID of the {@link User} to query
+	 * @param additionalCriteriaPath a criteria path to put add a further criterion
+	 * @param additionalCriterion additional criterion to filter query
+	 * @return the {@link User} object matching the query
+	 */
+	public User getUserById(int id, String additionalCriteriaPath, Criterion additionalCriterion) {
 
+		Criteria criteria =
+			this.sessionFactory.getCurrentSession().createCriteria(User.class);
+
+		// add additional restrictions like
+		// where user is in group with ID xy
+		if (additionalCriteriaPath != null &&
+				additionalCriteriaPath.isEmpty() == false &&
+				additionalCriterion != null) {
+
+			criteria.createCriteria(additionalCriteriaPath)
+				.add(additionalCriterion);
+		}
+
+		// filter on ID
+		criteria.add(Restrictions.eq("id", id));
+
+		return (User) criteria.uniqueResult();
+	}
 
 	/**
 	 * Create a new User on the database or

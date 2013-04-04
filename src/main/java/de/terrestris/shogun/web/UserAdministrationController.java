@@ -98,29 +98,25 @@ public class UserAdministrationController extends AbstractWebController {
 
 
 	/**
-	 * Web-interface deleting a User objects in the database
+	 * Web-interface deleting a User object in the database.
 	 *
-	 * @param the_id an ID of the User to be deleted
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param userId the ID of the User to be deleted
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/deleteUser.action", method=RequestMethod.POST, headers="Accept=application/json,plain/text")
+	@RequestMapping(value = "/user/delete.action")
 	public @ResponseBody
-	Map<String, ? extends Object> deleteUser(@RequestBody int the_id, HttpServletResponse response)
+	Map<String, ? extends Object> deleteUser(int userId)
 			throws Exception {
 
 		try {
 
-			this.getShogunService().deleteUser(the_id);
+			this.getShogunService().deleteUser(userId);
 
-			Map<String, Object> modelMap = new HashMap<String, Object>(3);
-			modelMap.put("success", true);
-
-			return modelMap;
+			return this.getModelMapSuccess(userId);
 
 		} catch (Exception e) {
-			LOGGER.error("Error in deleteUser", e);
+			LOGGER.error("Error trying to delete user", e);
 			return getModelMapError("Error trying to delete user: " + e.getMessage());
 		}
 	}

@@ -307,22 +307,43 @@ public class UserAdministrationService extends AbstractShogunService {
 	 *
 	 * @param deleteId
 	 * @throws ShogunDatabaseAccessException
-	 * @throws Exception
+	 * @throws ShogunServiceException
 	 */
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
-	public void deleteUser(int deleteId) throws ShogunDatabaseAccessException {
+	public void deleteUser(Integer deleteId)
+				throws ShogunServiceException, ShogunDatabaseAccessException {
 
-		// it is only one object - cast to object/bean
-		Integer id = new Integer(deleteId);
+		List<Integer> sessionUserGroups = this.getDatabaseDao().getGroupIdsFromSession();
 
+		// get the possible user object
+		User userToDelete = null;
+
+		// ROLE_SUPERADMIN can delete every user
+		// ROLE_ADMIN only those who are in his group
 		if (this.getDatabaseDao().isSuperAdmin()) {
-			this.getDatabaseDao().deleteUser(id);
+			userToDelete = (User) this.getDatabaseDao().getEntityById(deleteId, User.class);
 		} else {
-			this.getDatabaseDao().deleteEntityGroupDependent(User.class, id);
+			userToDelete = this.getDatabaseDao().getUserById(
+					deleteId, "groups", Restrictions.in("id", sessionUserGroups));
 		}
-	}
 
+		// check if user for deletion exists
+		if (userToDelete == null) {
+			throw new ShogunServiceException(
+					"No user with ID " + deleteId + " found for deletion");
+		}
+
+		// remove all group relationships to prevent
+		// referential integrity constraint violation
+		Set<Group> userGroups = userToDelete.getGroups();
+		for (Group group : userGroups) {
+			group.getUsers().remove(userToDelete);
+		}
+
+		// delete in database
+		this.getDatabaseDao().deleteEntity(User.class, userToDelete);
+	}
 
 	/**
 	 * Inserts a new {@link Group} object into the database. <br>
@@ -685,6 +706,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			mailtext += pw + "\n\n";
 
 			try {
+
 				Mail.send("localhost", subadmin.getUser_email(), "admin",
 						"Registrierung bei SHOGun", mailtext);
 			} catch (Exception e) {
