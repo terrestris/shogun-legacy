@@ -504,10 +504,12 @@ public class DatabaseDao {
 	}
 
 	/**
+	 * Deletes a record of a given entity-class in the database.
+	 * The record to be deleted is given by its object representation.
 	 *
-	 * @param <T>
-	 * @param clazz
-	 * @param objectToDelete
+	 * @param <T> Template class, here the class of the object to be deleted
+	 * @param clazz Entity class of the object to be deleted
+	 * @param objectToDelete the instance to be deleted from database
 	 */
 	public <T> void deleteEntity(Class<T> clazz, BaseModelInterface objectToDelete) {
 		this.sessionFactory.getCurrentSession().delete(objectToDelete);
