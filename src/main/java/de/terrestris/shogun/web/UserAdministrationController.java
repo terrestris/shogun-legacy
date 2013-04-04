@@ -45,54 +45,61 @@ public class UserAdministrationController extends AbstractWebController {
 
 
 	/**
-	 * Web-interface creating a new User instance in the database
+	 * Web-interface creating a new User instance in the database.
 	 *
-	 * @param users A list of new User objects, which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param users
+	 *            A list of new User objects, which is delivered as JSON and
+	 *            automatically deserialized
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/createUser.action", method=RequestMethod.POST, headers="Accept=application/json, plain/text")
-	public @ResponseBody Map<String, ? extends Object> createUser(@RequestBody UserList users, HttpServletResponse response) {
+	@RequestMapping(value = "/user/create.action", method = RequestMethod.POST, headers = "Accept=application/json, plain/text")
+	public @ResponseBody
+	Map<String, ? extends Object> createUser(@RequestBody UserList users) {
 
-    	try {
-
-	    	List<User> returnUsers = this.getShogunService().createUsers(users.getUsers());
-	    	// Wrap to classical return object containing total, data, success
-	    	Map<String, Object> returnMap = this.getModelMapSuccess(returnUsers);
+		try {
+			List<User> returnUsers = this.getShogunService().createUsers(
+					users.getUsers());
+			// Wrap to classical return object containing total, data, success
+			Map<String, Object> returnMap = this
+					.getModelMapSuccess(returnUsers);
 
 			return returnMap;
-    	}
-    	catch (Exception e) {
-    		LOGGER.error("Error in createUser", e);
-    		return getModelMapError("Error trying to create user: " + e.getMessage());
-		}
 
+		} catch (Exception e) {
+			LOGGER.error("Error trying to create user", e);
+			return getModelMapError("Error trying to create user: "
+					+ e.getMessage());
+		}
 	}
 
 	/**
 	 * Web-interface updating User objects in the database
 	 *
-	 * @param users A list of User objects to be updated, which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param users
+	 *            A list of User objects to be updated, which is delivered as
+	 *            JSON and automatically deserialized
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/updateUser.action", method=RequestMethod.POST, headers="Accept=application/json, plain/text")
+	@RequestMapping(value = "/user/update.action", method = RequestMethod.POST, headers = "Accept=application/json, plain/text")
 	public @ResponseBody
-	Map<String, ? extends Object> updateUser(@RequestBody UserList users, HttpServletResponse response) throws Exception {
+	Map<String, ? extends Object> updateUser(@RequestBody UserList users) {
 
 		try {
 
-			List<User> returnedUsers = this.getShogunService().updateUser(users.getUsers());
+			List<User> returnedUsers = this.getShogunService().updateUser(
+					users.getUsers());
 			// Wrap to classical return object containing total, data, success
-			Map<String, Object> returnMap = this.getModelMapSuccess(returnedUsers);
+			Map<String, Object> returnMap = this
+					.getModelMapSuccess(returnedUsers);
 
 			return returnMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in updateUser", e);
-			return getModelMapError("Error trying to update user: " + e.getMessage());
+			LOGGER.error("Error trying to update user", e);
+			return getModelMapError("Error trying to update user: "
+					+ e.getMessage());
 		}
 	}
 
@@ -122,17 +129,17 @@ public class UserAdministrationController extends AbstractWebController {
 	}
 
 	/**
-	 * Web-interface for creating a new user password and
-	 * send the new password to the user email
+	 * Web-interface for creating a new user password and send the new password
+	 * to the user email
 	 *
-	 * @param user_id the user ID of the User who should get a new password
-	 * @param response A HttpServletResponse object in order to return the response
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
-	 * @throws Exception
+	 * @param user_id
+	 *            the user ID of the User who should get a new password
+	 *
+	 * @return A Map object representing the JSON structure of the response
 	 */
 	@RequestMapping(value = "/user/updateUserPw.action")
 	public @ResponseBody
-	Map<String, ? extends Object> updateUserPassword(@RequestBody String user_id, HttpServletResponse response) throws Exception {
+	Map<String, ? extends Object> updateUserPassword(@RequestBody String user_id) {
 
 		try {
 
@@ -145,8 +152,9 @@ public class UserAdministrationController extends AbstractWebController {
 			return returnMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in updateUserPassword", e);
-			return getModelMapError("Error updating User password: " + e.getMessage());
+			LOGGER.error("Error updating User-password", e);
+			return getModelMapError("Error updating User-password: "
+					+ e.getMessage());
 		}
 	}
 
