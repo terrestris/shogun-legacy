@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
@@ -434,6 +435,7 @@ public class DatabaseContentInitializer {
 	 * 			the shogunDatabaseInitializationEnabled to set
 	 */
 	@Autowired
+	@Qualifier("databaseInitializationEnabled")
 	public void setDatabaseInitializationEnabled(
 			Boolean databaseInitializationEnabled) {
 		this.databaseInitializationEnabled = databaseInitializationEnabled;
