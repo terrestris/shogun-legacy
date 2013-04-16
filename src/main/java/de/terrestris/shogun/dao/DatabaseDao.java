@@ -35,6 +35,7 @@ import de.terrestris.shogun.hibernatecriteria.filter.Filter.LogicalOperator;
 import de.terrestris.shogun.hibernatecriteria.paging.HibernatePagingObject;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortItem;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortObject;
+import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
@@ -654,7 +655,44 @@ public class DatabaseDao {
 		}
 	}
 
-	
+
+	/**
+	 * Deletes all entities in the given list.
+	 *
+	 * <p>This method is supposed to be called with lists of instances which
+	 * implement the {@link BaseModelInterface}. This qualifies all
+	 * subclasses of either {@link BaseModel} or {@link BaseModelInheritance}
+	 * as valid list items.</p>
+	 *
+	 * <p>If the needed criteria is met, this method will call
+	 * {@link DatabaseDao#deleteEntity(Class, Integer)} for every member of the
+	 * list.</p>
+	 *
+	 * @param entities
+	 */
+	public void deleteEntities(List<? extends Object> entities) {
+		// ignore empty lists and null
+		if (entities != null && entities.size() > 0) {
+			for (Object entity : entities) {
+				if (entity != null) {
+					// get the class of the current entity, we need to do it in
+					// the loop as the originally passed list can contain
+					// instances of more than one concrete class.
+					Class<? extends Object> clazz = entity.getClass();
+					// check whether we are dealing with an instance of a class
+					// that implements the BaseModelInterface
+					if (BaseModelInterface.class.isAssignableFrom(clazz)) {
+						// if so, we can cast to the Interface
+						BaseModelInterface castedEntity =
+								(BaseModelInterface) entity;
+						this.deleteEntity(clazz, castedEntity.getId());
+					}
+				}
+			}
+		}
+	}
+
+
 	// ---------------------------------------------------------------------------
 
 	// USER RELATED STUFF
