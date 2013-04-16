@@ -444,34 +444,11 @@ public class DatabaseDao {
 	 */
 	public Object getEntityByStringFields(Class clazz,
 			HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
-		
-		Criteria criteria = null;
 		Object returnObject = null;
-		try {
-
-			criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
-			
-			for(Iterator<String> iter = fieldsAndValues.keySet().iterator(); iter.hasNext();) {
-				
-				String fieldname = iter.next();
-				String value = fieldsAndValues.get(fieldname);
-				
-				criteria.add(Restrictions.ilike(fieldname, value));
-			}
-			
-			List<Object> objectList = criteria.list();
-			
-			
-			if (objectList.size() > 0) {
-				returnObject = objectList.get(0);
-			}
-			
-		} catch (Exception e) {
-			throw new ShogunDatabaseAccessException(
-					"Error getting entity " + clazz.getSimpleName() + 
-					" by text field.", e);
+		List<Object> listOfEntities = this.getEntitiesByStringFields(clazz, fieldsAndValues);
+		if (listOfEntities != null && listOfEntities.size() > 0) {
+			returnObject = listOfEntities.get(0);
 		}
-		
 		return returnObject;
 	}
 
@@ -520,6 +497,64 @@ public class DatabaseDao {
 
 		return (List<T>)criteria.list();
 	}
+
+
+	/**
+	 * Returns a list of entities where the given fields match their respective
+	 * values.
+	 *
+	 * <p>NOTE: The operator used is <code>'ILIKE'</code><p>
+	 *
+	 * @param clazz
+	 * @param fieldsAndValues
+	 * @return
+	 * @throws ShogunDatabaseAccessException
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> List<T> getEntitiesByStringFields(Class<T> clazz, HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
+		Criteria criteria = null;
+		List<T> returnList = null;
+		try {
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+			for(Iterator<String> iter = fieldsAndValues.keySet().iterator(); iter.hasNext();) {
+				String fieldname = iter.next();
+				String value = fieldsAndValues.get(fieldname);
+				criteria.add(Restrictions.ilike(fieldname, value));
+			}
+			returnList = (List<T>) criteria.list();
+
+		} catch (Exception e) {
+			throw new ShogunDatabaseAccessException(
+					"Error getting entities of class " + clazz.getSimpleName() +
+					" by text fields.", e);
+		}
+
+		return returnList;
+	}
+
+
+	/**
+	 * Returns a list of entities where the given field matches the given value
+	 *
+	 * <p>NOTE: The operator used is <code>'ILIKE'</code><p>
+	 *
+	 * <p>This is a utility method to easily get a list of all entities
+	 * matching a string comparison. Will construct a HashMap of the given field
+	 * and value and then call
+	 * {@link DatabaseDao#getEntitiesByStringFields(Class, HashMap)} to fetch
+	 * the list of matching entities.</p>
+	 *
+	 * @param clazz
+	 * @param fieldsAndValues
+	 * @return
+	 * @throws ShogunDatabaseAccessException
+	 */
+	public <T> List<T> getEntitiesByStringField(Class<T> clazz, String field, String value) throws ShogunDatabaseAccessException {
+		HashMap<String, String> fieldsAndValues = new HashMap<String, String>();
+		fieldsAndValues.put(field, value);
+		return this.getEntitiesByStringFields(clazz, fieldsAndValues);
+	}
+
 
 	/**
 	 * Creates a record of a given Entity in the database
