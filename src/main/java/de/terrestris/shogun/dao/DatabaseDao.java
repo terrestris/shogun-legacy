@@ -29,12 +29,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
+import de.terrestris.shogun.hibernatecriteria.filter.Filter.LogicalOperator;
 import de.terrestris.shogun.hibernatecriteria.filter.HibernateFilter;
 import de.terrestris.shogun.hibernatecriteria.filter.HibernateFilterItem;
-import de.terrestris.shogun.hibernatecriteria.filter.Filter.LogicalOperator;
 import de.terrestris.shogun.hibernatecriteria.paging.HibernatePagingObject;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortItem;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortObject;
+import de.terrestris.shogun.model.BaseModel;
+import de.terrestris.shogun.model.BaseModelInheritance;
 import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.Role;
@@ -705,23 +707,16 @@ public class DatabaseDao {
 	 *
 	 * @param entities
 	 */
-	public void deleteEntities(List<? extends Object> entities) {
+	public void deleteEntities(List<BaseModelInterface> entities) {
 		// ignore empty lists and null
 		if (entities != null && entities.size() > 0) {
-			for (Object entity : entities) {
+			for (BaseModelInterface entity : entities) {
 				if (entity != null) {
 					// get the class of the current entity, we need to do it in
 					// the loop as the originally passed list can contain
 					// instances of more than one concrete class.
 					Class<? extends Object> clazz = entity.getClass();
-					// check whether we are dealing with an instance of a class
-					// that implements the BaseModelInterface
-					if (BaseModelInterface.class.isAssignableFrom(clazz)) {
-						// if so, we can cast to the Interface
-						BaseModelInterface castedEntity =
-								(BaseModelInterface) entity;
-						this.deleteEntity(clazz, castedEntity.getId());
-					}
+					this.deleteEntity(clazz, entity.getId());
 				}
 			}
 		}
