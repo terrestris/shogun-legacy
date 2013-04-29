@@ -513,7 +513,7 @@ public class DatabaseDao {
 	 * @throws ShogunDatabaseAccessException
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> List<T> getEntitiesByStringFields(Class<T> clazz, HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
+	public <T extends BaseModelInterface> List<T> getEntitiesByStringFields(Class<T> clazz, HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
 		Criteria criteria = null;
 		List<T> returnList = null;
 		try {
@@ -551,7 +551,7 @@ public class DatabaseDao {
 	 * @return
 	 * @throws ShogunDatabaseAccessException
 	 */
-	public <T> List<T> getEntitiesByStringField(Class<T> clazz, String field, String value) throws ShogunDatabaseAccessException {
+	public <T extends BaseModelInterface> List<T> getEntitiesByStringField(Class<T> clazz, String field, String value) throws ShogunDatabaseAccessException {
 		HashMap<String, String> fieldsAndValues = new HashMap<String, String>();
 		fieldsAndValues.put(field, value);
 		return this.getEntitiesByStringFields(clazz, fieldsAndValues);
@@ -707,7 +707,7 @@ public class DatabaseDao {
 	 *
 	 * @param entities
 	 */
-	public void deleteEntities(List<BaseModelInterface> entities) {
+	public void deleteEntities(List<? extends BaseModelInterface> entities) {
 		// ignore empty lists and null
 		if (entities != null && entities.size() > 0) {
 			for (BaseModelInterface entity : entities) {
@@ -715,7 +715,7 @@ public class DatabaseDao {
 					// get the class of the current entity, we need to do it in
 					// the loop as the originally passed list can contain
 					// instances of more than one concrete class.
-					Class<? extends Object> clazz = entity.getClass();
+					Class<? extends BaseModelInterface> clazz = entity.getClass();
 					this.deleteEntity(clazz, entity.getId());
 				}
 			}
