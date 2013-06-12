@@ -1,6 +1,7 @@
 package de.terrestris.shogun.dao;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -586,6 +587,22 @@ public class DatabaseDao {
 		Object createdObjectId = this.getSessionFactory().getCurrentSession().save(
 				clazz.getSimpleName(), objToCreate);
 		return (T)this.getEntityById((Integer)createdObjectId, clazz);
+	}
+
+	/**
+	 * Creates records for the given entities in the database. This method will
+	 * return the newly created objects.
+	 *
+	 * @param objsToCreate the new objects to be created in the DB
+	 * @return the objects that were created in the database
+	 */
+	@Transactional
+	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate){
+		List<T> createdObjs = new ArrayList<T>();
+		for (T t : objsToCreate) {
+			createdObjs.add(this.createEntity(t));
+		}
+		return createdObjs;
 	}
 
 
