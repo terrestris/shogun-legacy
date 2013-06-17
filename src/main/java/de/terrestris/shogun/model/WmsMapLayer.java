@@ -47,7 +47,7 @@ public class WmsMapLayer extends MapLayer {
 	/**
 	 * @return the layers
 	 */
-	@Column(name = "LAYERS", nullable = false)
+	@Column(name = "LAYERS", nullable = false, length = 2048)
 	public String getLayers() {
 		return layers;
 	}
