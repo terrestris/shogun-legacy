@@ -13,11 +13,21 @@
 	<!-- Scans the classpath of this application for @Components to deploy as beans -->
 	<context:component-scan base-package="de.terrestris.shogun" />
 
+	<!-- Configures the @Controller programming model -->
+	<mvc:annotation-driven />
+
+	<!-- misc - internal view resolver -->
+	<!--  we dont use spring MVC-views -->
+<!-- <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="suffix" value=".jsp"/>
+	</bean> -->
+
 	<!-- enable post pre annotations -->	
 	<sec:global-method-security pre-post-annotations="enabled"/>
 
 	<!-- Configures the initialization script, 
-	     for example a standard user to be created on first startup
+		 for example a standard user to be created on first startup
 	-->
 	<import resource="initialize-beans.xml" />
 
