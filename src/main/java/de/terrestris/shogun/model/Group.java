@@ -3,6 +3,7 @@ package de.terrestris.shogun.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -49,7 +50,7 @@ public class Group extends BaseModel{
 	private String notes;
 	private String language;
 
-	private List<Module> modules;
+	private Set<Module> modules;
 	private String group_module_list;
     
 
@@ -317,14 +318,14 @@ public class Group extends BaseModel{
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) }, 
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID", 
 					nullable = false, updatable = false) })
-	public List<Module> getModules() {
+	public Set<Module> getModules() {
 		return modules;
 	}
 
 	/**
 	 * @param modules the modules to set
 	 */
-	public void setModules(List<Module> modules) {
+	public void setModules(Set<Module> modules) {
 		this.modules = modules;
 	}
 	
