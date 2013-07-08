@@ -12,6 +12,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -336,7 +337,7 @@ public class ShogunService extends AbstractShogunService {
 	 */
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	public List<Module> getModulesByUser(String username) throws ShogunDatabaseAccessException {
+	public java.util.Set<Module> getModulesByUser(String username) throws ShogunDatabaseAccessException {
 
 		List<User> users = this.getDatabaseDao().getUserByName(username);
 
@@ -344,11 +345,11 @@ public class ShogunService extends AbstractShogunService {
 
 		if (users.size() > 0) {
 			user = users.get(0);
-			List<Module> modules = user.getModules();
+			java.util.Set<Module> modules = user.getModules();
 
 			return modules;
 		} else {
-			return new ArrayList<Module>();
+			return new HashSet<Module>();
 		}
 	}
 

@@ -1,7 +1,6 @@
 package de.terrestris.shogun.init;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -305,7 +304,10 @@ public class DatabaseContentInitializer {
 		// give the superadmin all available modules:
 		List<Module> allModules = (List<Module>) (List<?>) this.dbDao
 				.getAllEntities(Module.class);
-		currentSuperAdmin.setModules(allModules);
+
+		Set<Module> allModuleSet = new HashSet<Module>(allModules);
+
+		currentSuperAdmin.setModules(allModuleSet);
 		LOGGER.info("  - Assigning all " + allModules.size()
 				+ " modules to superadmin.");
 
@@ -347,7 +349,7 @@ public class DatabaseContentInitializer {
 
 			LOGGER.info("  - Assigning the desired modules to anonymous");
 			List<String> anonModules = this.getModulesForAnonymous();
-			List<Module> modulesToAssign = new ArrayList<Module>();
+			Set<Module> modulesToAssign = new HashSet<Module>();
 
 			for (String anonModuleName : anonModules) {
 				Module m = (Module) this.dbDao.getEntityByStringField(

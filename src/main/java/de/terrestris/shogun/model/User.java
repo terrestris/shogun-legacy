@@ -1,6 +1,7 @@
 package de.terrestris.shogun.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class User extends BaseModel {
 	private String user_lang;
 	private Boolean active = true;
 
-	private List<Module> modules;
+	private Set<Module> modules;
 	private Set<MapLayer> mapLayers;
 //	private Set<MapConfig> mapConfigs;
 	private MapConfig mapConfig;
@@ -248,7 +249,7 @@ public class User extends BaseModel {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
-	public List<Module> getModules() {
+	public Set<Module> getModules() {
 		return modules;
 	}
 
@@ -259,7 +260,7 @@ public class User extends BaseModel {
 	 * @param modules the modules to set
 	 */
 	@JsonIgnore
-	public void setModules(List<Module> modules) {
+	public void setModules(Set<Module> modules) {
 		this.modules = modules;
 	}
 
@@ -400,7 +401,7 @@ public class User extends BaseModel {
 	 */
 	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
 		// create module object list from comma-separated list
-		List<Module> newModules = null;
+		Set<Module> newModules = null;
 
 		if (this.getUser_module_list() != null
 				&& this.getUser_module_list().equals("") == false) {
@@ -416,7 +417,7 @@ public class User extends BaseModel {
 			List<? extends Object> modules = databaseDAO.getEntitiesByIds(
 					intArray.toArray(), Module.class);
 
-			newModules = new ArrayList<Module>(modules.size());
+			newModules = new HashSet<Module>(modules.size());
 			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
 				Module module = (Module) iterator2.next();
 				newModules.add(module);
@@ -425,7 +426,7 @@ public class User extends BaseModel {
 			modules = null;
 
 		} else {
-			newModules = new ArrayList<Module>();
+			newModules = new HashSet<Module>();
 		}
 
 		this.setModules(newModules);

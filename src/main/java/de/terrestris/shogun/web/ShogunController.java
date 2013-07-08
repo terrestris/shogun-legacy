@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,7 +107,7 @@ public class ShogunController extends AbstractWebController {
 		
 		try {
 
-			List<Module> modules = null;
+			Set<Module> modules = null;
 			
 			if (username != null && username.isEmpty() == false) {
 				
