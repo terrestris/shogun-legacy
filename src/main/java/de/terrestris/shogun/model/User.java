@@ -19,8 +19,6 @@ import javax.persistence.Table;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import de.terrestris.shogun.annotation.RestrictedBy;
-import de.terrestris.shogun.annotation.RestrictionType;
 import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
@@ -50,6 +48,7 @@ public class User extends BaseModel {
 	private String user_country;
 	private String user_password;
 	private String user_lang;
+	private Boolean active = true;
 
 	private Set<Group> groups;
 	private Set<Module> modules;
@@ -205,6 +204,21 @@ public class User extends BaseModel {
 	 */
 	public void setUser_lang(String user_lang) {
 		this.user_lang = user_lang;
+	}
+
+	/**
+	 * @return the active
+	 */
+	@Column(name="ACTIVE")
+	public Boolean getActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	/**
@@ -386,7 +400,7 @@ public class User extends BaseModel {
 	 */
 	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
 		// create module object list from comma-separated list
-		List<Module> newModules = null;
+		Set<Module> newModules = null;
 
 		if (this.getUser_module_list() != null
 				&& this.getUser_module_list().equals("") == false) {
@@ -402,7 +416,7 @@ public class User extends BaseModel {
 			List<? extends Object> modules = databaseDAO.getEntitiesByIds(
 					intArray.toArray(), Module.class);
 
-			newModules = new ArrayList<Module>(modules.size());
+			newModules = new HashSet<Module>(modules.size());
 			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
 				Module module = (Module) iterator2.next();
 				newModules.add(module);
@@ -411,7 +425,7 @@ public class User extends BaseModel {
 			modules = null;
 
 		} else {
-			newModules = new ArrayList<Module>();
+			newModules = new HashSet<Module>();
 		}
 
 		Set<Module> moduleSet = new HashSet<Module>(newModules);

@@ -12,6 +12,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,17 @@ public class ShogunService extends AbstractShogunService {
 				hibernateAdditionalFilter
 			);
 
+			// treat GROUP as a special case because of sub entities
+			if (objectType.equals("Group")) {
+				dataList = this.getDatabaseDao().getDataByFilter(hibernateSortObject,
+						hibernateFilter, hibernatePaging,
+						hibernateAdditionalFilter);
+			} else {
+				dataList = this.getDatabaseDao().getDataByFilter(hibernateSortObject,
+						hibernateFilter, hibernatePaging,
+						hibernateAdditionalFilter);
+			}
+
 			//TODO introduce a Beans abstracting this
 			Map<String, Object> returnMap = new HashMap<String, Object>();
 			returnMap.put("total", new Long(total));
@@ -166,7 +178,6 @@ public class ShogunService extends AbstractShogunService {
 			// list of left-class-objects, e.g. User.getMapLayers()
 			LOGGER.debug("Create a method object for " + associationProperties.get("assocGetter"));
 			rightGetter = rightClazz.getMethod(associationProperties.get("assocGetter"));
-
 
 			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz);
 
@@ -327,7 +338,7 @@ public class ShogunService extends AbstractShogunService {
 	 */
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	public List<Module> getModulesByUser(String username) throws ShogunDatabaseAccessException {
+	public java.util.Set<Module> getModulesByUser(String username) throws ShogunDatabaseAccessException {
 
 		List<User> users = this.getDatabaseDao().getUserByName(username);
 
@@ -335,12 +346,10 @@ public class ShogunService extends AbstractShogunService {
 
 		if (users.size() > 0) {
 			user = users.get(0);
-			// TODO move to one step towards set
 			Set<Module> modules = user.getModules();
-			List<Module> lModules = new ArrayList<Module>(modules);
-			return lModules;
+			return modules;
 		} else {
-			return new ArrayList<Module>();
+			return new HashSet<Module>();
 		}
 	}
 

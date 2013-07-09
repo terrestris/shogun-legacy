@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -103,6 +101,25 @@ public class UserAdministrationController extends AbstractWebController {
 		}
 	}
 
+	/**
+	 * Web-interface returning all active users. <br><br>
+	 *
+	 * CAUTION: this is only accessible as authenticated user.
+	 *
+	 * @return a JSON representation of the response
+	 */
+	@RequestMapping(value = "/user/get-active.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getActiveUsers() {
+		try {
+			List<User> activeUsers = this.shogunService.getActiveUsers();
+			return this.getModelMapSuccess(activeUsers);
+		} catch (Exception e) {
+			LOGGER.error("Error while returning active Users.", e);
+			return this.getModelMapError("Error while returning active Users: " + e.getMessage());
+		}
+	}
+
 
 	/**
 	 * Web-interface deleting a User object in the database.
@@ -156,6 +173,19 @@ public class UserAdministrationController extends AbstractWebController {
 			return getModelMapError("Error updating User-password: "
 					+ e.getMessage());
 		}
+	}
+
+
+	/**
+	 * Gets the ID of the currently logged in user.
+	 *
+	 * @return the userId of the currently logged in user
+	 */
+	@RequestMapping(value = "/user/getLoggedInUserId.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getLoggedInUserId() {
+		 Integer userId = this.shogunService.getDatabaseDao().getUserIdFromSession();
+		return this.getModelMapSuccess(userId);
 	}
 
 

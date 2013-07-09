@@ -53,7 +53,7 @@ public class Group extends BaseModel{
 	private String language;
 
 	private Set<User> users;
-	private List<Module> modules;
+	private Set<Module> modules;
 	private Set<MapLayer> mapLayers;
 
 	private String group_module_list;
@@ -350,14 +350,14 @@ public class Group extends BaseModel{
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
-	public List<Module> getModules() {
+	public Set<Module> getModules() {
 		return modules;
 	}
 
 	/**
 	 * @param modules the modules to set
 	 */
-	public void setModules(List<Module> modules) {
+	public void setModules(Set<Module> modules) {
 		this.modules = modules;
 	}
 

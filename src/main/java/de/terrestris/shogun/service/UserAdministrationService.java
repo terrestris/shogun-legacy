@@ -346,6 +346,17 @@ public class UserAdministrationService extends AbstractShogunService {
 	}
 
 	/**
+	 * Returns a list of all active users from database.
+	 *
+	 * @return list of active {@link User} objects
+	 */
+	@Transactional
+	@PreAuthorize("isAuthenticated()")
+	public List<User> getActiveUsers() {
+		return this.getDatabaseDao().getEntitiesByBooleanField(User.class, "active", true);
+	}
+
+	/**
 	 * Inserts a new {@link Group} object into the database. <br>
 	 * It is checked if there is no other Group with the same number. <br>
 	 * Before saving the Group object:

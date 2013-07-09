@@ -1,7 +1,9 @@
 package de.terrestris.shogun.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +26,7 @@ public class Wms extends BaseModel {
 	
 	private String supportedVersion;
 	private String baseUrl;
-	private List<WmsLayer> wmsLayers;
+	private Set<WmsLayer> wmsLayers;
 	
 	/**
 	 * The default Constructor
@@ -34,13 +36,30 @@ public class Wms extends BaseModel {
 	}
 	
 	/**
-	 * 
+	 * An alternative constructor for backwards compatibility: Field `wmsLayers`
+	 * is of type Set<WmsLayer>, no longer List<WmsLayer>.
+	 *
 	 * @param supportedVersion
 	 * @param baseUrl
 	 * @param wmsLayers
 	 */
 	public Wms(String supportedVersion, String baseUrl, List<WmsLayer> wmsLayers) {
+		this.supportedVersion = supportedVersion;
+		this.baseUrl = baseUrl;
+		this.wmsLayers = new HashSet<WmsLayer>(wmsLayers);
 		
+		this.setCreated_at(new Date());
+		this.setUpdated_at(new Date());
+	}
+
+	/**
+	 * An alternative constructor which will all fields to the given values.
+	 *
+	 * @param supportedVersion
+	 * @param baseUrl
+	 * @param wmsLayers
+	 */
+	public Wms(String supportedVersion, String baseUrl, Set<WmsLayer> wmsLayers) {
 		this.supportedVersion = supportedVersion;
 		this.baseUrl = baseUrl;
 		this.wmsLayers = wmsLayers;
@@ -85,14 +104,14 @@ public class Wms extends BaseModel {
 	 * @return the wmsLayers
 	 */
 	@OneToMany(fetch = FetchType.EAGER, targetEntity=WmsLayer.class)
-	public List<WmsLayer> getWmsLayers() {
+	public Set<WmsLayer> getWmsLayers() {
 		return wmsLayers;
 	}
 
 	/**
 	 * @param wmsLayers the wmsLayers to set
 	 */
-	public void setWmsLayers(List<WmsLayer> wmsLayers) {
+	public void setWmsLayers(Set<WmsLayer> wmsLayers) {
 		this.wmsLayers = wmsLayers;
 	}
 	

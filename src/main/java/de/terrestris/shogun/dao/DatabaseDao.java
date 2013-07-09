@@ -36,6 +36,8 @@ import de.terrestris.shogun.hibernatecriteria.filter.HibernateFilterItem;
 import de.terrestris.shogun.hibernatecriteria.paging.HibernatePagingObject;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortItem;
 import de.terrestris.shogun.hibernatecriteria.sort.HibernateSortObject;
+import de.terrestris.shogun.model.BaseModel;
+import de.terrestris.shogun.model.BaseModelInheritance;
 import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.Role;
@@ -272,7 +274,6 @@ public class DatabaseDao {
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq("id", id));
-
 		// we expect a single record or null
 		Object result = criteria.uniqueResult();
 
@@ -293,6 +294,10 @@ public class DatabaseDao {
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		if (values.length > 0) {
 			criteria.add(Restrictions.in("id", values));
+		} else {
+			// we add a restriction that can never be fullfilled
+			// this is the case when e.g. an empty object has been passed
+			criteria.add(Restrictions.sqlRestriction("1 = 2"));
 		}
 
 		// this ensures that no cartesian product is returned when
@@ -375,36 +380,14 @@ public class DatabaseDao {
 	 */
 	public Object getEntityByStringFields(Class clazz,
 			HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
-
-		Criteria criteria = null;
 		Object returnObject = null;
-		try {
-
-			criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
-
-			for(Iterator<String> iter = fieldsAndValues.keySet().iterator(); iter.hasNext();) {
-
-				String fieldname = iter.next();
-				String value = fieldsAndValues.get(fieldname);
-
-				criteria.add(Restrictions.ilike(fieldname, value));
-			}
-
-			List<Object> objectList = criteria.list();
-
-
-			if (objectList.size() > 0) {
-				returnObject = objectList.get(0);
-			}
-
-		} catch (Exception e) {
-			throw new ShogunDatabaseAccessException(
-					"Error getting entity " + clazz.getSimpleName() +
-					" by text field.", e);
+		List<Object> listOfEntities = this.getEntitiesByStringFields(clazz, fieldsAndValues);
+		if (listOfEntities != null && listOfEntities.size() > 0) {
+			returnObject = listOfEntities.get(0);
 		}
-
 		return returnObject;
 	}
+
 
 	/**
 	 * Returns a set of Objects from database by a Integer comparison
@@ -427,6 +410,88 @@ public class DatabaseDao {
 		return criteria.list();
 	}
 
+
+	/**
+	 * Returns a set of objects from database by a boolean comparison
+	 * with a specified field. <br>
+	 *
+	 * @param clazz The class of the object model to be used
+	 * @param fieldname the column which should be filtered
+	 * @param value the value to filter (type Boolean)
+	 * @return The objects fulfilling the filter request
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> List<T> getEntitiesByBooleanField(Class<T> clazz, String fieldname, Boolean value) {
+
+		Criteria criteria =
+			this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria.add(Restrictions.eq(fieldname, value));
+
+		// this ensures that no cartesian product is returned when
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return (List<T>)criteria.list();
+	}
+
+
+	/**
+	 * Returns a list of entities where the given fields match their respective
+	 * values.
+	 *
+	 * <p>NOTE: The operator used is <code>'ILIKE'</code><p>
+	 *
+	 * @param clazz
+	 * @param fieldsAndValues
+	 * @return
+	 * @throws ShogunDatabaseAccessException
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BaseModelInterface> List<T> getEntitiesByStringFields(Class<T> clazz, HashMap<String, String> fieldsAndValues) throws ShogunDatabaseAccessException {
+		Criteria criteria = null;
+		List<T> returnList = null;
+		try {
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+			for(Iterator<String> iter = fieldsAndValues.keySet().iterator(); iter.hasNext();) {
+				String fieldname = iter.next();
+				String value = fieldsAndValues.get(fieldname);
+				criteria.add(Restrictions.ilike(fieldname, value));
+			}
+			returnList = (List<T>) criteria.list();
+
+		} catch (Exception e) {
+			throw new ShogunDatabaseAccessException(
+					"Error getting entities of class " + clazz.getSimpleName() +
+					" by text fields.", e);
+		}
+
+		return returnList;
+	}
+
+
+	/**
+	 * Returns a list of entities where the given field matches the given value
+	 *
+	 * <p>NOTE: The operator used is <code>'ILIKE'</code><p>
+	 *
+	 * <p>This is a utility method to easily get a list of all entities
+	 * matching a string comparison. Will construct a HashMap of the given field
+	 * and value and then call
+	 * {@link DatabaseDao#getEntitiesByStringFields(Class, HashMap)} to fetch
+	 * the list of matching entities.</p>
+	 *
+	 * @param clazz
+	 * @param fieldsAndValues
+	 * @return
+	 * @throws ShogunDatabaseAccessException
+	 */
+	public <T extends BaseModelInterface> List<T> getEntitiesByStringField(Class<T> clazz, String field, String value) throws ShogunDatabaseAccessException {
+		HashMap<String, String> fieldsAndValues = new HashMap<String, String>();
+		fieldsAndValues.put(field, value);
+		return this.getEntitiesByStringFields(clazz, fieldsAndValues);
+	}
+
+
 	/**
 	 * Creates a record of a given Entity in the database
 	 *
@@ -440,6 +505,7 @@ public class DatabaseDao {
 
 		return objToCreate;
 	}
+
 
 	/**
 	 * Creates a record of a given Entity in the database. This method will return the
@@ -457,6 +523,24 @@ public class DatabaseDao {
 				clazz.getSimpleName(), objToCreate);
 		return (T)this.getEntityById((Integer)createdObjectId, clazz);
 	}
+
+	/**
+	 * Creates records for the given entities in the database. This method will
+	 * return the newly created objects.
+	 *
+	 * @param objsToCreate the new objects to be created in the DB
+	 * @return the objects that were created in the database
+	 * @throws ShogunDatabaseAccessException 
+	 */
+	@Transactional
+	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate) throws ShogunDatabaseAccessException{
+		List<T> createdObjs = new ArrayList<T>();
+		for (T t : objsToCreate) {
+			createdObjs.add(this.createEntity(t));
+		}
+		return createdObjs;
+	}
+
 
 	/**
 	 * Creates or updates a record of a given Entity in the database. <br>
@@ -502,6 +586,7 @@ public class DatabaseDao {
 		Object record = this.sessionFactory.getCurrentSession().load(clazz, id);
 		this.sessionFactory.getCurrentSession().delete(record);
 	}
+
 
 	/**
 	 * Deletes a record of a given entity-class in the database.
@@ -576,6 +661,35 @@ public class DatabaseDao {
 		}
 	}
 
+
+	/**
+	 * Deletes all entities in the given list.
+	 *
+	 * <p>This method is supposed to be called with lists of instances which
+	 * implement the {@link BaseModelInterface}. This qualifies all
+	 * subclasses of either {@link BaseModel} or {@link BaseModelInheritance}
+	 * as valid list items.</p>
+	 *
+	 * <p>If the needed criteria is met, this method will call
+	 * {@link DatabaseDao#deleteEntity(Class, Integer)} for every member of the
+	 * list.</p>
+	 *
+	 * @param entities
+	 */
+	public void deleteEntities(List<? extends BaseModelInterface> entities) {
+		// ignore empty lists and null
+		if (entities != null && entities.size() > 0) {
+			for (BaseModelInterface entity : entities) {
+				if (entity != null) {
+					// get the class of the current entity, we need to do it in
+					// the loop as the originally passed list can contain
+					// instances of more than one concrete class.
+					Class<? extends BaseModelInterface> clazz = entity.getClass();
+					this.deleteEntity(clazz, entity.getId());
+				}
+			}
+		}
+	}
 
 	// ---------------------------------------------------------------------------
 
@@ -1068,7 +1182,7 @@ public class DatabaseDao {
 
 		return false;
 	}
-
+	
 	/**
 	 * Helper function to print out the SQL from a criteria object
 	 *

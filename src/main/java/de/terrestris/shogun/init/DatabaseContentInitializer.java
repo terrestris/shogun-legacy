@@ -1,7 +1,6 @@
 package de.terrestris.shogun.init;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
@@ -29,9 +29,9 @@ import de.terrestris.shogun.model.WmsProxyConfig;
 
 /**
  * The class handling the initial import of all data needed for a running setup.
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class DatabaseContentInitializer {
 
@@ -40,6 +40,11 @@ public class DatabaseContentInitializer {
 	 */
 	private static Logger LOGGER = Logger
 			.getLogger(DatabaseContentInitializer.class);
+
+	/**
+	 * flag symbolizing if the database will be modified by this class
+	 */
+	private Boolean databaseInitializationEnabled;
 
 	/**
 	 * a list of module objects for this applications
@@ -108,29 +113,34 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * The method called on init.
-	 * 
+	 *
 	 * Delegated the tasks to fill the database due to config
 	 */
 	public void initializeDatabaseContent() {
-		LOGGER.info("Initializing database content on servlet init.");
 
-		try {
-			this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
-			this.createAvailableRoles();
-			this.createAvailableModules();
-			this.persistantStdMapConfig = this.createAvailableMapConfig();
-			this.persistantDefaultGroup = this.createDefaultGroup();
-			this.createSuperAdmin();
-			this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
-		} catch (Exception e) {
-			LOGGER.error("Caught exception '" + e.getClass().getSimpleName()
-					+ "':", e);
+		if (this.databaseInitializationEnabled == true) {
+
+			LOGGER.info("Initializing database content on servlet init.");
+
+
+			try {
+				this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
+				this.createAvailableRoles();
+				this.createAvailableModules();
+				this.persistantStdMapConfig = this.createAvailableMapConfig();
+				this.persistantDefaultGroup = this.createDefaultGroup();
+				this.createSuperAdmin();
+				this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
+			} catch (Exception e) {
+				LOGGER.error("Caught exception '" + e.getClass().getSimpleName()
+						+ "':", e);
+			}
 		}
 	}
 
 	/**
 	 * Creates the available standard {@link WmsMapLayer} entry in the database
-	 * 
+	 *
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 * @throws NoSuchMethodException
@@ -158,7 +168,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * Creates the available standard {@link MapConfig} entry in the database
-	 * 
+	 *
 	 * @return
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
@@ -183,17 +193,17 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * Creates the available {@link Module} entries in the database
-	 * 
+	 *
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws NoSuchMethodException
-	 * @throws ShogunDatabaseAccessException 
+	 * @throws ShogunDatabaseAccessException
 	 */
 	private void createAvailableModules() throws IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException, 
+			InvocationTargetException, NoSuchMethodException,
 			ShogunDatabaseAccessException {
 		LOGGER.info("Creating available modules");
-		
+
 		List<Module> availableModules = this.getAvailableModules();
 
 		for (Module desiredModule : availableModules) {
@@ -211,18 +221,18 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * Creates the available {@link Role} entries in the database
-	 * @throws ShogunDatabaseAccessException 
+	 * @throws ShogunDatabaseAccessException
 	 */
 	private void createAvailableRoles() throws ShogunDatabaseAccessException {
 		LOGGER.info("Creating available roles");
-		
+
 		for (Iterator<String> iterator = this.getAvailableRoles().iterator(); iterator
 				.hasNext();) {
 			String rolename = (String) iterator.next();
 
 			if (this.dbDao.getEntityByStringField(Role.class, "name", rolename) == null) {
 				LOGGER.info("  - Role '" + rolename + "' needs to be created.");
-				
+
 				Role newRole = new Role();
 				newRole.setName(rolename);
 				newRole.setApp_user("auto-create-on-init");
@@ -237,12 +247,12 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * Creates a default group to ensure there is always one
-	 * 
+	 *
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
-	 * @throws ShogunDatabaseAccessException 
-	 * 
+	 * @throws ShogunDatabaseAccessException
+	 *
 	 */
 	private Group createDefaultGroup() throws IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException, 
@@ -262,14 +272,14 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * Creates an SuperAdmin {@link User} with declared properties
-	 * @throws ShogunDatabaseAccessException 
-	 * 
+	 * @throws ShogunDatabaseAccessException
+	 *
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	private void createSuperAdmin() throws ShogunDatabaseAccessException {
 		LOGGER.info("Creating superadmin user");
-		
+
 		List<Object> allUsers = this.dbDao.getAllEntities(User.class);
 
 		// determine if we hav already a superadmin and save for later
@@ -302,7 +312,7 @@ public class DatabaseContentInitializer {
 		// give the superadmin all available modules:
 		List<Module> allModules = (List<Module>) (List<?>) this.dbDao
 				.getAllEntities(Module.class);
-		//TODO move to one step directly to set
+
 		Set<Module> moduleSet = new HashSet<Module>(allModules);
 		currentSuperAdmin.setModules(moduleSet);
 		LOGGER.info("  - Assigning all " + allModules.size()
@@ -314,8 +324,8 @@ public class DatabaseContentInitializer {
 	/**
 	 * Creates an anonymous {@link User} with declared properties, such as
 	 * {@link MapLayer} and {@link MapConfig}
-	 * @throws ShogunDatabaseAccessException 
-	 * 
+	 * @throws ShogunDatabaseAccessException
+	 *
 	 * @throws Exception
 	 */
 	private void createAnonymousUser(WmsMapLayer wmsMapLayer,
@@ -346,7 +356,7 @@ public class DatabaseContentInitializer {
 
 			LOGGER.info("  - Assigning the desired modules to anonymous");
 			List<String> anonModules = this.getModulesForAnonymous();
-			List<Module> modulesToAssign = new ArrayList<Module>();
+			Set<Module> modulesToAssign = new HashSet<Module>();
 
 			for (String anonModuleName : anonModules) {
 				Module m = (Module) this.dbDao.getEntityByStringField(
@@ -394,11 +404,11 @@ public class DatabaseContentInitializer {
 	 * Method checks if there is an existing target. If yes the source object is
 	 * applied to the target. If there is no existing target, we create a new
 	 * one.
-	 * 
+	 *
 	 * @param target
 	 * @param source
 	 * @return
-	 * 
+	 *
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws NoSuchMethodException
@@ -436,6 +446,17 @@ public class DatabaseContentInitializer {
 		}
 
 		return target;
+	}
+
+	/**
+	 * @param shogunDatabaseInitializationEnabled
+	 * 			the shogunDatabaseInitializationEnabled to set
+	 */
+	@Autowired
+	@Qualifier("databaseInitializationEnabled")
+	public void setDatabaseInitializationEnabled(
+			Boolean databaseInitializationEnabled) {
+		this.databaseInitializationEnabled = databaseInitializationEnabled;
 	}
 
 	/**
@@ -582,7 +603,7 @@ public class DatabaseContentInitializer {
 
 	/**
 	 * Auto generation of an TsDAO instance via dependency injection.
-	 * 
+	 *
 	 * @param dao
 	 */
 	@Autowired

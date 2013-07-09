@@ -110,14 +110,19 @@
 			<version>3.5.6-Final</version>
 		</dependency>
 
-
 		<!-- Hibernate Spatial -->
 		<dependency>
 			<groupId>org.hibernatespatial</groupId>
 			<artifactId>hibernate-spatial-postgis</artifactId>
 			<version>1.0</version>
 		</dependency>
-
+	
+		<!-- c3p0 JDBC Connection Pooling -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.2.1</version>
+		</dependency>
 
 		<!-- H2 database -->
 		<dependency>
