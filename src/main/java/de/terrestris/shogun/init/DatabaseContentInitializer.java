@@ -105,6 +105,11 @@ public class DatabaseContentInitializer {
 	 * The persistant representation of the standard map configuration
 	 */
 	private MapConfig persistantStdMapConfig;
+	
+	/**
+	 * The persistant representation of the default group object
+	 */
+	private Group persistantDefaultGroup;
 
 	/**
 	 * The method called on init.
@@ -117,12 +122,13 @@ public class DatabaseContentInitializer {
 
 			LOGGER.info("Initializing database content on servlet init.");
 
+
 			try {
 				this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
 				this.createAvailableRoles();
 				this.createAvailableModules();
 				this.persistantStdMapConfig = this.createAvailableMapConfig();
-				this.createDefaultGroup();
+				this.persistantDefaultGroup = this.createDefaultGroup();
 				this.createSuperAdmin();
 				this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
 			} catch (Exception e) {
@@ -248,8 +254,8 @@ public class DatabaseContentInitializer {
 	 * @throws ShogunDatabaseAccessException
 	 *
 	 */
-	private void createDefaultGroup() throws IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException,
+	private Group createDefaultGroup() throws IllegalAccessException,
+			InvocationTargetException, NoSuchMethodException, 
 			ShogunDatabaseAccessException {
 
 		LOGGER.info("Creating default group");
@@ -260,6 +266,8 @@ public class DatabaseContentInitializer {
 
 		existinGroup = (Group) this.createOrApplyObjects(existinGroup,
 				desiredGroup);
+		
+		return existinGroup;
 	}
 
 	/**
@@ -305,9 +313,8 @@ public class DatabaseContentInitializer {
 		List<Module> allModules = (List<Module>) (List<?>) this.dbDao
 				.getAllEntities(Module.class);
 
-		Set<Module> allModuleSet = new HashSet<Module>(allModules);
-
-		currentSuperAdmin.setModules(allModuleSet);
+		Set<Module> moduleSet = new HashSet<Module>(allModules);
+		currentSuperAdmin.setModules(moduleSet);
 		LOGGER.info("  - Assigning all " + allModules.size()
 				+ " modules to superadmin.");
 
@@ -357,7 +364,10 @@ public class DatabaseContentInitializer {
 				modulesToAssign.add(m);
 				LOGGER.info("	- assigning module '" + anonModuleName + "'");
 			}
-			anon.setModules(modulesToAssign);
+			
+			//TODO move to one step conversion to set
+			Set<Module> moduleToAssignSet = new HashSet<Module>(modulesToAssign);
+			anon.setModules(moduleToAssignSet);
 
 			// TODO check for old properties first, before overwriting these
 
@@ -377,8 +387,14 @@ public class DatabaseContentInitializer {
 				// set the auto created WmsProxyConfig
 				anon.setWmsProxyConfig(wmsProxyConfig);
 			}
-
+			
+			// persist the anonymous user
 			this.dbDao.updateUser(anon);
+			
+			// add the anonymous user to the default group
+			this.persistantDefaultGroup.getUsers().add(anon);
+			this.dbDao.updateEntity("Group", this.persistantDefaultGroup);
+			
 		} else {
 			LOGGER.info("Skipping the creation of an anonymous user.");
 		}

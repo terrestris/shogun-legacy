@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.terrestris.shogun.jsonmodel.GroupList;
 import de.terrestris.shogun.jsonmodel.UserList;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.User;
@@ -46,130 +43,101 @@ public class UserAdministrationController extends AbstractWebController {
 
 
 	/**
-	 * Web-interface creating a new User instance in the database
+	 * Web-interface creating a new User instance in the database.
 	 *
-	 * @param users A list of new User objects, which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param users
+	 *            A list of new User objects, which is delivered as JSON and
+	 *            automatically deserialized
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/createUser.action", method=RequestMethod.POST, headers="Accept=application/json, plain/text")
-	public @ResponseBody Map<String, ? extends Object> createUser(@RequestBody UserList users, HttpServletResponse response) {
+	@RequestMapping(value = "/user/create.action", method = RequestMethod.POST, headers = "Accept=application/json, plain/text")
+	public @ResponseBody
+	Map<String, ? extends Object> createUser(@RequestBody UserList users) {
 
-    	try {
-
-	    	List<User> returnUsers = this.getShogunService().createUsers(users.getUsers());
-	    	// Wrap to classical return object containing total, data, success
-	    	Map<String, Object> returnMap = this.getModelMapSuccess(returnUsers);
+		try {
+			List<User> returnUsers = this.getShogunService().createUsers(
+					users.getUsers());
+			// Wrap to classical return object containing total, data, success
+			Map<String, Object> returnMap = this
+					.getModelMapSuccess(returnUsers);
 
 			return returnMap;
-    	}
-    	catch (Exception e) {
-    		LOGGER.error("Error in createUser", e);
-    		return getModelMapError("Error trying to create user: " + e.getMessage());
-		}
 
+		} catch (Exception e) {
+			LOGGER.error("Error trying to create user", e);
+			return getModelMapError("Error trying to create user: "
+					+ e.getMessage());
+		}
 	}
 
 	/**
 	 * Web-interface updating User objects in the database
 	 *
-	 * @param users A list of User objects to be updated, which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param users
+	 *            A list of User objects to be updated, which is delivered as
+	 *            JSON and automatically deserialized
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/updateUser.action", method=RequestMethod.POST, headers="Accept=application/json, plain/text")
+	@RequestMapping(value = "/user/update.action", method = RequestMethod.POST, headers = "Accept=application/json, plain/text")
 	public @ResponseBody
-	Map<String, ? extends Object> updateUser(@RequestBody UserList users, HttpServletResponse response) throws Exception {
+	Map<String, ? extends Object> updateUser(@RequestBody UserList users) {
 
 		try {
 
-			List<User> returnedUsers = this.getShogunService().updateUser(users.getUsers());
+			List<User> returnedUsers = this.getShogunService().updateUser(
+					users.getUsers());
 			// Wrap to classical return object containing total, data, success
-			Map<String, Object> returnMap = this.getModelMapSuccess(returnedUsers);
+			Map<String, Object> returnMap = this
+					.getModelMapSuccess(returnedUsers);
 
 			return returnMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in updateUser", e);
-			return getModelMapError("Error trying to update user: " + e.getMessage());
+			LOGGER.error("Error trying to update user", e);
+			return getModelMapError("Error trying to update user: "
+					+ e.getMessage());
 		}
 	}
 
-	/**
-	 * Gets the ID of the currently logged in user.
-	 *
-	 * @return the userId of the currently logged in user
-	 */
-	@RequestMapping(value = "/user/getLoggedInUserId.action", method=RequestMethod.GET)
-	public @ResponseBody
-	Map<String, ? extends Object> getLoggedInUserId() {
-		Integer userId = this.shogunService.getDatabaseDao().getUserIdFromSession();
-		return this.getModelMapSuccess(userId);
-	}
 
 	/**
-	 * Web-interface returning all active users. <br><br>
+	 * Web-interface deleting a User object in the database.
 	 *
-	 * CAUTION: this is only accessible as authenticated user.
+	 * @param userId the ID of the User to be deleted
 	 *
-	 * @return a JSON representation of the response
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/get-active.action", method=RequestMethod.GET)
+	@RequestMapping(value = "/user/delete.action")
 	public @ResponseBody
-	Map<String, ? extends Object> getActiveUsers() {
-
-		try {
-			List<User> activeUsers = this.shogunService.getActiveUsers();
-
-			return this.getModelMapSuccess(activeUsers);
-		} catch (Exception e) {
-			LOGGER.error("Error while returning active Users.", e);
-			return this.getModelMapError("Error while returning active Users: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * Web-interface deleting a User objects in the database
-	 *
-	 * @param the_id an ID of the User to be deleted
-	 * @param response A HttpServletResponse object in order to return the response
-	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
-	 */
-	@RequestMapping(value = "/user/deleteUser.action", method=RequestMethod.POST, headers="Accept=application/json,plain/text")
-	public @ResponseBody
-	Map<String, ? extends Object> deleteUser(@RequestBody int the_id, HttpServletResponse response)
+	Map<String, ? extends Object> deleteUser(int userId)
 			throws Exception {
 
 		try {
 
-			this.getShogunService().deleteUser(the_id);
+			this.getShogunService().deleteUser(userId);
 
-			Map<String, Object> modelMap = new HashMap<String, Object>(3);
-			modelMap.put("success", true);
-
-			return modelMap;
+			return this.getModelMapSuccess(userId);
 
 		} catch (Exception e) {
-			LOGGER.error("Error in deleteUser", e);
+			LOGGER.error("Error trying to delete user", e);
 			return getModelMapError("Error trying to delete user: " + e.getMessage());
 		}
 	}
 
 	/**
-	 * Web-interface for creating a new user password and
-	 * send the new password to the user email
+	 * Web-interface for creating a new user password and send the new password
+	 * to the user email
 	 *
-	 * @param user_id the user ID of the User who should get a new password
-	 * @param response response A HttpServletResponse object in order to return the response
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
-	 * @throws Exception
+	 * @param user_id
+	 *            the user ID of the User who should get a new password
+	 *
+	 * @return A Map object representing the JSON structure of the response
 	 */
 	@RequestMapping(value = "/user/updateUserPw.action")
 	public @ResponseBody
-	Map<String, ? extends Object> updateUserPassword(@RequestBody String user_id, HttpServletResponse response) throws Exception {
+	Map<String, ? extends Object> updateUserPassword(@RequestBody String user_id) {
 
 		try {
 
@@ -182,8 +150,9 @@ public class UserAdministrationController extends AbstractWebController {
 			return returnMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in updateUserPassword", e);
-			return getModelMapError("Error updating User password: " + e.getMessage());
+			LOGGER.error("Error updating User-password", e);
+			return getModelMapError("Error updating User-password: "
+					+ e.getMessage());
 		}
 	}
 
@@ -196,76 +165,76 @@ public class UserAdministrationController extends AbstractWebController {
 	/**
 	 * Web-interface creating a new Group instance in the database
 	 *
-	 * @param users A list of new {@link Group} objects,
-	 *   which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param group
+	 *            A new {@link Group} object, which is delivered as
+	 *            JSON and is automatically deserialized
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the returned
+	 *         response
 	 */
-	@RequestMapping(value = "/user/createGroup.action", method=RequestMethod.POST, headers="Accept=application/json, plain/text")
-	public @ResponseBody Map<String, ? extends Object> createGroup(@RequestBody GroupList groups, HttpServletResponse response) {
+	@RequestMapping(value = "/group/create.action", method = RequestMethod.POST)
+	public @ResponseBody
+	Map<String, ? extends Object> createGroup(@RequestBody Group group) {
 
-    	try {
+		try {
 
-	    	List<Group> returnGroups = this.getShogunService().createGroups(groups.getGroups());
-	    	// Wrap to classical return object containing total, data, success
-	    	Map<String, Object> returnMap = this.getModelMapSuccess(returnGroups);
+			Group persistentGroup = this.getShogunService().createGroup(group);
+			// Wrap to classical return object containing total, data, success
+			Map<String, Object> returnMap = this
+					.getModelMapSuccess(persistentGroup);
 
 			return returnMap;
-    	}
-    	catch (Exception e) {
-    		LOGGER.error("Error in createGroup", e);
-    		return getModelMapError("Error trying to create Group: " + e.getMessage());
+
+		} catch (Exception e) {
+			LOGGER.error("Error trying to create Group", e);
+			return getModelMapError("Error trying to create Group: "
+					+ e.getMessage());
 		}
 
 	}
 
 
 	/**
-	 * Web-interface updating Group objects in the database
+	 * Web-interface updating a Group object in the database
 	 *
-	 * @param users A list of {@link Group} objects to be updated,
+	 * @param group A {@link Group} object to be updated,
 	 *   which is delivered as JSON and automatically deserialized
-	 * @param response A HttpServletResponse object in order to return the response
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/updateGroup.action", method=RequestMethod.POST, headers="Accept=application/json,plain/text")
+	@RequestMapping(value = "/group/update.action", method=RequestMethod.POST)
 	public @ResponseBody
-	Map<String, ? extends Object> updateGroup(@RequestBody GroupList groups, HttpServletResponse response)
-			throws Exception {
+	Map<String, ? extends Object> updateGroup(@RequestBody Group group) {
 
 		try {
 
-			List<Group> returnedgroups = this.getShogunService().updateGroup(groups.getGroups());
+			Group updatedGroup = this.getShogunService().updateGroup(group);
 			// Wrap to classical return object containing total, data, success
-			Map<String, Object> returnMap = this.getModelMapSuccess(returnedgroups);
+			Map<String, Object> returnMap = this.getModelMapSuccess(updatedGroup);
 
 			return returnMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in updateGroup", e);
+			LOGGER.error("Error trying to update Group.", e);
 			return getModelMapError("Error trying to update Group: " + e.getMessage());
 		}
 	}
 
 
 	/**
-	 * Web-interface deleting a Group objects in the database
+	 * Web-interface deleting a Group object in the database.
 	 *
-	 * @param the_id an ID of the {@link Group} to be deleted
-	 * @param response A HttpServletResponse object in order to return the response
+	 * @param groupId the ID of the {@link Group} to be deleted
 	 *
-	 * @return A Map object representing the JSON structure of the returned HttpServletResponse
+	 * @return A Map object representing the JSON structure of the response
 	 */
-	@RequestMapping(value = "/user/deleteGroup.action", method=RequestMethod.POST, headers="Accept=application/json,plain/text")
+	@RequestMapping(value = "/group/delete.action", method=RequestMethod.GET)
 	public @ResponseBody
-	Map<String, ? extends Object> deleteGroup(@RequestBody int the_id, HttpServletResponse response)
-			throws Exception {
+	Map<String, ? extends Object> deleteGroup(Integer groupId) {
 
 		try {
 
-			this.getShogunService().deleteGroup(the_id);
+			this.getShogunService().deleteGroup(groupId);
 
 			Map<String, Object> modelMap = new HashMap<String, Object>(3);
 			modelMap.put("success", true);
@@ -273,10 +242,35 @@ public class UserAdministrationController extends AbstractWebController {
 			return modelMap;
 
 		} catch (Exception e) {
-			LOGGER.error("Error in deleteGroup", e);
+			LOGGER.error("Error trying to delete group.", e);
 			return getModelMapError("Error trying to delete group: " + e.getMessage());
 		}
 	}
+
+	/**
+	 * Web-interface for reading all own {@link Group} objects from the
+	 * database.
+	 *
+	 * If the logged in user is a SUPERADMIN, so all groups are returned.
+	 *
+	 * @return A JSON representation of all owned group objects
+	 */
+	@RequestMapping(value = "/group/get-all-own.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getAllOwnedGroups() {
+
+		try {
+
+			List<Group> ownedGroups = this.getShogunService().getAllOwnedGroups();
+
+			return this.getModelMapSuccess(ownedGroups);
+
+		} catch (Exception e) {
+			LOGGER.error("Error trying to read groups.", e);
+			return getModelMapError("Error trying to read groups: " + e.getMessage());
+		}
+	}
+
 
 	/**
 	 * @return the shogunService

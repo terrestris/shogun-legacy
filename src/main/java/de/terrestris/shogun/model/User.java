@@ -36,10 +36,9 @@ import de.terrestris.shogun.dao.DatabaseDao;
 public class User extends BaseModel {
 
 	public static final String ROLENAME_SUPERADMIN = "ROLE_SUPERADMIN";
+	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
 	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
 
-
-	private int group_id;
 	private String user_name;
 	private String user_longname;
 	private String user_email;
@@ -49,8 +48,8 @@ public class User extends BaseModel {
 	private String user_country;
 	private String user_password;
 	private String user_lang;
-	private Boolean active = true;
 
+	private Set<Group> groups;
 	private Set<Module> modules;
 	private Set<MapLayer> mapLayers;
 //	private Set<MapConfig> mapConfigs;
@@ -59,22 +58,6 @@ public class User extends BaseModel {
 	private WmsProxyConfig wmsProxyConfig;
 	private Set<Role> roles;
 	private String user_module_list;
-
-
-	/**
-	 * @return the group_id
-	 */
-	@Column(name="GROUP_ID", nullable=false)
-	public int getGroup_id() {
-		return group_id;
-	}
-
-	/**
-	 * @param group_id the group_id to set
-	 */
-	public void setGroup_id(int group_id) {
-		this.group_id = group_id;
-	}
 
 
 	/**
@@ -223,20 +206,20 @@ public class User extends BaseModel {
 	}
 
 	/**
-	 * @return the active
+	 * @return the groups
 	 */
-	@Column(name="ACTIVE")
-	public Boolean getActive() {
-		return active;
+	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+	@JsonIgnore
+	public Set<Group> getGroups() {
+		return groups;
 	}
 
 	/**
-	 * @param active the active to set
+	 * @param groups the groups to set
 	 */
-	public void setActive(Boolean active) {
-		this.active = active;
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
 	}
-
 
 	/**
 	 * We probably should use a set in future, due to a know limitation
@@ -429,7 +412,8 @@ public class User extends BaseModel {
 			newModules = new HashSet<Module>();
 		}
 
-		this.setModules(newModules);
+		Set<Module> moduleSet = new HashSet<Module>(newModules);
+		this.setModules(moduleSet);
 	}
 
 	/**
@@ -441,6 +425,18 @@ public class User extends BaseModel {
 	 */
 	public boolean hasSuperAdminRole() {
 		return this.hasRole(User.ROLENAME_SUPERADMIN);
+	}
+
+
+	/**
+	 * Returns whether the user has role User.ROLENAME_ADMIN in his set of
+	 * roles by comparing the name of all roles to the given string using
+	 * the private hasRole-method.
+	 *
+	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
+	 */
+	public boolean hasAdminRole() {
+		return this.hasRole(User.ROLENAME_ADMIN);
 	}
 
 	/**
