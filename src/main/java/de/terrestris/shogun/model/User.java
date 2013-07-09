@@ -48,6 +48,7 @@ public class User extends BaseModel {
 	private String user_country;
 	private String user_password;
 	private String user_lang;
+	private Boolean active = true;
 
 	private Set<Group> groups;
 	private Set<Module> modules;
@@ -203,6 +204,21 @@ public class User extends BaseModel {
 	 */
 	public void setUser_lang(String user_lang) {
 		this.user_lang = user_lang;
+	}
+
+	/**
+	 * @return the active
+	 */
+	@Column(name="ACTIVE")
+	public Boolean getActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	/**
