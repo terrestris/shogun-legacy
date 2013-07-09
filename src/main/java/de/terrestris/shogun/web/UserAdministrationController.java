@@ -157,6 +157,19 @@ public class UserAdministrationController extends AbstractWebController {
 	}
 
 
+	/**
+	 * Gets the ID of the currently logged in user.
+	 *
+	 * @return the userId of the currently logged in user
+	 */
+	@RequestMapping(value = "/user/getLoggedInUserId.action", method=RequestMethod.GET)
+	public @ResponseBody
+	Map<String, ? extends Object> getLoggedInUserId() {
+		 Integer userId = this.shogunService.getDatabaseDao().getUserIdFromSession();
+		return this.getModelMapSuccess(userId);
+	}
+
+
 	// ---------------------------------------------------------------------------------
 	// GROUP ENTITIES
 	// ---------------------------------------------------------------------------------
