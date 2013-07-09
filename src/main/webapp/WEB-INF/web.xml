@@ -4,17 +4,38 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
 	<display-name>SHOGun</display-name>
-	
+
+	<!-- Log4J configuration -->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/log4j.properties</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+
+	<!-- Application Context -->
+	<!-- This Context is the root app context.
+		 The context of a servlet (e.g. the following shogun-servlet)
+		 will inherit from this context and have access to the stuff
+		 defined here, e.g. Hibernate-TransactionManger from db-config.
+		 see e.g. http://syntx.co/languages-frameworks/difference-between-loading-context-via-dispatcherservlet-and-contextloaderlistener/
+		 for more information.
+	-->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			/WEB-INF/spring/app-config.xml
+			/WEB-INF/spring/db-config.xml
+			/WEB-INF/spring/applicationContext-security.xml
+			/WEB-INF/spring/initialize-beans.xml
 		</param-value>
 	</context-param>
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-	
+
 	<!-- This is the binding of our self-defined class CustomHttpSessionListener
 		 for the handling of session timeouts and logouts.
 		 
@@ -27,13 +48,14 @@
 	</listener>
 	-->
 
+	<!-- Shogun-Servlet -->
 	<servlet>
 		<servlet-name>shogun</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
 			<param-value>
-				/WEB-INF/spring/app-config.xml
+				/WEB-INF/spring/shogun-config.xml
 			</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
@@ -43,7 +65,6 @@
 		<servlet-name>shogun</servlet-name>
 		<url-pattern>*.action</url-pattern>
 	</servlet-mapping>
-	
 
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
@@ -64,15 +85,4 @@
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
-
-	<!-- Log4J configuration -->
-	<context-param>
-		<param-name>log4jConfigLocation</param-name>
-		<param-value>/WEB-INF/log4j.properties</param-value>
-	</context-param>
-
-	<listener>
-		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-	</listener>
-	
 </web-app>
