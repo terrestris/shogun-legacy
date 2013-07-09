@@ -269,7 +269,7 @@ public class DatabaseDao {
 	 * @param clazz The entity to be queried
 	 * @return the object matching the passed entity and the passed ID
 	 */
-	public Object getEntityById(int id, Class<?> clazz) throws ShogunDatabaseAccessException {
+	public Object getEntityById(int id, Class<?> clazz) {
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -516,7 +516,7 @@ public class DatabaseDao {
 	 * @return the object that was created in the database
 	 * @throws ShogunDatabaseAccessException
 	 */
-	public <T> T createEntity(T objToCreate) throws ShogunDatabaseAccessException {
+	public <T> T createEntity(T objToCreate) {
 
 		Class<? extends Object> clazz = objToCreate.getClass();
 		Object createdObjectId = this.getSessionFactory().getCurrentSession().save(
@@ -533,7 +533,7 @@ public class DatabaseDao {
 	 * @throws ShogunDatabaseAccessException 
 	 */
 	@Transactional
-	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate) throws ShogunDatabaseAccessException{
+	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate) {
 		List<T> createdObjs = new ArrayList<T>();
 		for (T t : objsToCreate) {
 			createdObjs.add(this.createEntity(t));
