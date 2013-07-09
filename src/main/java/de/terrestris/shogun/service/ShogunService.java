@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.persistence.ManyToMany;
 
@@ -108,8 +109,13 @@ public class ShogunService extends AbstractShogunService {
 			// get total count
 			long total = this.getDatabaseDao().getTotal(hibernateFilter, hibernateAdditionalFilter);
 
-			// get the data
+			// get the data from database
 			List<Object> dataList = null;
+			dataList = this.getDatabaseDao().getDataByFilter(
+				hibernateSortObject,
+				hibernateFilter, hibernatePaging,
+				hibernateAdditionalFilter
+			);
 
 			// treat GROUP as a special case because of sub entities
 			if (objectType.equals("Group")) {
@@ -173,8 +179,7 @@ public class ShogunService extends AbstractShogunService {
 			LOGGER.debug("Create a method object for " + associationProperties.get("assocGetter"));
 			rightGetter = rightClazz.getMethod(associationProperties.get("assocGetter"));
 
-
-			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz, 0);
+			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz);
 
 			List<Object> allUsers = this.getDatabaseDao().getAllEntities(rightClazz);
 
@@ -285,7 +290,7 @@ public class ShogunService extends AbstractShogunService {
 	 * Builds an application context object, consisting of:
 	 * <ul>
 	 * <li>logged in user from session</li>
-	 * <li>general application information (language, group, etc...)</li>
+	 * <li>general application information (language, etc...)</li>
 	 * <ul>
 	 *
 	 * @return HashMap representing the application context as JSON object
@@ -309,13 +314,9 @@ public class ShogunService extends AbstractShogunService {
 			throw new ShogunServiceException("No user found, who is logged in at the backend");
 		}
 
-		// get corresponding group object from database
-		int group_id = user.getGroup_id();
-
 		// create an data object containing an JS object for app and user
 		// as a sub object of the return object
 		Map<String, Object> appDataMap = new HashMap<String, Object>(2);
-		appDataMap.put("group_id", group_id);
 
 		// the application context object
 		Map<String, Object> appContextMap = new HashMap<String, Object>(2);
@@ -345,8 +346,7 @@ public class ShogunService extends AbstractShogunService {
 
 		if (users.size() > 0) {
 			user = users.get(0);
-			java.util.Set<Module> modules = user.getModules();
-
+			Set<Module> modules = user.getModules();
 			return modules;
 		} else {
 			return new HashSet<Module>();

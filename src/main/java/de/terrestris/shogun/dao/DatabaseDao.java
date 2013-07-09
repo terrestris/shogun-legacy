@@ -100,27 +100,6 @@ public class DatabaseDao {
 			criteria.addOrder(hibernateSortItem.createHibernateOrder());
 		}
 
-
-		// GROUP dependent model
-		// needs further WHERE CLAUSE (WHERE group_id=x)
-		if (this.isGroupDependent(hibernateFilter.getMainClass())) {
-
-			// AND conjuncton group_id=x
-			Conjunction groupConjunction = Restrictions.conjunction();
-			Criterion groupCriterion = null;
-			try {
-				groupCriterion = Restrictions.eq(this.getGroupFieldName(hibernateFilter.getMainClass()), this.getGroupIdFromSession());
-				groupConjunction.add(groupCriterion);
-			} catch (Exception e) {
-				throw new ShogunDatabaseAccessException(
-						"Error retrieving the group ID from session while " +
-						"applying filter ", e);
-			}
-
-			criteria.add(groupConjunction);
-		}
-
-
 		/*
 		 * Check additional filters:
 		 * These are being sent from a client and represent AND conditions to be
@@ -230,13 +209,6 @@ public class DatabaseDao {
 		criteria.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property(field), field)));
 
-		// filter by group
-		if (groupDependent == true) {
-
-			int groupId = this.getGroupIdFromSession();
-			criteria.add(Restrictions.eq("group_id", groupId));
-		}
-
 		// this ensures that no cartesian product is returned when
 		// having sub objects, e.g. User <-> Modules
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
@@ -266,7 +238,6 @@ public class DatabaseDao {
 		return criteria.list();
 	}
 
-
 	/**
 	 * Determines all records of the passed entity owned by the
 	 * currently logged in user.
@@ -292,58 +263,22 @@ public class DatabaseDao {
 
 
 	/**
-	 * Returns an object from the database defined by its ID
-	 *
-	 * @param id
-	 * @param clazz
-	 * @param group_id
-	 * @return
-	 */
-	public Object getEntityById(int id, Class<?> clazz, int group_id) {
-
-		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
-		criteria.add(Restrictions.eq("id", id));
-		if (this.isGroupDependent(clazz)) {
-			criteria.add(Restrictions.eq(this.getGroupFieldName(clazz), group_id));
-		}
-
-		List<Object> objectList = criteria.list();
-
-		if (objectList.size() > 0) {
-			return objectList.get(0);
-		}
-		else {
-			return null;
-		}
-	}
-
-
-	/**
 	 * Returns an object of a certain entity defined by its ID.
-	 *
-	 * TODO check whether this introduced a security leak as we do not check for
-	 * group dependency.
 	 *
 	 * @param id the ID of the object to query
 	 * @param clazz The entity to be queried
 	 * @return the object matching the passed entity and the passed ID
 	 */
-	public Object getEntityById(int id, Class clazz) {
+	public Object getEntityById(int id, Class<?> clazz) {
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq("id", id));
-		List<Object> objectList = criteria.list();
+		// we expect a single record or null
+		Object result = criteria.uniqueResult();
 
-		if (objectList.size() > 0) {
-			return objectList.get(0);
-		}
-		else {
-			return null;
-		}
+		return result;
 	}
-
 
 	/**
 	 * Returns a list of object of a certain entity defined by its ID.
@@ -372,7 +307,6 @@ public class DatabaseDao {
 		return criteria.list();
 	}
 
-
 	/**
 	 * Returns all entites besides the ones passed (as IDs).
 	 *
@@ -396,7 +330,6 @@ public class DatabaseDao {
 
 		return criteria.list();
 	}
-
 
 	/**
 	 * Returns an Object by a String comparison of a specified field
@@ -581,8 +514,10 @@ public class DatabaseDao {
 	 *
 	 * @param objToCreate the new object to be created in the DB
 	 * @return the object that was created in the database
+	 * @throws ShogunDatabaseAccessException
 	 */
 	public <T> T createEntity(T objToCreate) {
+
 		Class<? extends Object> clazz = objToCreate.getClass();
 		Object createdObjectId = this.getSessionFactory().getCurrentSession().save(
 				clazz.getSimpleName(), objToCreate);
@@ -595,9 +530,10 @@ public class DatabaseDao {
 	 *
 	 * @param objsToCreate the new objects to be created in the DB
 	 * @return the objects that were created in the database
+	 * @throws ShogunDatabaseAccessException 
 	 */
 	@Transactional
-	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate){
+	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate) {
 		List<T> createdObjs = new ArrayList<T>();
 		for (T t : objsToCreate) {
 			createdObjs.add(this.createEntity(t));
@@ -622,7 +558,6 @@ public class DatabaseDao {
 		return objToCreateOrUpdate;
 	}
 
-
 	/**
 	 * Updates a record of a given Entity in the database with the passed one
 	 *
@@ -638,7 +573,6 @@ public class DatabaseDao {
 		return updatedObject;
 	}
 
-
 	/**
 	 * Deletes a record of a given Entity in the database. The record to be
 	 * deleted is defined by its ID.
@@ -653,6 +587,18 @@ public class DatabaseDao {
 		this.sessionFactory.getCurrentSession().delete(record);
 	}
 
+
+	/**
+	 * Deletes a record of a given entity-class in the database.
+	 * The record to be deleted is given by its object representation.
+	 *
+	 * @param <T> Template class, here the class of the object to be deleted
+	 * @param clazz Entity class of the object to be deleted
+	 * @param objectToDelete the instance to be deleted from database
+	 */
+	public <T> void deleteEntity(Class<T> clazz, BaseModelInterface objectToDelete) {
+		this.sessionFactory.getCurrentSession().delete(objectToDelete);
+	}
 
 	/**
 	 * Deletes a record of a given Entity in the database. The record to be
@@ -677,7 +623,6 @@ public class DatabaseDao {
 		this.sessionFactory.getCurrentSession().delete(record);
 	}
 
-
 	/**
 	 * Delete an object of an entity NOT regarding the logged
 	 * in user is in the same group
@@ -693,7 +638,14 @@ public class DatabaseDao {
 		// user to be deleted is a child of the current group
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq("id", id));
-		criteria.add(Restrictions.eq(this.getGroupFieldName(clazz), this.getGroupIdFromSession()));
+
+		List<Integer> groupIdsOfSessionUser = this.getGroupIdsFromSession();
+
+		if (groupIdsOfSessionUser.size() > 0) {
+			criteria.createCriteria("groups")
+				.add(Restrictions.in("id", groupIdsOfSessionUser));
+		}
+
 		List<Object> records = criteria.list();
 
 		// group check --> user allowed to delete this instance?
@@ -739,7 +691,6 @@ public class DatabaseDao {
 		}
 	}
 
-
 	// ---------------------------------------------------------------------------
 
 	// USER RELATED STUFF
@@ -747,56 +698,23 @@ public class DatabaseDao {
 	// ---------------------------------------------------------------------------
 
 	/**
-	 * TODO remove this by a many-to-many relation on group
-	 * TODO remove this method
-	 *
-	 * @param groupId
-	 * @return
-	 */
-	public long getCurrentUserByGroup(int groupId) {
-
-		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
-		criteria.setProjection(Projections.count("id"));
-		criteria.add(Restrictions.eq("group_id", groupId));
-
-		return (Long)criteria.list().get(0);
-	}
-
-
-	/**
 	 * Returns the {@link User} object defined by the passed user name.
 	 *
 	 * @param name the user_name of the record in the database
 	 * @return
-	 * @throws Exception
-	 */
-	public List<User> getUserByName(String name) throws ShogunDatabaseAccessException {
-		return this.getUserByName(name, 0);
-	}
-
-
-	/**
-	 * Returns the {@link User} object defined by the passed user name. <br>
-	 * When passed a group_id greater than 0, the query will be additionally
-	 * filtered with the given group.
-	 *
-	 * @param name the user_name of th record in the database
-	 * @param group_id  if this is valid (>0) the returned user has to be a child this group
-	 * @return
+	 * @throws ShogunDatabaseAccessException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<User> getUserByName(String name, int group_id) throws ShogunDatabaseAccessException {
+	public List<User> getUserByName(String name)
+										throws ShogunDatabaseAccessException {
 
 		Criteria criteria = null;
 
 		try {
 
 			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+
 			criteria.add(Restrictions.ilike("user_name", name));
-			if(group_id > 0) {
-				criteria.add(Restrictions.eq("group_id", group_id));
-			}
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
@@ -814,6 +732,87 @@ public class DatabaseDao {
 		return criteria.list();
 	}
 
+	/**
+	 * Returns the {@link User} object defined by the passed user name.
+	 *
+	 * @param name the user_name of the record in the database
+	 * @return
+	 * @throws ShogunDatabaseAccessException
+	 */
+	public User getUserByName(String name,
+			String additionalCriteriaPath, Criterion additionalCriterion) throws ShogunDatabaseAccessException {
+
+		Criteria criteria = null;
+
+		try {
+
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+
+			// add additional restrictions like
+			// where user is in group with ID xy
+			if (additionalCriteriaPath != null &&
+					additionalCriteriaPath.isEmpty() == false &&
+					additionalCriterion != null) {
+
+				criteria.createCriteria(additionalCriteriaPath)
+					.add(additionalCriterion);
+			}
+
+			criteria.add(Restrictions.ilike("user_name", name));
+
+		} catch (Exception e) {
+			throw new ShogunDatabaseAccessException(
+					"Error while getting User by name: " + name, e);
+		}
+
+		// we have to ensure that the modules are distinct
+		// @see http://docs.jboss.org/hibernate/orm/3.6/javadocs/org/hibernate/Criteria.html#createAlias(java.lang.String, java.lang.String, int)
+		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
+
+		// this ensures that no cartesian product is returned when
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return (User) criteria.uniqueResult();
+	}
+
+	/**
+	 * Returns a User object defined by its ID in the database.
+	 * <br>
+	 * <br>
+	 * Can be filtered by a further criterion (additionalCriterion) put on a
+	 * specific path (additionalCriteriaPath). This could model a filter like
+	 * <br>
+	 * <code>
+	 * criteria.createCriteria("groups")
+				.add(Restrictions.in("id", groupIdsOfSessionUser));
+	 * <code>
+	 *
+	 * @param id the ID of the {@link User} to query
+	 * @param additionalCriteriaPath a criteria path to put add a further criterion
+	 * @param additionalCriterion additional criterion to filter query
+	 * @return the {@link User} object matching the query
+	 */
+	public User getUserById(int id, String additionalCriteriaPath, Criterion additionalCriterion) {
+
+		Criteria criteria =
+			this.sessionFactory.getCurrentSession().createCriteria(User.class);
+
+		// add additional restrictions like
+		// where user is in group with ID xy
+		if (additionalCriteriaPath != null &&
+				additionalCriteriaPath.isEmpty() == false &&
+				additionalCriterion != null) {
+
+			criteria.createCriteria(additionalCriteriaPath)
+				.add(additionalCriterion);
+		}
+
+		// filter on ID
+		criteria.add(Restrictions.eq("id", id));
+
+		return (User) criteria.uniqueResult();
+	}
 
 	/**
 	 * Create a new User on the database or
@@ -849,22 +848,30 @@ public class DatabaseDao {
 	 */
 	public User createUser(User user, String role, boolean setSessionGroup) throws ShogunDatabaseAccessException {
 
-		if (setSessionGroup == true) {
-
-			try {
-
-				// set the current group ID of logged in user
-				int group_id = this.getGroupIdFromSession();
-				user.setGroup_id(group_id);
-			} catch (Exception e) {
-				throw new ShogunDatabaseAccessException(
-						"Error getting group from session. " + e.getMessage());
-			}
-		}
-
 		try {
 
 			this.sessionFactory.getCurrentSession().save(user);
+
+			if (setSessionGroup == true) {
+
+				try {
+
+					// add the saved user to current session group
+					Group sessionGroup = this.getFirstGroupObjectFromSessionUser();
+
+					if (sessionGroup != null) {
+
+						sessionGroup.getUsers().add(user);
+
+						// persist the changes of the group object
+						this.updateEntity("Group", sessionGroup);
+					}
+
+				} catch (Exception e) {
+					throw new ShogunDatabaseAccessException(
+							"Error adding the saved user to current session group. " + e.getMessage());
+				}
+			}
 
 			// create the mapping of new user and its role
 			Role oRole = (Role)this.getEntityByStringField(Role.class, "name", role);
@@ -881,7 +888,6 @@ public class DatabaseDao {
 		return user;
 	}
 
-
 	/**
 	 * TODO: this method should call the internal updateEntity-method!
 	 */
@@ -893,93 +899,32 @@ public class DatabaseDao {
 		return user;
 	}
 
-
 	/**
-	 * Deletes a user instance given by its user id
-	 * Function also deletes the roles of the user in
-	 * tbl_user_role, due to the fact that the roles are not mapped
-	 * automatically
-	 *
-	 * @throws Exception
-	 *
-	 */
-	public void deleteUser(int id) throws ShogunDatabaseAccessException {
-
-		// get group ID of logged in User and check if there is the
-		// user to be deleted is a child of the current group
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
-		criteria.add(Restrictions.eq("id", id));
-		criteria.add(Restrictions.eq(this.getGroupFieldName(User.class), this.getGroupIdFromSession()));
-		List<User> users = criteria.list();
-
-		// group check --> user allowed to delete this instance?
-		if (users.size() > 0) {
-			// delete the user instance
-			this.deleteEntity(User.class, id);
-
-		} else {
-			throw new ShogunDatabaseAccessException(
-					"The User to be deleted is not accessible " +
-					"for the logged in user!");
-		}
-	}
-
-
-	/**
-	 * Deletes a user instance given by its user id
-	 * Function also deletes the roles of the user in
-	 * tbl_user_role, due to the fact that the roles are not mapped
-	 * automatically
+	 * Deletes a user instance given by its user id. <br>
 	 *
 	 * Here it is NOT checked if the logged in group matches the one stored
 	 * for the user. This method is intended to be called by the super user
 	 * with the role ROLE_SUPERADMIN
 	 *
-	 *
 	 * @param id
 	 * @throws Exception
 	 */
-	public void deleteUserGroupIndependent(int id) throws ShogunDatabaseAccessException {
+	public void deleteUser(int id) throws ShogunDatabaseAccessException {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 		criteria.add(Restrictions.eq("id", id));
-		List<User> users = criteria.list();
+		User userToDelete = (User) criteria.uniqueResult();
 
-		// group check --> user allowed to delete this instance?
-		if (users.size() > 0) {
+		if (userToDelete != null) {
 
 			// delete the user instance
-			this.deleteEntity(User.class, id);
+			this.deleteEntity(User.class, userToDelete.getId());
 
 		} else {
 			throw new ShogunDatabaseAccessException(
 					"No User found with ID " + id);
 		}
 	}
-
-
-	/**
-	 * Deletes all User records of the given group (defined by group-ID)
-	 *
-	 * @param groupId the ID of the group containing the Users to be deleted
-	 * @throws ShogunDatabaseAccessException
-	 * @throws Exception
-	 */
-	public void deleteGroupUsers(int groupId) throws ShogunDatabaseAccessException {
-
-		// fetch all User records with the given group-ID
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
-		criteria.add(Restrictions.eq("group_id", groupId));
-		criteria.setProjection(Projections.property("id"));
-		List<Integer> users = criteria.list();
-
-		for (Iterator<Integer> iterator = users.iterator(); iterator.hasNext();) {
-			Integer userId = (Integer) iterator.next();
-
-			this.deleteUserGroupIndependent(userId);
-		}
-	}
-
 
 	/**
 	 * Empties the session completely.
@@ -991,7 +936,6 @@ public class DatabaseDao {
 	public void clearSession() {
 		 this.sessionFactory.getCurrentSession().clear();
 	}
-
 
 	/**
 	 * Return the total count of a request.
@@ -1015,27 +959,6 @@ public class DatabaseDao {
 					"The requested model " + hibernateFilter.getMainClass() +
 					" is not defined ", e);
 		}
-
-
-		// GROUP dependent class (model)
-		// needs a further WHERE clause (WHERE group_id=x)
-		if (isGroupDependent(hibernateFilter.getMainClass())) {
-
-			// AND conjuncton group_id=x
-			Conjunction groupConjunction = Restrictions.conjunction();
-			Criterion groupCriterion = null;
-			try {
-				groupCriterion = Restrictions.eq(this.getGroupFieldName(hibernateFilter.getMainClass()), this.getGroupIdFromSession());
-				groupConjunction.add(groupCriterion);
-			} catch (Exception e) {
-				throw new ShogunDatabaseAccessException(
-						"Problems retrieving the group ID from session while " +
-						"calculating total " + e.getMessage());
-			}
-
-			criteria.add(groupConjunction);
-		}
-
 
 		/*
 		 * check additional filters:
@@ -1137,7 +1060,6 @@ public class DatabaseDao {
 		}
 	}
 
-
 	/**
 	 * Determines the ID of the logged in user from Security Context
 	 *
@@ -1163,7 +1085,6 @@ public class DatabaseDao {
 		}
 	}
 
-
 	/**
 	 * Returns the {@link User} object of the logged in user
 	 *
@@ -1186,109 +1107,82 @@ public class DatabaseDao {
 		}
 	}
 
-
 	/**
-	 * Returns the group ID of the logged in user
+	 * Returns the IDs of all groups ID of the logged in user
 	 *
 	 * @return
+	 * @throws ShogunDatabaseAccessException
 	 * @throws Exception
 	 */
-	public int getGroupIdFromSession() {
+	public List<Integer> getGroupIdsFromSession() {
 
-		// get the authorization context, incl. user name
-		Authentication authResult = SecurityContextHolder.getContext().getAuthentication();
+		Set<Group> sessionGroups = this.getGroupObjectsFromSessionUser();
+		List<Integer> groupIdsOfSessionUser = new ArrayList<Integer>();
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+		for (Group group : sessionGroups) {
+			groupIdsOfSessionUser.add(group.getId());
+		}
 
-		criteria.setProjection(Projections.property("group_id"));
-		criteria.add(Restrictions.ilike("user_name", authResult.getName()));
-
-		Integer group_id = (Integer)criteria.list().get(0);
-
-		return group_id;
+		return groupIdsOfSessionUser;
 	}
-
 
 	/**
-	 * Returns the {@link Group} object of the logged in user
+	 * Returns all {@link Group} objects of the logged in user.
 	 *
-	 * @return the {@link Group} object of the logged in user or NULL if not found
+	 * @return the set of {@link Group} objects of the logged in user
+	 * 			or NULL if not found
 	 */
-	public Group getGroupObjectFromSession() {
+	public Set<Group> getGroupObjectsFromSessionUser() {
 
-		Integer id = this.getGroupIdFromSession();
+		// get the logged-in user
+		User sessionUser = this.getUserObjectFromSession();
 
-		return (Group)this.getEntityById(id, Group.class, 0);
+		// get a set of the groups of the logged-in user
+		if (sessionUser != null) {
+			return sessionUser.getGroups();
+		} else {
+			return null;
+		}
 	}
 
+	/**
+	 * Returns the first {@link Group} object of the logged in user.
+	 *
+	 * @return the first {@link Group} object of the logged in user or
+	 * 			NULL if not found
+	 */
+	public Group getFirstGroupObjectFromSessionUser() {
+
+		// get the logged-in user
+		User sessionUser = this.getUserObjectFromSession();
+
+		if (sessionUser != null && sessionUser.getGroups() != null) {
+			return sessionUser.getGroups().iterator().next();
+		} else {
+			return null;
+		}
+	}
 
 	/**
 	 * Determines if the logged in User is a SuperAdmin.
-	 *
-	 * TODO eventually the logic here has to be improved.
 	 *
 	 * @return flag SuperAdmin=true/false
 	 */
 	public boolean isSuperAdmin() {
 
-		return (this.getGroupIdFromSession() == 0) && (this.getUserIdFromSession() == 1);
-	}
+		// get the logged-in user and check if he has the SuperAdmin role
+		User sessionUser = this.getUserObjectFromSession();
+		Set<Role> roles = sessionUser.getRoles();
 
-
-	/**
-	 * Decides whether an entity is group dependent or not
-	 *
-	 * TODO: refactor this method: implement a super class
-	 * having a member variable group_id and extend this class by
-	 * group dependent models
-	 *
-	 * @param model
-	 * @return
-	 */
-	private boolean isGroupDependent(Class model) {
-
-		// let's assume that the super user never wants group dependent models:
-		if (this.getGroupIdFromSession() == 0) {
-			return false;
-		}
-
-		Field fields[] = model.getDeclaredFields();
-
-		for (int j = 0, m = fields.length; j < m; j++) {
-
-			if(fields[j].getName().equalsIgnoreCase("group_id")) {
+		for (Role role : roles) {
+			if (role.getName().equals(User.ROLENAME_SUPERADMIN)) {
 				return true;
 			}
 		}
 
 		return false;
 	}
-
-
-	/**
-	 * Returns the correct field name of the group id column
-	 *
-	 * TODO: remove this method when to changes commented in
-	 * isGroupDependent are applied (implement a superclass/interface)
-	 *
-	 * @return
-	 * @throws Exception
-	 */
-	private String getGroupFieldName(Class model) {
-
-		Field fields[] = model.getDeclaredFields();
-
-		for (int j = 0, m = fields.length; j < m; j++) {
-
-			if(fields[j].getName().equalsIgnoreCase("group_id")) {
-				return fields[j].getName();
-			}
-		}
-
-		return null;
-	}
-
-
+	
 	/**
 	 * Helper function to print out the SQL from a criteria object
 	 *
@@ -1314,7 +1208,6 @@ public class DatabaseDao {
 		}
 	}
 
-
 	/**
 	 * Sets the SessionFactory of Hibernate via Spring's DI
 	 *
@@ -1324,7 +1217,6 @@ public class DatabaseDao {
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-
 
 	/**
 	 * @return the session factory of Hibernate
