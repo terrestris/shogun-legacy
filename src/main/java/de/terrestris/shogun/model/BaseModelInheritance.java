@@ -126,4 +126,24 @@ public class BaseModelInheritance implements BaseModelInterface {
         this.app_user = user;
     }
 
+    /**
+     * Returns a string-representation of an instance of the class.<br><br>
+     *
+     * The string representation of this class (or child-classes) consists of
+     * the simple name of the class, followed by the #-sign, followed by the
+     * instance id-field, followed by '@', followed by the unsigned hexadecimal
+     * representation of the hash code of the object.<br><br>
+     *
+     * Example output for an instance with id=1 of the
+     * class 'WmsMapLayer':<br><br>
+     *
+     * <code>WmsMapLayer#1@3ac6acd3</code><br>
+     *
+     * @return String The string-representation of an instance of the class.
+     */
+    public String toString(){
+        return this.getClass().getSimpleName() +
+            "#" + id +
+            "@" + Integer.toHexString(hashCode());
+    }
 }
