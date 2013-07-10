@@ -117,17 +117,6 @@ public class ShogunService extends AbstractShogunService {
 				hibernateAdditionalFilter
 			);
 
-			// treat GROUP as a special case because of sub entities
-			if (objectType.equals("Group")) {
-				dataList = this.getDatabaseDao().getDataByFilter(hibernateSortObject,
-						hibernateFilter, hibernatePaging,
-						hibernateAdditionalFilter);
-			} else {
-				dataList = this.getDatabaseDao().getDataByFilter(hibernateSortObject,
-						hibernateFilter, hibernatePaging,
-						hibernateAdditionalFilter);
-			}
-
 			//TODO introduce a Beans abstracting this
 			Map<String, Object> returnMap = new HashMap<String, Object>();
 			returnMap.put("total", new Long(total));
