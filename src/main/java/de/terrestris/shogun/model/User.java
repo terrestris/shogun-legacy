@@ -18,8 +18,13 @@ import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import de.terrestris.shogun.dao.DatabaseDao;
+import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
 /**
  * User POJO
@@ -226,6 +231,8 @@ public class User extends BaseModel {
 	 */
 	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	@JsonIgnore
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<Group> getGroups() {
 		return groups;
 	}
@@ -238,9 +245,6 @@ public class User extends BaseModel {
 	}
 
 	/**
-	 * We probably should use a set in future, due to a know limitation
-	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-	 *
 	 * @return the modules
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
@@ -248,13 +252,13 @@ public class User extends BaseModel {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<Module> getModules() {
 		return modules;
 	}
 
 	/**
-	 * We probably should use a set in future, due to a know limitation
-	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
 	 *
 	 * @param modules the modules to set
 	 */
@@ -272,6 +276,8 @@ public class User extends BaseModel {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
 					nullable = false, updatable = false) })
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}
@@ -379,6 +385,8 @@ public class User extends BaseModel {
 	 * @return the roles
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<Role> getRoles() {
 		return roles;
 	}

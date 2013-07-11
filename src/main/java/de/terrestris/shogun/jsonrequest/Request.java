@@ -1,5 +1,7 @@
 package de.terrestris.shogun.jsonrequest;
 
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -21,6 +23,11 @@ public class Request {
 	 * Filter conditions
 	 */
 	private Filter filter;
+	
+	/**
+	 * 
+	 */
+	private Set<String> fields;
 	
 	/**
 	 * Additional Filter conditions that are added as global conjunction. 
@@ -72,6 +79,20 @@ public class Request {
 	}
 
 	
+	/**
+	 * @return the fields
+	 */
+	public Set<String> getFields() {
+		return fields;
+	}
+
+	/**
+	 * @param fields the fields to set
+	 */
+	public void setFields(Set<String> fields) {
+		this.fields = fields;
+	}
+
 	/**
 	 * @return the globalAndFilter
 	 */

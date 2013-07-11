@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import de.terrestris.shogun.dao.DatabaseDao;
 
@@ -331,6 +333,7 @@ public class Group extends BaseModel{
 			@JoinColumn(name = "GROUP_FK", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "USER_FK",
 					nullable = true, updatable = false) })
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -350,6 +353,7 @@ public class Group extends BaseModel{
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<Module> getModules() {
 		return modules;
 	}
@@ -369,6 +373,7 @@ public class Group extends BaseModel{
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
 					nullable = false, updatable = false) })
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}
