@@ -30,6 +30,10 @@ public class Request {
 	private Set<String> fields;
 	
 	/**
+	 * 
+	 */
+	private Set<String> ignoreFields;
+	/**
 	 * Additional Filter conditions that are added as global conjunction. 
 	 * 
 	 * This is only a intermediate solution.
@@ -133,6 +137,18 @@ public class Request {
 	 */
 	public void setPagingObject(Paging pagingObject) {
 		this.pagingObject = pagingObject;
+	}
+
+	public Set<String> getIgnoreFields() {
+		// TODO Auto-generated method stub
+		return ignoreFields;
+	}
+
+	/**
+	 * @param ignoreFields the ignoreFields to set
+	 */
+	public void setIgnoreFields(Set<String> ignoreFields) {
+		this.ignoreFields = ignoreFields;
 	}
 	
 	

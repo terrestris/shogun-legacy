@@ -82,6 +82,7 @@ public class ShogunService extends AbstractShogunService {
 		HibernateFilter hibernateAdditionalFilter = null;
 		HibernatePagingObject hibernatePaging = null;
 		Set<String> fields = null;
+		Set<String> ignoreFields = null;
 
 		try {
 
@@ -104,6 +105,7 @@ public class ShogunService extends AbstractShogunService {
 			hibernateFilter = HibernateFilter.create(clazz, filter);
 			
 			fields = request.getFields();
+			ignoreFields = request.getIgnoreFields();
 			
 			// needed to be able to have another global conjunction
 			// temporary solution
@@ -119,6 +121,7 @@ public class ShogunService extends AbstractShogunService {
 				hibernateSortObject,
 				hibernateFilter,
 				fields,
+				ignoreFields,
 				hibernatePaging,
 				hibernateAdditionalFilter
 			);
