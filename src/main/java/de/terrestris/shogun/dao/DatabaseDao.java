@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -85,9 +86,10 @@ public class DatabaseDao {
 	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject,
 			HibernateFilter hibernateFilter,
 			Set<String> fields,
+			Set<String> ignoreFields,
 			HibernatePagingObject hibernatePagingObject,
 			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
-		return getDataByFilter(hibernateSortObject, hibernateFilter, fields,
+		return getDataByFilter(hibernateSortObject, hibernateFilter, fields, ignoreFields, 
 				hibernatePagingObject, hibernateAdditionalFilter,true);
 	}
 	
@@ -108,6 +110,7 @@ public class DatabaseDao {
 	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject,
 			HibernateFilter hibernateFilter,
 			Set<String> fields,
+			Set<String> ignoreFields,
 			HibernatePagingObject hibernatePagingObject,
 			HibernateFilter hibernateAdditionalFilter,
 			boolean deepInitialize) throws ShogunDatabaseAccessException {
@@ -126,6 +129,30 @@ public class DatabaseDao {
 			}
 			criteria.setProjection(Projections.distinct(pl));
 
+		}
+		
+		// Ignore Fields
+		// -> get all fields of the class and remove the ignorefields, works like a blacklist
+		Set<String> cleanedFieldNames = new HashSet();
+		if (ignoreFields != null) {
+			ProjectionList pl = Projections.projectionList();
+			List<Field> allFields = getAllFields(new ArrayList<Field>(), hibernateSortObject.getMainClass());
+			
+			for (Iterator iterator = allFields.iterator(); iterator.hasNext();) {
+				Field field = (Field) iterator.next();
+				
+				if (!ignoreFields.contains(field.getName())) {
+					cleanedFieldNames.add(field.getName());
+				}
+				
+			}
+			
+			for (Iterator<String> iterator = cleanedFieldNames.iterator(); iterator.hasNext();) {
+				String cleanField = iterator.next();
+				
+				pl.add(Projections.property(cleanField));
+			}
+			criteria.setProjection(Projections.distinct(pl));
 		}
 		
 		// PAGING
@@ -239,14 +266,16 @@ public class DatabaseDao {
 		
 		List<Object> list = null;
 		
-		if (fields != null) {
+		if (fields != null || ignoreFields != null) {
 			// We are filtered and will have to create a sane hashmap instead of
 			// relying on the serilisation of BaseModelInterface classes.
 			
 			// Please beware that we can NOT setResultTransformer here,
 			// otherwise we'll loose all but the first filtered field.
 			
-//			System.out.println("SQL: " + this.toSql(criteria));
+			if (fields == null && cleanedFieldNames.size() > 0) {
+				fields = cleanedFieldNames;
+			}
 			
 			List<Object[]> rawListOfResults = criteria.list();
 			
@@ -297,9 +326,11 @@ public class DatabaseDao {
 		//   * if we got a raw result,
 		//   * and we weren't being filtered for only a subset of fields
 		//   * and if we have been explicitly been told to go deep.
-		if (list != null && deepInitialize == true && fields == null) {
-			this.initializeDeep(list, hibernateSortObject.getMainClass());
-		}
+		
+		// as we do not use LAZY at the moment, this will not be fired!
+//		if (list != null && deepInitialize == true && fields == null) {
+//			this.initializeDeep(list, hibernateSortObject.getMainClass());
+//		}
 		
 		return list;
 	}
@@ -313,6 +344,7 @@ public class DatabaseDao {
 	 * @return
 	 */
 	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+		System.out.println("declared fields: " + type.getDeclaredFields() + " for class" + type);
 		for (Field field: type.getDeclaredFields()) {
 			fields.add(field);
 		}
