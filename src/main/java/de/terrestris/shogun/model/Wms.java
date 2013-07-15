@@ -12,8 +12,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+
+import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
 /**
  * Wms POJO
@@ -105,8 +108,9 @@ public class Wms extends BaseModel {
 	/**
 	 * @return the wmsLayers
 	 */
-	@OneToMany(fetch = FetchType.EAGER, targetEntity=WmsLayer.class)
+	@OneToMany(fetch = FetchType.LAZY, targetEntity=WmsLayer.class)
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<WmsLayer> getWmsLayers() {
 		return wmsLayers;
 	}

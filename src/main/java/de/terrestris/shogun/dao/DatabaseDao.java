@@ -2,12 +2,12 @@ package de.terrestris.shogun.dao;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -32,7 +34,6 @@ import org.hibernate.impl.SessionImpl;
 import org.hibernate.loader.OuterJoinLoader;
 import org.hibernate.loader.criteria.CriteriaLoader;
 import org.hibernate.persister.entity.OuterJoinLoadable;
-import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.Authentication;
@@ -53,7 +54,6 @@ import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
-import de.terrestris.shogun.service.ShogunService;
 
 
 /**
@@ -83,16 +83,6 @@ public class DatabaseDao {
 	 */
 	private SessionFactory sessionFactory;
 
-	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject,
-			HibernateFilter hibernateFilter,
-			Set<String> fields,
-			Set<String> ignoreFields,
-			HibernatePagingObject hibernatePagingObject,
-			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
-		return getDataByFilter(hibernateSortObject, hibernateFilter, fields, ignoreFields, 
-				hibernatePagingObject, hibernateAdditionalFilter,true);
-	}
-	
 	
 	/**
 	 * Retrieves entities of the database by a given filter, sort-object
@@ -112,11 +102,13 @@ public class DatabaseDao {
 			Set<String> fields,
 			Set<String> ignoreFields,
 			HibernatePagingObject hibernatePagingObject,
-			HibernateFilter hibernateAdditionalFilter,
-			boolean deepInitialize) throws ShogunDatabaseAccessException {
+			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
-				hibernateSortObject.getMainClass());
+		
+		boolean isPlainModelRequest = (fields == null && ignoreFields == null);
+		Class clazz = hibernateSortObject.getMainClass();
+		
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 
 		// Fields
 		if (fields != null) {
@@ -136,7 +128,7 @@ public class DatabaseDao {
 		Set<String> cleanedFieldNames = new HashSet();
 		if (ignoreFields != null) {
 			ProjectionList pl = Projections.projectionList();
-			List<Field> allFields = getAllFields(new ArrayList<Field>(), hibernateSortObject.getMainClass());
+			List<Field> allFields = getAllFields(new ArrayList<Field>(), clazz);
 			
 			for (Iterator iterator = allFields.iterator(); iterator.hasNext();) {
 				Field field = (Field) iterator.next();
@@ -183,7 +175,7 @@ public class DatabaseDao {
 			Criterion afCriterion = null;
 			try {
 				HibernateFilterItem hfi = (HibernateFilterItem) hibernateAdditionalFilter.getFilterItem(0);
-				afCriterion = hfi.makeCriterion(hibernateAdditionalFilter.getMainClass());
+				afCriterion = hfi.makeCriterion(clazz);
 				afConjunction.add(afCriterion);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -208,7 +200,7 @@ public class DatabaseDao {
 				try {
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+						Criterion criterion = hfi.makeCriterion(clazz);
 						if (criterion != null) {
 							dis.add(criterion);
 						}
@@ -234,14 +226,14 @@ public class DatabaseDao {
 							criteria.createCriteria(ownFieldName, ownFieldName);
 							
 							// todo move outside
-							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							Criterion criterion = hfi.makeCriterion(clazz);
 							if (criterion != null) {
 								conjunction.add(criterion);
 							}
 							
 						}
 						else {
-							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							Criterion criterion = hfi.makeCriterion(clazz);
 							if (criterion != null) {
 								conjunction.add(criterion);
 							}
@@ -266,7 +258,7 @@ public class DatabaseDao {
 		
 		List<Object> list = null;
 		
-		if (fields != null || ignoreFields != null) {
+		if (isPlainModelRequest == false) {
 			// We are filtered and will have to create a sane hashmap instead of
 			// relying on the serilisation of BaseModelInterface classes.
 			
@@ -315,6 +307,11 @@ public class DatabaseDao {
 			// having sub objects, e.g. User <-> Modules
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			
+			// we need to set the fetch mode for all sets in our class, as most
+			// of them are defined to be fetched lazily:
+			
+			criteria = this.setEagerFetchModeForCollections(criteria, clazz);
+			
 			list = criteria.list();
 		}
 		
@@ -335,6 +332,41 @@ public class DatabaseDao {
 		return list;
 	}
 
+	private Criteria setEagerFetchModeForCollections(Criteria criteria,
+			Class clazz) {
+
+		List<Field> fields = getAllFields(new ArrayList<Field>(), clazz);
+		
+		for (Field field : fields) {
+			
+			boolean isJsonIgnore = false;
+			
+			Method getterMethod;
+			try {
+				getterMethod = new PropertyDescriptor(field.getName(), clazz).getReadMethod();
+				Annotation[] anoArr = getterMethod.getAnnotations();
+				for (Annotation annotation : anoArr) {
+					if (annotation instanceof JsonIgnore) {
+						isJsonIgnore = true;
+					}
+				}
+			} catch (IntrospectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			
+			if (!isJsonIgnore && field.getType().isAssignableFrom(Set.class)) {
+				// yes, we have to set the fetch mode
+				criteria.setFetchMode(field.getName(), FetchMode.JOIN);
+			}
+		}
+		
+		return criteria;
+	}
+
 	/**
 	 * TODO move to a better place or use existing functionality elsewhere.
 	 * TODO we have a very similar method in {@link HibernateFilterItem}.
@@ -344,7 +376,6 @@ public class DatabaseDao {
 	 * @return
 	 */
 	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
-		System.out.println("declared fields: " + type.getDeclaredFields() + " for class" + type);
 		for (Field field: type.getDeclaredFields()) {
 			fields.add(field);
 		}
@@ -546,11 +577,30 @@ public class DatabaseDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz) {
-
+		final int maxInElems = 999;
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
-		if (values.length > 0) {
+		if (values.length > 0 && values.length <= maxInElems) {
 			criteria.add(Restrictions.in("id", values));
+		} else if (values.length > maxInElems) {
+			List<Criterion> listOfInRestrictions = new ArrayList<Criterion>();
+			int numSubArrays = (int) Math.ceil(((double) values.length) / ((double) maxInElems));
+			int start = 0;
+			for (int i = 0; i < numSubArrays; i++) {
+				// int start = i * maxInElems;
+				int end = (i + 1) * maxInElems;
+				if (end > values.length) {
+					end =  values.length;
+				}
+				Object[] subArr = Arrays.copyOfRange(values, start, end);
+				listOfInRestrictions.add(Restrictions.in("id", subArr));
+				start = end;
+			}
+			Disjunction disj = Restrictions.disjunction();
+			for (Criterion restrictions : listOfInRestrictions) {
+				disj.add(restrictions);
+			}
+			criteria.add(disj);
 		} else {
 			// we add a restriction that can never be fullfilled
 			// this is the case when e.g. an empty object has been passed
@@ -714,6 +764,7 @@ public class DatabaseDao {
 				String value = fieldsAndValues.get(fieldname);
 				criteria.add(Restrictions.ilike(fieldname, value));
 			}
+			
 			returnList = (List<T>) criteria.list();
 
 		} catch (Exception e) {
@@ -971,7 +1022,7 @@ public class DatabaseDao {
 
 			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 
-			criteria.add(Restrictions.ilike("user_name", name));
+			criteria.add(Restrictions.eq("user_name", name));
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
@@ -980,8 +1031,11 @@ public class DatabaseDao {
 
 		// we have to ensure that the modules are distinct
 		// @see http://docs.jboss.org/hibernate/orm/3.6/javadocs/org/hibernate/Criteria.html#createAlias(java.lang.String, java.lang.String, int)
-		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
+//		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
 
+		criteria.setFetchMode("mapLayers", FetchMode.JOIN);
+		
+		
 		// this ensures that no cartesian product is returned when
 		// having sub objects, e.g. User <-> Modules
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
@@ -1384,15 +1438,16 @@ public class DatabaseDao {
 	 * @return the {@link User} object of the logged in user or NULL if not found
 	 */
 	public User getUserObjectFromSession() {
-
 		// get the authorization context, incl. user name
 		Authentication authResult = SecurityContextHolder.getContext().getAuthentication();
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 
 		criteria.add(Restrictions.eq("user_name", authResult.getName()));
-
-		return (User) criteria.uniqueResult();
+		
+		User u = (User) criteria.uniqueResult();
+		
+		return u;
 		
 	}
 

@@ -229,10 +229,10 @@ public class User extends BaseModel {
 	/**
 	 * @return the groups
 	 */
-	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
 	@JsonIgnore
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}
@@ -247,7 +247,7 @@ public class User extends BaseModel {
 	/**
 	 * @return the modules
 	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
+	@ManyToMany(fetch = FetchType.LAZY, targetEntity=Module.class)
 	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
@@ -271,7 +271,7 @@ public class User extends BaseModel {
 	/**
 	 * @return the mapLayers
 	 */
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "TBL_USER_TBL_MAPLAYER",  joinColumns = {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
@@ -295,7 +295,7 @@ public class User extends BaseModel {
 //	 *
 //	 * @return the mapConfigs
 //	 */
-//	@OneToMany(fetch = FetchType.EAGER, targetEntity=MapConfig.class)
+//	@OneToMany(fetch = FetchType.LAZY, targetEntity=MapConfig.class)
 //	@Cache(usage = CacheConcurrencyStrategy.NONE)
 //	public Set<MapConfig> getMapConfigs() {
 //		return mapConfigs;
@@ -385,7 +385,7 @@ public class User extends BaseModel {
 	 * @return the roles
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	@Fetch(FetchMode.SUBSELECT)
 	public Set<Role> getRoles() {
 		return roles;
