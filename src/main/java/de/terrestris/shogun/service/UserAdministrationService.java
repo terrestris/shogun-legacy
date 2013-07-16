@@ -15,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
@@ -24,7 +23,6 @@ import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.MapConfig;
 import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.model.WfsProxyConfig;
 import de.terrestris.shogun.model.WmsProxyConfig;
@@ -232,12 +230,10 @@ public class UserAdministrationService extends AbstractShogunService {
 			// user to be updated
 			User user = iterator.next();
 
-			List<Module> newModules = null;
+//			List<Module> newModules = null;
 
 			// create module object list
 			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
-			newModules = null;
 
 			// Check if logged-in user has the same group than the
 			// user to be updated

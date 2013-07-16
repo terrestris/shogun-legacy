@@ -1,6 +1,5 @@
 package de.terrestris.shogun.hibernatecriteria.filter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +14,13 @@ public class HibernateFilter extends Filter {
 	/**
 	 * 
 	 */
-	private Class mainClass = null;
+	private Class<?> mainClass = null;
 
 	/**
 	 * 
 	 * @param mainClass
 	 */
-	public HibernateFilter(Class mainClass) {
+	public HibernateFilter(Class<?> mainClass) {
 		super();
 		this.mainClass = mainClass;
 	}
@@ -34,7 +33,7 @@ public class HibernateFilter extends Filter {
 	 * @param plainFilter
 	 * @return
 	 */
-	public static HibernateFilter create(Class clazz,
+	public static HibernateFilter create(Class<?> clazz,
 			de.terrestris.shogun.jsonrequest.Filter plainFilter) {
 
 		HibernateFilter hibernateFilter = null;
@@ -105,7 +104,7 @@ public class HibernateFilter extends Filter {
 	 * @param operands
 	 * @return
 	 */
-	public static HibernateFilter create(Class clazz, String fieldName, 
+	public static HibernateFilter create(Class<?> clazz, String fieldName, 
 			String operator, String[] operands) {
 		
 		de.terrestris.shogun.jsonrequest.Filter filter = new de.terrestris.shogun.jsonrequest.Filter();
@@ -121,7 +120,7 @@ public class HibernateFilter extends Filter {
 		
 		filter.setFilterItems(filterItems );
 		
-		HibernateFilter hibernateFilter = HibernateFilter.create((Class) clazz, filter);
+		HibernateFilter hibernateFilter = HibernateFilter.create((Class<?>) clazz, filter);
 		
 		return hibernateFilter;
 
@@ -131,7 +130,7 @@ public class HibernateFilter extends Filter {
 	 * 
 	 * @return
 	 */
-	public Class getMainClass() {
+	public Class<?> getMainClass() {
 		return mainClass;
 	}
 
@@ -139,7 +138,7 @@ public class HibernateFilter extends Filter {
 	 * 
 	 * @param mainClass
 	 */
-	public void setMainClass(Class mainClass) {
+	public void setMainClass(Class<?> mainClass) {
 		this.mainClass = mainClass;
 	}
 

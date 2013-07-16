@@ -42,7 +42,7 @@ public class HibernateFilterItem extends FilterItem {
 	 * 
 	 * @return the hibernate criterion object
 	 */
-	public Criterion makeCriterion(Class mainClass) {
+	public Criterion makeCriterion(Class<?> mainClass) {
 
 		Criterion criterion = null;
 
@@ -55,7 +55,7 @@ public class HibernateFilterItem extends FilterItem {
 		// we have to change the mainClass and the fieldanem
 		if (fieldName != null && fieldName.contains(".")) {
 			String[] parts = fieldName.split("\\.");
-			Class clz = this.getClassFromFieldName(parts[0], mainClass);
+			Class<?> clz = this.getClassFromFieldName(parts[0], mainClass);
 			mainClass = clz;
 			fieldName = parts[1];
 		}
@@ -145,8 +145,8 @@ public class HibernateFilterItem extends FilterItem {
 	 * @param mainClass
 	 * @return
 	 */
-	private Class getClassFromFieldName(String fieldName, Class mainClass) {
-		Class c = null;
+	private Class<?> getClassFromFieldName(String fieldName, Class<?> mainClass) {
+		Class<?> c = null;
 		try {
 			List<Field> allFields = getAllFields(new ArrayList<Field>(), mainClass);
 			Field f = null;
@@ -162,7 +162,7 @@ public class HibernateFilterItem extends FilterItem {
 			if (t instanceof ParameterizedType) {
 				ParameterizedType pt = (ParameterizedType) t;
 				for (Type ttt : pt.getActualTypeArguments()) {
-					c = (Class) ttt;
+					c = (Class<?>) ttt;
 					break;
 				}
 			}
@@ -183,7 +183,7 @@ public class HibernateFilterItem extends FilterItem {
 	 * @param operand
 	 * @return
 	 */
-	private Object castOperandToFinalDataType(Class mainClass, String fieldName, String operand) {
+	private Object castOperandToFinalDataType(Class<?> mainClass, String fieldName, String operand) {
 		Object finalOperand = null;
 		List<Field> fieldList = new ArrayList<Field>();
 		fieldList = this.getAllFields(fieldList, mainClass);
@@ -253,10 +253,11 @@ public class HibernateFilterItem extends FilterItem {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} 
-				else if (false) {
-					// ... more types here
 				}
+				// DEAD CODE
+//				else if (false) {
+//					// ... more types here
+//				}
 				// DEFAULT is String
 				else {
 					finalOperand = operand;
