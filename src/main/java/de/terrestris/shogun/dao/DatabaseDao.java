@@ -574,6 +574,17 @@ public class DatabaseDao {
 		return this.getEntitiesByIds(values, clazz, null);
 	}
 	
+	public List<? extends Object> getEntitiesByIds(Set values, Class<?> clazz) {
+		Object[] objectValues = new Object[values.size()];
+		int i = 0;
+		for (Iterator iterator = values.iterator(); iterator.hasNext();) {
+			Object object = (Object) iterator.next();
+			objectValues[i] = object;
+			i++;
+		}
+		return this.getEntitiesByIds(objectValues, clazz, null);
+	}
+	
 	/**
 	 * Returns a list of object of a certain entity defined by its ID.
 	 *
