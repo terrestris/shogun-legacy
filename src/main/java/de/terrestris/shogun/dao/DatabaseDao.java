@@ -635,7 +635,7 @@ public class DatabaseDao {
 	 * @return the objects matching the passed entity and NOT matching the passed IDs
 	 */
 	@SuppressWarnings("unchecked")
-	public List<? extends Object> getEntitiesByExcludingIds(Object[] values, Class clazz) {
+	public List<? extends Object> getEntitiesByExcludingIds(Object[] values, Class<?> clazz) {
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -901,7 +901,7 @@ public class DatabaseDao {
 	 * @param clazz Entity class of the object to be deleted
 	 * @param id the ID of the record to be deleted
 	 */
-	public void deleteEntity(Class clazz, Integer id) {
+	public void deleteEntity(Class<?> clazz, Integer id) {
 
 		// delete the object record
 		Object record = this.sessionFactory.getCurrentSession().load(clazz, id);
