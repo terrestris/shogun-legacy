@@ -106,7 +106,7 @@ public class DatabaseDao {
 
 		
 		boolean isPlainModelRequest = (fields == null && ignoreFields == null);
-		Class clazz = hibernateSortObject.getMainClass();
+		Class<?> clazz = hibernateSortObject.getMainClass();
 		
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 
@@ -125,12 +125,12 @@ public class DatabaseDao {
 		
 		// Ignore Fields
 		// -> get all fields of the class and remove the ignorefields, works like a blacklist
-		Set<String> cleanedFieldNames = new HashSet();
+		Set<String> cleanedFieldNames = new HashSet<String>();
 		if (ignoreFields != null) {
 			ProjectionList pl = Projections.projectionList();
 			List<Field> allFields = getAllFields(new ArrayList<Field>(), clazz);
 			
-			for (Iterator iterator = allFields.iterator(); iterator.hasNext();) {
+			for (Iterator<Field> iterator = allFields.iterator(); iterator.hasNext();) {
 				Field field = (Field) iterator.next();
 				
 				if (!ignoreFields.contains(field.getName())) {
@@ -333,7 +333,7 @@ public class DatabaseDao {
 	}
 
 	private Criteria setEagerFetchModeForCollections(Criteria criteria,
-			Class clazz) {
+			Class<?> clazz) {
 
 		List<Field> fields = getAllFields(new ArrayList<Field>(), clazz);
 		
@@ -570,7 +570,7 @@ public class DatabaseDao {
 
 	// method used to keep the old behaviour, which means
 	// getting entities without initializing lazy fields
-	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz) {
+	public List<? extends Object> getEntitiesByIds(Object[] values, Class<?> clazz) {
 		return this.getEntitiesByIds(values, clazz, null);
 	}
 	
@@ -582,7 +582,7 @@ public class DatabaseDao {
 	 * @return the objects matching the passed entity and the passed IDs
 	 */
 	@SuppressWarnings("unchecked")
-	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz, String[] eagerfields) {
+	public List<? extends Object> getEntitiesByIds(Object[] values, Class<?> clazz, String[] eagerfields) {
 		final int maxInElems = 999;
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -670,7 +670,7 @@ public class DatabaseDao {
 	 * @throws ShogunDatabaseAccessException
 	 */
 	public Object getEntityByStringField(
-			Class clazz, String fieldname, String value) throws ShogunDatabaseAccessException {
+			Class<?> clazz, String fieldname, String value) throws ShogunDatabaseAccessException {
 
 		HashMap<String, String> fieldsAndValues = new HashMap<String, String>();
 		fieldsAndValues.put(fieldname, value);
@@ -718,7 +718,7 @@ public class DatabaseDao {
 	 * @param value
 	 * @return
 	 */
-	public List<Object> getEntitiesByIntegerField(Class clazz, String fieldname, Integer value) {
+	public List<Object> getEntitiesByIntegerField(Class<?> clazz, String fieldname, Integer value) {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(fieldname, value));
@@ -930,7 +930,7 @@ public class DatabaseDao {
 	 * @param column Column name which is used to determine the record
 	 * @param value The value which is used to determine the record
 	 */
-	public void deleteEntityByValue(Class clazz, String column, String value) {
+	public void deleteEntityByValue(Class<?> clazz, String column, String value) {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(column, value));
@@ -953,7 +953,7 @@ public class DatabaseDao {
 	 *
 	 * @throws Exception
 	 */
-	public void deleteEntityGroupDependent(Class clazz, Integer id) throws ShogunDatabaseAccessException {
+	public void deleteEntityGroupDependent(Class<?> clazz, Integer id) throws ShogunDatabaseAccessException {
 
 		// get group ID of logged in User and check if there is the
 		// user to be deleted is a child of the current group

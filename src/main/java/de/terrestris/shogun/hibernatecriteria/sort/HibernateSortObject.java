@@ -1,6 +1,5 @@
 package de.terrestris.shogun.hibernatecriteria.sort;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -16,7 +15,7 @@ public class HibernateSortObject {
 	/**
 	 * 
 	 */
-	private Class mainClass = null;
+	private Class<?> mainClass = null;
 
 	/**
 	 * 
@@ -27,7 +26,7 @@ public class HibernateSortObject {
 	 * 
 	 * @param mainClass
 	 */
-	public HibernateSortObject(Class mainClass) {
+	public HibernateSortObject(Class<?> mainClass) {
 		super();
 		this.mainClass = mainClass;
 	}
@@ -48,7 +47,7 @@ public class HibernateSortObject {
 	 * @param plainSortObject
 	 * @return
 	 */
-	public static HibernateSortObject create(Class clazz,
+	public static HibernateSortObject create(Class<?> clazz,
 			de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
 
 		HibernateSortObject hibernateSortObject = null;
@@ -83,7 +82,7 @@ public class HibernateSortObject {
 	 * @param dir
 	 * @return
 	 */
-	public static HibernateSortObject create(Class clazz, String field, String dir) {
+	public static HibernateSortObject create(Class<?> clazz, String field, String dir) {
 		
 		SortItem sortItem = new SortItem();
 		sortItem.setDir(dir);
@@ -95,7 +94,7 @@ public class HibernateSortObject {
 		Sort plainSortObject = new Sort();
 		plainSortObject.setSortItems(sortItems);
 		
-		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class) clazz, plainSortObject);
+		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<?>) clazz, plainSortObject);
 		
 		return hibernateSortObject;
 	}
@@ -112,9 +111,9 @@ public class HibernateSortObject {
 	 * @param field
 	 * @return
 	 */
-	public static HibernateSortObject create(Class clazz, String field) {
+	public static HibernateSortObject create(Class<?> clazz, String field) {
 		
-		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class) clazz, field, "ASC");
+		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<?>) clazz, field, "ASC");
 		
 		return hibernateSortObject;
 	}
@@ -122,14 +121,14 @@ public class HibernateSortObject {
 	/**
 	 * @return the mainClass
 	 */
-	public Class getMainClass() {
+	public Class<?> getMainClass() {
 		return mainClass;
 	}
 
 	/**
 	 * @param mainClass the mainClass to set
 	 */
-	public void setMainClass(Class mainClass) {
+	public void setMainClass(Class<?> mainClass) {
 		this.mainClass = mainClass;
 	}
 
