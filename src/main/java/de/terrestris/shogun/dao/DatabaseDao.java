@@ -568,6 +568,12 @@ public class DatabaseDao {
 		return result;
 	}
 
+	// method used to keep the old behaviour, which means
+	// getting entities without initializing lazy fields
+	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz) {
+		return this.getEntitiesByIds(values, clazz, null);
+	}
+	
 	/**
 	 * Returns a list of object of a certain entity defined by its ID.
 	 *
@@ -576,10 +582,17 @@ public class DatabaseDao {
 	 * @return the objects matching the passed entity and the passed IDs
 	 */
 	@SuppressWarnings("unchecked")
-	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz) {
+	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz, String[] eagerfields) {
 		final int maxInElems = 999;
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		
+		if (eagerfields != null && eagerfields.length > 0) {
+			for (String field : eagerfields) {
+				criteria.setFetchMode(field, FetchMode.JOIN);
+			}
+		} 
+		
 		if (values.length > 0 && values.length <= maxInElems) {
 			criteria.add(Restrictions.in("id", values));
 		} else if (values.length > maxInElems) {
