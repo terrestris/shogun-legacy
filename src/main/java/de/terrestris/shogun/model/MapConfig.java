@@ -27,6 +27,8 @@ public class MapConfig extends BaseModel {
 	private Double maxResolution;
 	private String maxExtent; // "-20037508, -20037508, 20037508, 20037508"; //TODO data hibernate format
 	private String center; // [-10764594.758211, 4523072.3184791], //TODO data hibernate format
+	private String resolutions;
+	private String scales;
 	private Integer zoom;
 	
 	
@@ -154,5 +156,30 @@ public class MapConfig extends BaseModel {
 	 */
 	public void setZoom(Integer zoom) {
 		this.zoom = zoom;
+	}
+	/**
+	 * @return the resolutions
+	 */
+	@Column(name="RESOLUTIONS", length=1000)
+	public String getResolutions() {
+		return resolutions;
+	}
+	/**
+	 * @param resolutions the resolutions to set
+	 */
+	public void setResolutions(String resolutions) {
+		this.resolutions = resolutions;
+	}
+	/**
+	 * @return the scales
+	 */
+	public String getScales() {
+		return scales;
+	}
+	/**
+	 * @param scales the scales to set
+	 */
+	public void setScales(String scales) {
+		this.scales = scales;
 	}
 }
