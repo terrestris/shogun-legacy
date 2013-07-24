@@ -395,7 +395,7 @@ public class DatabaseDao {
 	 * @param obj
 	 * @param mainClass
 	 */
-	private void initializeDeep(Object obj, Class<?> mainClass) {
+	protected void initializeDeep(Object obj, Class<?> mainClass) {
 		List<Object> list = new ArrayList<Object>();
 		list.add(obj);
 		this.initializeDeep(list, mainClass);
@@ -408,7 +408,7 @@ public class DatabaseDao {
 	 * @param list
 	 * @param mainClass
 	 */
-	private void initializeDeep(List<Object> list, Class<?> mainClass) {
+	protected void initializeDeep(List<Object> list, Class<?> mainClass) {
 		List<Field> fields = getAllFields(new ArrayList<Field>(), mainClass);
 		List<Method> methods = new ArrayList<Method>();
 		
@@ -432,6 +432,9 @@ public class DatabaseDao {
 		
 		for (Iterator<Object> iterator = list.iterator(); iterator.hasNext();) {
 			Object obj = iterator.next();
+			if (obj == null) {
+				continue;
+			}
 			for (Method method : methods) {
 				String errMsg = "Failed to invoke getter '" +
 						method.getName() + "' of class '" +
