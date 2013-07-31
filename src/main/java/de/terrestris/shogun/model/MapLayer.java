@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
@@ -387,6 +388,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	@OneToMany(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
+	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
 //	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<LayerMetadata> getMetadata() {
 		return metadata;

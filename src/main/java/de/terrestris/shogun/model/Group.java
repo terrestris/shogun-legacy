@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,6 +20,7 @@ import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -38,6 +41,12 @@ import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 @Embeddable
 public class Group extends BaseModel{
 
+	// TODO refactor as an enum
+	public static final String ROLENAME_SUPERADMIN = "ROLE_SUPERADMIN";
+	public static final String ROLENAME_USER = "ROLE_USER";
+	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
+	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
+	
 	private String name;
 	private String group_nr;
 	private String company;
@@ -59,6 +68,7 @@ public class Group extends BaseModel{
 	private Set<User> users;
 	private Set<Module> modules;
 	private Set<MapLayer> mapLayers;
+	private Set<Role> roles;
 
 	private String group_module_list;
 	private Set<Integer> grantedUsers;
@@ -69,6 +79,7 @@ public class Group extends BaseModel{
 	 */
 	public Group() {
 		super();
+//		this.setRoles(new HashSet<String>());
 		this.setUsers(new HashSet<User>());
 	}
 
@@ -388,6 +399,36 @@ public class Group extends BaseModel{
 	 */
 	public void setMapLayers(Set<MapLayer> mapLayers) {
 		this.mapLayers = mapLayers;
+	}
+
+	/**
+	 * @return the roles
+	 */
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
+	@JoinTable(
+		name = "TBL_GROUP_TBL_ROLE",
+		joinColumns = {
+			@JoinColumn(
+				name = "GROUP_ID", nullable = false, updatable = false
+			)
+		},
+		inverseJoinColumns = {
+			@JoinColumn(
+				name = "ROLE_ID", nullable = false, updatable = false
+			)
+		}
+	)
+	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	public Set<Role> getRoles() {
+		return roles;
+	}
+
+	/**
+	 * @param roles the roles to set
+	 */
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
 
 	/**

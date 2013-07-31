@@ -52,7 +52,6 @@ import de.terrestris.shogun.model.BaseModel;
 import de.terrestris.shogun.model.BaseModelInheritance;
 import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
-import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
 
 
@@ -116,7 +115,6 @@ public class DatabaseDao {
 			
 			for (Iterator<String> iterator = fields.iterator(); iterator.hasNext();) {
 				String field = iterator.next();
-//				System.out.println("  -> " + field);
 				pl.add(Projections.property( field));
 			}
 			criteria.setProjection(Projections.distinct(pl));
@@ -415,9 +413,6 @@ public class DatabaseDao {
 		for (Field field : fields) {
 			if (field.getType().isAssignableFrom(Set.class)) {
 				// yes, we have to initialize this field via its getter
-				
-//				System.out.println("Initialize the field " + field.getName() + " via its getter.");
-				
 				Method method = null;
 				try {
 					method = new PropertyDescriptor(field.getName(), mainClass).getReadMethod();
@@ -1173,6 +1168,8 @@ public class DatabaseDao {
 
 
 	/**
+	 * // TODO check refactoring-MJMJMJMJMJ
+	 * 
 	 * Creates a new {@link User} object in the database.
 	 * The gets the role passed as String.
 	 * If needed the current group of the logged in user is stored
@@ -1211,12 +1208,12 @@ public class DatabaseDao {
 				}
 			}
 
-			// create the mapping of new user and its role
-			Role oRole = (Role)this.getEntityByStringField(Role.class, "name", role);
-			Set<Role> roles = new HashSet<Role>();
-			roles.add(oRole);
+//			// create the mapping of new user and its role
+//			Role oRole = (Role)this.getEntityByStringField(Role.class, "name", role);
+//			Set<Role> roles = new HashSet<Role>();
+//			roles.add(oRole);
 
-			user.setRoles(roles);
+//			user.setRoles(roles);
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
@@ -1540,18 +1537,9 @@ public class DatabaseDao {
 	 * @return flag SuperAdmin=true/false
 	 */
 	public boolean isSuperAdmin() {
-
 		// get the logged-in user and check if he has the SuperAdmin role
 		User sessionUser = this.getUserObjectFromSession();
-		Set<Role> roles = sessionUser.getRoles();
-
-		for (Role role : roles) {
-			if (role.getName().equals(User.ROLENAME_SUPERADMIN)) {
-				return true;
-			}
-		}
-
-		return false;
+		return sessionUser.hasSuperAdminRole();
 	}
 	
 	/**

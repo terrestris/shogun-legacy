@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
- * User POJO
+ * Role POJO
  * 
  * @author terrestris GmbH & Co. KG
  * 
@@ -18,13 +18,13 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 @Table(name="TBL_ROLE")
 @Embeddable
 public class Role extends BaseModel {
-	
+
 	String name;
 
 	/**
 	 * @return the name
 	 */
-	@Column(name="NAME", nullable=false)
+	@Column(name="NAME", nullable=false, unique=true)
 	public String getName() {
 		return name;
 	}

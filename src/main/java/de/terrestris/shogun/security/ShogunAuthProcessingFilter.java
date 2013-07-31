@@ -81,7 +81,7 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
      */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        super.unsuccessfulAuthentication(request, response, failed);
+    	super.unsuccessfulAuthentication(request, response, failed);
         HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response);
         Writer out = responseWrapper.getWriter();
         out.write("{success:false}");
