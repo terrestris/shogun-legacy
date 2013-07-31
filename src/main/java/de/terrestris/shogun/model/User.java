@@ -39,10 +39,6 @@ import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 @Embeddable
 public class User extends BaseModel {
 
-	public static final String ROLENAME_SUPERADMIN = "ROLE_SUPERADMIN";
-	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
-	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
-
 	private String user_name;
 	private String user_longname;
 	private String user_email;
@@ -61,14 +57,13 @@ public class User extends BaseModel {
 	private MapConfig mapConfig;
 	private WfsProxyConfig wfsProxyConfig;
 	private WmsProxyConfig wmsProxyConfig;
-	private Set<Role> roles;
 	private String user_module_list;
 
 
 	/**
 	 * @return the user_name
 	 */
-	@Column(name="USER_NAME", length=50)
+	@Column(name="USER_NAME", length=50, unique=true)
 	public String getUser_name() {
 		return user_name;
 	}
@@ -228,7 +223,7 @@ public class User extends BaseModel {
 	/**
 	 * @return the groups
 	 */
-	@ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSerializer.class)
@@ -380,24 +375,6 @@ public class User extends BaseModel {
 	}
 
 
-	/**
-	 * @return the roles
-	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
-//	@JsonSerialize(using=LeanBaseModelSerializer.class)
-	@Fetch(FetchMode.SUBSELECT)
-	public Set<Role> getRoles() {
-		return roles;
-	}
-
-	/**
-	 * @param roles the roles to set
-	 */
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
-
-
 	// ----------------------------------------------------------------
 
 
@@ -447,7 +424,7 @@ public class User extends BaseModel {
 	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
 	 */
 	public boolean hasSuperAdminRole() {
-		return this.hasRole(User.ROLENAME_SUPERADMIN);
+		return this.hasRole(Group.ROLENAME_SUPERADMIN);
 	}
 
 
@@ -459,7 +436,7 @@ public class User extends BaseModel {
 	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
 	 */
 	public boolean hasAdminRole() {
-		return this.hasRole(User.ROLENAME_ADMIN);
+		return this.hasRole(Group.ROLENAME_ADMIN);
 	}
 
 	/**
@@ -470,24 +447,29 @@ public class User extends BaseModel {
 	 * @return whether the user has the queried role User.ROLENAME_ANONYMOUS.
 	 */
 	public boolean hasAnonymousRole() {
-		return this.hasRole(User.ROLENAME_ANONYMOUS);
+		return this.hasRole(Group.ROLENAME_ANONYMOUS);
 	}
 
 	/**
 	 * Returns whether the user has the given role in his set of roles by
 	 * Comparing the name of all roles to the given string.
 	 *
-	 * @param rolename The rolename to check this users set of roles for
+	 * @param searchRoleName The rolename to check this users set of roles for
 	 * @return whether the user has the queried role or not.
 	 */
-	private boolean hasRole(String rolename) {
-		for (Iterator<Role> iterator = this.getRoles().iterator(); iterator.hasNext();) {
-			Role role = (Role) iterator.next();
-
-			if (role.getName().equals(rolename)) {
-				return true;
+	private boolean hasRole(String searchRoleName) {
+		boolean hasRole = false;
+		for (Group g : this.getGroups()) {
+			for (Role r : g.getRoles()) {
+				hasRole = r.getName().equals(searchRoleName);
+				if (hasRole) {
+					break;
+				}
+			}
+			if (hasRole) {
+				break;
 			}
 		}
-		return false;
+		return hasRole;
 	}
 }

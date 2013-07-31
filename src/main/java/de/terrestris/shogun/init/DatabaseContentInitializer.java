@@ -1,6 +1,8 @@
 package de.terrestris.shogun.init;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,8 +40,9 @@ public class DatabaseContentInitializer {
 	/**
 	 * the logger instance
 	 */
-	private static Logger LOGGER = Logger
-			.getLogger(DatabaseContentInitializer.class);
+	private static Logger LOGGER = Logger.getLogger(DatabaseContentInitializer.class);
+	
+	private static final String APP_USER_AUTO_CREATED = "auto-create-on-init"; 
 
 	/**
 	 * flag symbolizing if the database will be modified by this class
@@ -69,17 +72,17 @@ public class DatabaseContentInitializer {
 	/**
 	 * a default user group
 	 */
-	private Group defaultGroup;
+	private Group defaultAnonymousGroup;
 
 	/**
-	 * a list of available user roles
+	 * a default user group
 	 */
-	private List<String> availableRoles;
-
+	private Group defaultSuperAdminGroup;
+	
 	/**
 	 * a default map configuration
 	 */
-	private MapConfig mapConfig;
+	private List<MapConfig> mapConfigs;
 
 	/**
 	 * modules to be assigned to anonymous user
@@ -107,10 +110,13 @@ public class DatabaseContentInitializer {
 	private MapConfig persistantStdMapConfig;
 	
 	/**
-	 * The persistant representation of the default group object
 	 */
-	private Group persistantDefaultGroup;
+	protected Group persistantDefaultAnonymousGroup;
 
+	/**
+	 */
+	protected Group persistantDefaultSuperAdminGroup;
+	
 	/**
 	 * The method called on init.
 	 *
@@ -122,13 +128,13 @@ public class DatabaseContentInitializer {
 
 			LOGGER.info("Initializing database content on servlet init.");
 
-
 			try {
 				this.persistantStdWmsLayer = this.createStandardWmsMapLayer();
-				this.createAvailableRoles();
 				this.createAvailableModules();
 				this.persistantStdMapConfig = this.createAvailableMapConfig();
-				this.persistantDefaultGroup = this.createDefaultGroup();
+				this.createAvailableRoles();
+				this.persistantDefaultAnonymousGroup = this.createDefaultAnonymousGroup();
+				this.persistantDefaultSuperAdminGroup = this.createDefaultSuperAdminGroup();
 				this.createSuperAdmin();
 				this.createAnonymousUser(this.persistantStdWmsLayer, this.persistantStdMapConfig, null);
 			} catch (Exception e) {
@@ -136,6 +142,27 @@ public class DatabaseContentInitializer {
 						+ "':", e);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void createAvailableRoles() {
+		LOGGER.info("Creating available roles");
+		List<String> rolenames = Arrays.asList(
+			Group.ROLENAME_ANONYMOUS,
+			Group.ROLENAME_USER,
+			Group.ROLENAME_ADMIN,
+			Group.ROLENAME_SUPERADMIN
+		);
+		List<Role> roles = new ArrayList<Role>();
+		for (String rolename : rolenames) {
+			Role role = new Role();
+			role.setName(rolename);
+			role.setApp_user(APP_USER_AUTO_CREATED);
+			roles.add(role);
+		}
+		this.dbDao.createEntities(roles);
 	}
 
 	/**
@@ -178,17 +205,16 @@ public class DatabaseContentInitializer {
 	private MapConfig createAvailableMapConfig() throws IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException,
 			ShogunDatabaseAccessException {
-		MapConfig desiredMapConfig = this.getMapConfig();
-		MapConfig existingMapConfig = (MapConfig) this.dbDao
-				.getEntityByStringField(MapConfig.class, "mapId",
-						desiredMapConfig.getMapId());
-
-		// check if we have an existing map config
-		// create or apply/update a module
-		existingMapConfig = (MapConfig) this.createOrApplyObjects(
-				existingMapConfig, desiredMapConfig);
-
-		return existingMapConfig;
+		
+		List<MapConfig> allMapConfigs = this.getMapConfigs();
+		for (Iterator iterator = allMapConfigs.iterator(); iterator.hasNext();) {
+			MapConfig desiredMapConfig = (MapConfig) iterator.next();
+			// check for existing config
+			MapConfig existingMapConfig = (MapConfig) this.dbDao.getEntityByStringField(MapConfig.class, "mapId", desiredMapConfig.getMapId());
+			existingMapConfig = (MapConfig) this.createOrApplyObjects(existingMapConfig, desiredMapConfig);
+		}
+		MapConfig stdMapConfig = (MapConfig) this.dbDao.getEntityByStringField(MapConfig.class, "mapId", "stdmap");
+		return stdMapConfig;
 	}
 
 	/**
@@ -219,30 +245,39 @@ public class DatabaseContentInitializer {
 		}
 	}
 
+
 	/**
-	 * Creates the available {@link Role} entries in the database
+	 * Creates a default group to ensure there is always one
+	 *
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
 	 * @throws ShogunDatabaseAccessException
+	 *
 	 */
-	private void createAvailableRoles() throws ShogunDatabaseAccessException {
-		LOGGER.info("Creating available roles");
+	private Group createDefaultAnonymousGroup() throws IllegalAccessException,
+			InvocationTargetException, NoSuchMethodException, 
+			ShogunDatabaseAccessException {
 
-		for (Iterator<String> iterator = this.getAvailableRoles().iterator(); iterator
-				.hasNext();) {
-			String rolename = (String) iterator.next();
+		LOGGER.info("Creating default group");
 
-			if (this.dbDao.getEntityByStringField(Role.class, "name", rolename) == null) {
-				LOGGER.info("  - Role '" + rolename + "' needs to be created.");
+		Group desiredGroup = this.defaultAnonymousGroup;
+		
+		// getting the anonymous role
+		Role anonRole = (Role) this.dbDao.getEntityByStringField(Role.class, "name", Group.ROLENAME_ANONYMOUS);
+		Set<Role> roles = new HashSet<Role>();
+		roles.add(anonRole);
+		
+		// setting anon role
+		desiredGroup.setRoles(roles);
+		
+		Group existingGroup = (Group) this.dbDao.getEntityByStringField(
+				Group.class, "group_nr", this.defaultAnonymousGroup.getGroup_nr());
 
-				Role newRole = new Role();
-				newRole.setName(rolename);
-				newRole.setApp_user("auto-create-on-init");
-
-				this.dbDao.createEntity("Role", newRole);
-			} else {
-				LOGGER.info("  - Role '" + rolename
-						+ "' already exists. Skipping.");
-			}
-		}
+		existingGroup = (Group) this.createOrApplyObjects(existingGroup,
+				desiredGroup);
+		
+		return existingGroup;
 	}
 
 	/**
@@ -254,22 +289,41 @@ public class DatabaseContentInitializer {
 	 * @throws ShogunDatabaseAccessException
 	 *
 	 */
-	private Group createDefaultGroup() throws IllegalAccessException,
+	private Group createDefaultSuperAdminGroup() throws IllegalAccessException, 
 			InvocationTargetException, NoSuchMethodException, 
 			ShogunDatabaseAccessException {
 
 		LOGGER.info("Creating default group");
 
-		Group desiredGroup = this.defaultGroup;
-		Group existinGroup = (Group) this.dbDao.getEntityByStringField(
-				Group.class, "group_nr", this.defaultGroup.getGroup_nr());
+		Group desiredGroup = this.defaultSuperAdminGroup;
+		
+		// getting roles
+		Set<Role> roles = new HashSet<Role>();
+		roles.add(
+			(Role) this.dbDao.getEntityByStringField(Role.class, "name", Group.ROLENAME_ANONYMOUS)
+		);
+		roles.add(
+			(Role) this.dbDao.getEntityByStringField(Role.class, "name", Group.ROLENAME_ADMIN)
+		);
+		roles.add(
+			(Role) this.dbDao.getEntityByStringField(Role.class, "name", Group.ROLENAME_USER)
+		);
+		roles.add(
+			(Role) this.dbDao.getEntityByStringField(Role.class, "name", Group.ROLENAME_SUPERADMIN)
+		);
+		
+		desiredGroup.setRoles(roles);
+		
+		Group existingGroup = (Group) this.dbDao.getEntityByStringField(
+				Group.class, "group_nr", this.defaultSuperAdminGroup.getGroup_nr());
 
-		existinGroup = (Group) this.createOrApplyObjects(existinGroup,
+		existingGroup = (Group) this.createOrApplyObjects(existingGroup,
 				desiredGroup);
 		
-		return existinGroup;
+		return existingGroup;
 	}
-
+	
+	
 	/**
 	 * Creates an SuperAdmin {@link User} with declared properties
 	 * @throws ShogunDatabaseAccessException
@@ -299,7 +353,7 @@ public class DatabaseContentInitializer {
 		if (currentSuperAdmin == null) {
 			LOGGER.info("  - We could not find a superuser. Create one.");
 			currentSuperAdmin = this.dbDao.createUser(new User(),
-					User.ROLENAME_SUPERADMIN, false);
+					Group.ROLENAME_SUPERADMIN, false);
 		}
 
 		currentSuperAdmin.setUser_name(this.superAdminName);
@@ -307,7 +361,7 @@ public class DatabaseContentInitializer {
 		PasswordEncoder pwencoder = new Md5PasswordEncoder();
 		String hashed = pwencoder.encodePassword(this.superAdminPw, null);
 		currentSuperAdmin.setUser_password(hashed);
-		currentSuperAdmin.setApp_user("auto-create-on-init");
+		currentSuperAdmin.setApp_user(APP_USER_AUTO_CREATED);
 
 		// give the superadmin all available modules:
 		List<Module> allModules = (List<Module>) (List<?>) this.dbDao
@@ -318,7 +372,12 @@ public class DatabaseContentInitializer {
 		LOGGER.info("  - Assigning all " + allModules.size()
 				+ " modules to superadmin.");
 
-		this.dbDao.createOrUpdateEntity("User", currentSuperAdmin);
+		currentSuperAdmin = (User) this.dbDao.createOrUpdateEntity("User", currentSuperAdmin);
+		
+		// add the anonymous user to the default group
+		this.persistantDefaultSuperAdminGroup.getUsers().add(currentSuperAdmin);
+		this.dbDao.updateEntity("Group", this.persistantDefaultSuperAdminGroup);
+		
 	}
 
 	/**
@@ -340,7 +399,7 @@ public class DatabaseContentInitializer {
 			for (Iterator<Object> iterator = allUsers.iterator(); iterator
 					.hasNext();) {
 				User user = (User) iterator.next();
-				if (user.hasAnonymousRole() == true) {
+				if (user.hasAnonymousRole() == true  && user.getUser_name().equals("anonymousUser")) {
 					anon = user;
 					break;
 				}
@@ -349,8 +408,8 @@ public class DatabaseContentInitializer {
 				LOGGER.info("  - We could not find an anonymous user. Create one.");
 				anon = new User();
 				anon.setUser_name("anonymousUser");
-				anon.setApp_user("auto-create-on-init");
-				anon = this.dbDao.createUser(anon, User.ROLENAME_ANONYMOUS,
+				anon.setApp_user(APP_USER_AUTO_CREATED);
+				anon = this.dbDao.createUser(anon, Group.ROLENAME_ANONYMOUS,
 						false);
 			}
 
@@ -392,8 +451,10 @@ public class DatabaseContentInitializer {
 			this.dbDao.updateUser(anon);
 			
 			// add the anonymous user to the default group
-			this.persistantDefaultGroup.getUsers().add(anon);
-			this.dbDao.updateEntity("Group", this.persistantDefaultGroup);
+			this.persistantDefaultAnonymousGroup.getUsers().add(anon);
+			this.dbDao.updateEntity("Group", this.persistantDefaultAnonymousGroup);
+			
+			
 			
 		} else {
 			LOGGER.info("Skipping the creation of an anonymous user.");
@@ -427,7 +488,7 @@ public class DatabaseContentInitializer {
 		String className = source.getClass().getSimpleName();
 		if (target == null) {
 			// tag the record, that it has been done automatically
-			source.setApp_user("auto-create-on-init");
+			source.setApp_user(APP_USER_AUTO_CREATED);
 			target = (BaseModelInterface) this.dbDao.createEntity(className,
 					source);
 		} else {
@@ -440,7 +501,7 @@ public class DatabaseContentInitializer {
 			target.setId(oldid);
 			target.setCreated_at(createdAt);
 			target.setUpdated_at(new Date());
-			target.setApp_user("auto-create-on-init");
+			target.setApp_user(APP_USER_AUTO_CREATED);
 			target = (BaseModelInterface) this.dbDao.updateEntity(className,
 					target);
 		}
@@ -475,21 +536,6 @@ public class DatabaseContentInitializer {
 	}
 
 	/**
-	 * @return the defaultGroup
-	 */
-	public Group getDefaultGroup() {
-		return defaultGroup;
-	}
-
-	/**
-	 * @param defaultGroup
-	 *			the defaultGroup to set
-	 */
-	public void setDefaultGroup(Group defaultGroup) {
-		this.defaultGroup = defaultGroup;
-	}
-
-	/**
 	 * @return the superAdminName
 	 */
 	public String getSuperAdminName() {
@@ -520,21 +566,6 @@ public class DatabaseContentInitializer {
 	}
 
 	/**
-	 * @return the availableRoles
-	 */
-	public List<String> getAvailableRoles() {
-		return availableRoles;
-	}
-
-	/**
-	 * @param availableRoles
-	 *			the availableRoles to set
-	 */
-	public void setAvailableRoles(List<String> availableRoles) {
-		this.availableRoles = availableRoles;
-	}
-
-	/**
 	 * @return the modulesForAnonymous
 	 */
 	public List<String> getModulesForAnonymous() {
@@ -562,21 +593,6 @@ public class DatabaseContentInitializer {
 	 */
 	public void setWmsMapLayer(WmsMapLayer wmsMapLayer) {
 		this.wmsMapLayer = wmsMapLayer;
-	}
-
-	/**
-	 * @return the mapConfig
-	 */
-	public MapConfig getMapConfig() {
-		return mapConfig;
-	}
-
-	/**
-	 * @param mapConfig
-	 *			the mapConfig to set
-	 */
-	public void setMapConfig(MapConfig mapConfig) {
-		this.mapConfig = mapConfig;
 	}
 
 	/**
@@ -624,5 +640,48 @@ public class DatabaseContentInitializer {
 	public MapConfig getPersistantStdMapConfig() {
 		return persistantStdMapConfig;
 	}
+
+	/**
+	 * @return the mapConfigs
+	 */
+	public List<MapConfig> getMapConfigs() {
+		return mapConfigs;
+	}
+
+	/**
+	 * @param mapConfigs the mapConfigs to set
+	 */
+	public void setMapConfigs(List<MapConfig> mapConfigs) {
+		this.mapConfigs = mapConfigs;
+	}
+	
+	/**
+	 * @return the defaultAnonymousGroup
+	 */
+	public Group getDefaultAnonymousGroup() {
+		return defaultAnonymousGroup;
+	}
+
+	/**
+	 * @param defaultAnonymousGroup the defaultAnonymousGroup to set
+	 */
+	public void setDefaultAnonymousGroup(Group defaultAnonymousGroup) {
+		this.defaultAnonymousGroup = defaultAnonymousGroup;
+	}
+
+	/**
+	 * @return the defaultSuperAdminGroup
+	 */
+	public Group getDefaultSuperAdminGroup() {
+		return defaultSuperAdminGroup;
+	}
+
+	/**
+	 * @param defaultSuperAdminGroup the defaultSuperAdminGroup to set
+	 */
+	public void setDefaultSuperAdminGroup(Group defaultSuperAdminGroup) {
+		this.defaultSuperAdminGroup = defaultSuperAdminGroup;
+	}
+
 
 }

@@ -277,11 +277,11 @@ public class UserAdministrationService extends AbstractShogunService {
 				user.setMapLayers(oldUser.getMapLayers());
 			}
 
-			// if roles is empty in request from client, keep the old
-			// one
-			if (user.getRoles() == null) {
-				user.setRoles(oldUser.getRoles());
-			}
+//			// if roles is empty in request from client, keep the old
+//			// one
+//			if (user.getRoles() == null) {
+//				user.setRoles(oldUser.getRoles());
+//			}
 
 			// write in DB
 			User updatedUser = this.getDatabaseDao().updateUser(user);
@@ -704,7 +704,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			// save sub-admin to database
 			User persistentSubadmin =
 				this.getDatabaseDao().createUser(
-						subadmin, User.ROLENAME_ADMIN, false);
+						subadmin, Group.ROLENAME_ADMIN, false);
 
 			// send a mail with the new password
 			String mailtext = "Sehr geehrter Nutzer " + subadmin.getUser_name()
