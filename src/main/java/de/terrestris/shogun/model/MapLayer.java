@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -16,6 +17,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.ForeignKey;
 
 import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
@@ -445,6 +447,8 @@ public abstract class MapLayer extends BaseModelInheritance {
 	@ManyToOne
 	@JsonIgnore
 	@Fetch(FetchMode.SELECT)
+	// foreign key needed here, otherwise hibernate will generate name which is too long ( > 30 chars)
+	@ForeignKey(name="FKOWNERID")
 	public User getOwner() {
 		return owner;
 	}
