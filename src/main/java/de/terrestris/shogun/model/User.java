@@ -361,8 +361,11 @@ public class User extends BaseModel {
 	@Transient
 	public Set<MapLayer> getMapLayers() {
 		Set<MapLayer> allMapLayers = new HashSet<MapLayer>();
-		for (Group group : this.getGroups()) {
-			allMapLayers.addAll(group.getMapLayers());
+		Set<Group> groups = this.getGroups();
+		if (groups != null) {
+			for (Group group : groups) {
+				allMapLayers.addAll(group.getMapLayers());
+			}
 		}
 		return allMapLayers;
 	}
