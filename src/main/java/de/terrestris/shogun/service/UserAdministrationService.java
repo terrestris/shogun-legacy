@@ -270,18 +270,11 @@ public class UserAdministrationService extends AbstractShogunService {
 			if (user.getMapConfig() == null) {
 				user.setMapConfig(oldUser.getMapConfig());
 			}
-
-			// if mapLayers is empty in request from client, keep the old
-			// one
-			if (user.getMapLayers() == null) {
-				user.setMapLayers(oldUser.getMapLayers());
+			
+			// if groups is empty in request from client, keep the old one
+			if (user.getGroups() == null) {
+				user.setGroups(oldUser.getGroups());
 			}
-
-//			// if roles is empty in request from client, keep the old
-//			// one
-//			if (user.getRoles() == null) {
-//				user.setRoles(oldUser.getRoles());
-//			}
 
 			// write in DB
 			User updatedUser = this.getDatabaseDao().updateUser(user);

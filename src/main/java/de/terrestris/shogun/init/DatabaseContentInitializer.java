@@ -440,8 +440,9 @@ public class DatabaseContentInitializer {
 			Set<MapLayer> wmsMapLayerSet = new HashSet<MapLayer>();
 			wmsMapLayerSet.add(wmsMapLayer);
 
-			anon.setMapLayers(wmsMapLayerSet);
-
+			// add the stdLayer to the anon-group
+			this.persistantDefaultAnonymousGroup.setMapLayers(wmsMapLayerSet);
+			
 			if (wmsProxyConfig != null) {
 				// set the auto created WmsProxyConfig
 				anon.setWmsProxyConfig(wmsProxyConfig);
@@ -449,6 +450,7 @@ public class DatabaseContentInitializer {
 			
 			// persist the anonymous user
 			this.dbDao.updateUser(anon);
+			
 			
 			// add the anonymous user to the default group
 			this.persistantDefaultAnonymousGroup.getUsers().add(anon);
