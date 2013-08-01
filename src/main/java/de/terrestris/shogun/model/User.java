@@ -15,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -52,8 +53,6 @@ public class User extends BaseModel {
 
 	private Set<Group> groups;
 	private Set<Module> modules;
-	private Set<MapLayer> mapLayers;
-//	private Set<MapConfig> mapConfigs;
 	private MapConfig mapConfig;
 	private WfsProxyConfig wfsProxyConfig;
 	private WmsProxyConfig wmsProxyConfig;
@@ -261,28 +260,6 @@ public class User extends BaseModel {
 		this.modules = modules;
 	}
 
-
-	/**
-	 * @return the mapLayers
-	 */
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "TBL_USER_TBL_MAPLAYER",  joinColumns = {
-			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
-			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
-					nullable = false, updatable = false) })
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
-	@Fetch(FetchMode.SUBSELECT)
-	public Set<MapLayer> getMapLayers() {
-		return mapLayers;
-	}
-
-	/**
-	 * @param mapLayers the mapLayers to set
-	 */
-	public void setMapLayers(Set<MapLayer> mapLayers) {
-		this.mapLayers = mapLayers;
-	}
-
 //	/**
 //	 * We have to use a Set instead of List, due to a know limitation
 //	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
@@ -374,6 +351,21 @@ public class User extends BaseModel {
 		this.wmsProxyConfig = wmsProxyConfig;
 	}
 
+	
+	/**
+	 * Will return the unification of all maplayers of all groups the user
+	 * belongs to.
+	 * 
+	 * @return
+	 */
+	@Transient
+	public Set<MapLayer> getMapLayers() {
+		Set<MapLayer> allMapLayers = new HashSet<MapLayer>();
+		for (Group group : this.getGroups()) {
+			allMapLayers.addAll(group.getMapLayers());
+		}
+		return allMapLayers;
+	}
 
 	// ----------------------------------------------------------------
 
@@ -472,4 +464,5 @@ public class User extends BaseModel {
 		}
 		return hasRole;
 	}
+	
 }

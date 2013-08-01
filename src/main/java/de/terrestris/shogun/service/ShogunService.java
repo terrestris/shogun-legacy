@@ -73,7 +73,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @return List<Object>
 	 * @throws ShogunServiceException
 	 */
-	// @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	@Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
 	public Map<String, Object> getEntities(Request request) throws ShogunServiceException {
 

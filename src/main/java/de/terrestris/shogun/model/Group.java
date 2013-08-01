@@ -380,11 +380,16 @@ public class Group extends BaseModel{
 	/**
 	 * @return the mapLayers
 	 */
-	@ManyToMany(fetch = FetchType.LAZY, targetEntity=MapLayer.class)
-	@JoinTable(name = "TBL_GROUP_TBL_MAPLAYER",  joinColumns = {
-			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
-			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
-					nullable = false, updatable = false) })
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=MapLayer.class)
+	@JoinTable(
+		name = "TBL_GROUP_TBL_MAPLAYER",
+		joinColumns = {
+			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false)
+		},
+		inverseJoinColumns = {
+			@JoinColumn(name = "MAPLAYER_ID", nullable = false, updatable = false)
+		}
+	)
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<MapLayer> getMapLayers() {

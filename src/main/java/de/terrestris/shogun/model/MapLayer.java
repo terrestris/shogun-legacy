@@ -9,6 +9,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -61,9 +62,10 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private String transitionEffect = null;
 
 	private Set<LayerMetadata> metadata;
-	private Set<User> users;
+//	private Set<User> users;
 	private Set<Group> groups;
-
+	
+	private User owner;
 
 	/**
 	 * @return the name
@@ -401,23 +403,23 @@ public abstract class MapLayer extends BaseModelInheritance {
 		this.metadata = metadata;
 	}
 
-	/**
-	 * @return the users
-	 */
-	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
-	@JsonIgnore
-	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
-	public Set<User> getUsers() {
-		return users;
-	}
-
-	/**
-	 * @param users the users to set
-	 */
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
+//	/**
+//	 * @return the users
+//	 */
+//	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
+//	@JsonIgnore
+//	@Fetch(FetchMode.SUBSELECT)
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
+//	public Set<User> getUsers() {
+//		return users;
+//	}
+//
+//	/**
+//	 * @param users the users to set
+//	 */
+//	public void setUsers(Set<User> users) {
+//		this.users = users;
+//	}
 
 	/**
 	 * @return the groups
@@ -437,5 +439,22 @@ public abstract class MapLayer extends BaseModelInheritance {
 		this.groups = groups;
 	}
 
+	/**
+	 * @return the owner
+	 */
+	@ManyToOne
+	@JsonIgnore
+	@Fetch(FetchMode.SELECT)
+	public User getOwner() {
+		return owner;
+	}
+
+	/**
+	 * @param owner
+	 *            the owner to set
+	 */
+	public void setOwner(User owner) {
+		this.owner = owner;
+	}
 }
 
