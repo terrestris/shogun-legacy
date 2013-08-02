@@ -43,7 +43,10 @@ public class Group extends BaseModel{
 	public static final String ROLENAME_USER = "ROLE_USER";
 	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
 	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
-	
+
+	public static final String DEFAULT_ADMIN_GROUP = "default-admin-group";
+	public static final String DEFAULT_USER_GROUP = "default-user-group";
+
 	private String name;
 	private String group_nr;
 	private String company;
