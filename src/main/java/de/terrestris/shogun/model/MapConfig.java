@@ -8,18 +8,19 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * MapConfig POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_MAPCONFIG")
 public class MapConfig extends BaseModel {
-	
-	
+
+	public static final String DEFAULT_MAPCONFIG = "default-mapconfig";
+
 	private String name; //TODO remove
-	
+
 	private String mapId; // id needed to reference map in portalConfig above
 	private String title;
 	private String projection;
@@ -30,8 +31,8 @@ public class MapConfig extends BaseModel {
 	private String resolutions;
 	private String scales;
 	private Integer zoom;
-	
-	
+
+
 	/**
 	 * @return the name
 	 */
@@ -45,7 +46,7 @@ public class MapConfig extends BaseModel {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * @return the mapId
 	 */
@@ -59,7 +60,7 @@ public class MapConfig extends BaseModel {
 	public void setMapId(String mapId) {
 		this.mapId = mapId;
 	}
-	
+
 	/**
 	 * @return the title
 	 */
@@ -73,7 +74,7 @@ public class MapConfig extends BaseModel {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	/**
 	 * @return the projection
 	 */
@@ -87,7 +88,7 @@ public class MapConfig extends BaseModel {
 	public void setProjection(String projection) {
 		this.projection = projection;
 	}
-	
+
 	/**
 	 * @return the units
 	 */
@@ -101,7 +102,7 @@ public class MapConfig extends BaseModel {
 	public void setUnits(String units) {
 		this.units = units;
 	}
-	
+
 	/**
 	 * @return the maxResolution
 	 */
@@ -115,7 +116,7 @@ public class MapConfig extends BaseModel {
 	public void setMaxResolution(Double maxResolution) {
 		this.maxResolution = maxResolution;
 	}
-	
+
 	/**
 	 * @return the maxExtent
 	 */
@@ -129,7 +130,7 @@ public class MapConfig extends BaseModel {
 	public void setMaxExtent(String maxExtent) {
 		this.maxExtent = maxExtent;
 	}
-	
+
 	/**
 	 * @return the center
 	 */
@@ -140,10 +141,10 @@ public class MapConfig extends BaseModel {
 	/**
 	 * @param center the center to set
 	 */
-	public void setCenter(String center) { 
+	public void setCenter(String center) {
 		this.center = center;
 	}
-	
+
 	/**
 	 * @return the zoom
 	 */
