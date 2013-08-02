@@ -1,17 +1,12 @@
 package de.terrestris.shogun.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -23,7 +18,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import de.terrestris.shogun.dao.DatabaseDao;
 import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
 /**
@@ -52,11 +46,10 @@ public class User extends BaseModel {
 	private Boolean active = true;
 
 	private Set<Group> groups;
-	private Set<Module> modules;
 	private MapConfig mapConfig;
 	private WfsProxyConfig wfsProxyConfig;
 	private WmsProxyConfig wmsProxyConfig;
-	private String user_module_list;
+//	private String user_module_list;
 
 
 	/**
@@ -237,28 +230,28 @@ public class User extends BaseModel {
 		this.groups = groups;
 	}
 
-	/**
-	 * @return the modules
-	 */
-	@ManyToMany(fetch = FetchType.LAZY, targetEntity=Module.class)
-	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = {
-			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
-			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
-					nullable = false, updatable = false) })
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
-	@Fetch(FetchMode.SUBSELECT)
-	public Set<Module> getModules() {
-		return modules;
-	}
-
-	/**
-	 *
-	 * @param modules the modules to set
-	 */
-	@JsonIgnore
-	public void setModules(Set<Module> modules) {
-		this.modules = modules;
-	}
+//	/**
+//	 * @return the modules
+//	 */
+//	@ManyToMany(fetch = FetchType.LAZY, targetEntity=Module.class)
+//	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = {
+//			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
+//			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
+//					nullable = false, updatable = false) })
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
+//	@Fetch(FetchMode.SUBSELECT)
+//	public Set<Module> getModules() {
+//		return modules;
+//	}
+//
+//	/**
+//	 *
+//	 * @param modules the modules to set
+//	 */
+//	@JsonIgnore
+//	public void setModules(Set<Module> modules) {
+//		this.modules = modules;
+//	}
 
 //	/**
 //	 * We have to use a Set instead of List, due to a know limitation
@@ -300,20 +293,21 @@ public class User extends BaseModel {
 		this.mapConfig = mapConfig;
 	}
 
-	/**
-	 * @return the simpleModuleList
-	 */
-	@Column(name="USER_MODULE_LIST")
-	public String getUser_module_list() {
-		return user_module_list;
-	}
-
-	/**
-	 * @param simpleModuleList the simpleModuleList to set
-	 */
-	public void setUser_module_list(String simpleModuleList) {
-		this.user_module_list = simpleModuleList;
-	}
+	// TODO NBNBNBNB discuss about finally removing this (unneeded?) property...
+//	/**
+//	 * @return the simpleModuleList
+//	 */
+//	@Column(name="USER_MODULE_LIST")
+//	public String getUser_module_list() {
+//		return user_module_list;
+//	}
+//
+//	/**
+//	 * @param simpleModuleList the simpleModuleList to set
+//	 */
+//	public void setUser_module_list(String simpleModuleList) {
+//		this.user_module_list = simpleModuleList;
+//	}
 
 
 	/**
@@ -351,11 +345,11 @@ public class User extends BaseModel {
 		this.wmsProxyConfig = wmsProxyConfig;
 	}
 
-	
+
 	/**
 	 * Will return the unification of all maplayers of all groups the user
 	 * belongs to.
-	 * 
+	 *
 	 * @return
 	 */
 	@Transient
@@ -370,46 +364,69 @@ public class User extends BaseModel {
 		return allMapLayers;
 	}
 
+	/**
+	 * Will return the unification of all maplayers of all groups the user
+	 * belongs to.
+	 *
+	 * @return
+	 */
+	@Transient
+	public Set<Module> getModules() {
+		Set<Module> allModulesOfUser = new HashSet<Module>();
+		Set<Group> groups = this.getGroups();
+		if(groups != null){
+			for (Group group : groups) {
+				allModulesOfUser.addAll(group.getModules());
+			}
+		}
+		return allModulesOfUser;
+	}
+
 	// ----------------------------------------------------------------
 
+	// TODO NBNBNBNB what about this dirty method?? dao as argument!??
+	// due to group refactoring users are not directly associated to modules
+	// anymore
 
-	/**
-	 *
-	 * @param databaseDAO
-	 */
-	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
-		// create module object list from comma-separated list
-		Set<Module> newModules = null;
-
-		if (this.getUser_module_list() != null
-				&& this.getUser_module_list().equals("") == false) {
-
-			String[] moduleIdArray = this.getUser_module_list().split(",");
-			List<Integer> intArray = new ArrayList<Integer>();
-
-			for (int i = 0; i < moduleIdArray.length; i++) {
-				Integer inte = new Integer(moduleIdArray[i]);
-				intArray.add(inte);
-			}
-
-			List<? extends Object> modules = databaseDAO.getEntitiesByIds(
-					intArray.toArray(), Module.class);
-
-			newModules = new HashSet<Module>(modules.size());
-			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
-				Module module = (Module) iterator2.next();
-				newModules.add(module);
-			}
-
-			modules = null;
-
-		} else {
-			newModules = new HashSet<Module>();
-		}
-
-		Set<Module> moduleSet = new HashSet<Module>(newModules);
-		this.setModules(moduleSet);
-	}
+//	/**
+//	 *
+//	 * @param databaseDAO
+//	 */
+//	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
+//		// create module object list from comma-separated list
+//		Set<Module> newModules = null;
+//
+//		if (this.getUser_module_list() != null
+//				&& this.getUser_module_list().equals("") == false) {
+//
+//			String[] moduleIdArray = this.getUser_module_list().split(",");
+//			List<Integer> intArray = new ArrayList<Integer>();
+//
+//			for (int i = 0; i < moduleIdArray.length; i++) {
+//				Integer inte = new Integer(moduleIdArray[i]);
+//				intArray.add(inte);
+//			}
+//
+//			List<? extends Object> modules = databaseDAO.getEntitiesByIds(
+//					intArray.toArray(), Module.class);
+//
+//			newModules = new HashSet<Module>(modules.size());
+//			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
+//				Module module = (Module) iterator2.next();
+//				newModules.add(module);
+//			}
+//
+//			modules = null;
+//
+//		} else {
+//			newModules = new HashSet<Module>();
+//		}
+//
+//		Set<Module> moduleSet = new HashSet<Module>(newModules);
+//
+//
+//		this.setModules(moduleSet);
+//	}
 
 	/**
 	 * Returns whether the user has role User.ROLENAME_SUPERADMIN in his set of
@@ -467,5 +484,4 @@ public class User extends BaseModel {
 		}
 		return hasRole;
 	}
-	
 }
