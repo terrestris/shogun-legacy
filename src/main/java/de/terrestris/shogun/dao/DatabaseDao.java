@@ -572,10 +572,10 @@ public class DatabaseDao {
 		return this.getEntitiesByIds(values, clazz, null);
 	}
 	
-	public List<? extends Object> getEntitiesByIds(Set values, Class<?> clazz) {
+	public List<? extends Object> getEntitiesByIds(Set<?> values, Class<?> clazz) {
 		Object[] objectValues = new Object[values.size()];
 		int i = 0;
-		for (Iterator iterator = values.iterator(); iterator.hasNext();) {
+		for (Iterator<?> iterator = values.iterator(); iterator.hasNext();) {
 			Object object = (Object) iterator.next();
 			objectValues[i] = object;
 			i++;
