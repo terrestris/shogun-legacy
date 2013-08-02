@@ -42,7 +42,7 @@ public class DatabaseContentInitializer {
 	 */
 	private static Logger LOGGER = Logger.getLogger(DatabaseContentInitializer.class);
 
-	private static final String APP_USER_AUTO_CREATED = "auto-create-on-init";
+	protected static final String APP_USER_AUTO_CREATED = "auto-create-on-init";
 
 	/**
 	 * flag symbolizing if the database will be modified by this class
