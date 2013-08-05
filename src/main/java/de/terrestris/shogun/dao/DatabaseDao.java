@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javassist.Modifier;
+
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.Criteria;
@@ -375,7 +377,11 @@ public class DatabaseDao {
 	 */
 	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
 		for (Field field: type.getDeclaredFields()) {
-			fields.add(field);
+			// only add fields that are not static and final
+			if(Modifier.isStatic(field.getModifiers()) == false &&
+				Modifier.isFinal(field.getModifiers()) == false){
+				fields.add(field);
+			}
 		}
 
 		if (type.getSuperclass() != null) {
