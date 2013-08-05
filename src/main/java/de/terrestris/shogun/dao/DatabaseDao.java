@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javassist.Modifier;
@@ -268,20 +269,25 @@ public class DatabaseDao {
 			if (fields == null && cleanedFieldNames.size() > 0) {
 				fields = cleanedFieldNames;
 			}
-			
-			List<Object[]> rawListOfResults = criteria.list();
-			
+			// we dont really know what criteria.list() will return, can be List<Object> or List<Object[]>
+			// will be determined later
+			List<Object> rawListOfResults = criteria.list();
 			List<Object> saneResultList = new ArrayList<Object>();
-			for (Object[] rawRow : rawListOfResults) {
-				HashMap<String, Object> newRowMap = new HashMap<String, Object>();
+			for (Object rawRow : rawListOfResults) {
+				
+				Map<String, Object> newRowMap = new HashMap<String, Object>();
 				int fieldIdx = 0;
 				for (Iterator<String> fieldIter = fields.iterator(); fieldIter.hasNext();) {
 					String fieldName = fieldIter.next();
-					
 					Object fieldVal = null;
 					
 					if (rawRow != null) {
-						fieldVal = rawRow[fieldIdx];
+						if (rawRow.getClass().isArray()) {
+							Object[] objArr = (Object[]) rawRow;
+							fieldVal = objArr[fieldIdx];
+						} else {
+							fieldVal = rawRow;
+						}
 					}
 
 					// store the pair in the newRowMap. 
@@ -374,14 +380,37 @@ public class DatabaseDao {
 	 * @param fields
 	 * @param type
 	 * @return
+	 * @throws NoSuchFieldException 
+	 * @throws SecurityException 
+	 * @throws IntrospectionException 
 	 */
 	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
 		for (Field field: type.getDeclaredFields()) {
-			// only add fields that are not static and final
+			
+			// check if the filed is not a constant
 			if(Modifier.isStatic(field.getModifiers()) == false &&
-				Modifier.isFinal(field.getModifiers()) == false){
-				fields.add(field);
+					Modifier.isFinal(field.getModifiers()) == false) {
+				
+				// now we check if the readmethod of the field
+				// has NOT a transient annotation
+				try {
+					Method readmethod = new PropertyDescriptor(field.getName(), type).getReadMethod();
+					Annotation[] annotationsArr = readmethod.getAnnotations();
+					if (annotationsArr.length == 0) {
+						fields.add(field);
+					} else {
+						for (Annotation annotation : annotationsArr) {
+							if(annotation.annotationType().equals(javax.persistence.Transient.class) == false) {
+								fields.add(field);
+							}
+						}
+					}
+				} catch (IntrospectionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			
 		}
 
 		if (type.getSuperclass() != null) {
