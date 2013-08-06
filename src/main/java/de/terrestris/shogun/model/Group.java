@@ -1,6 +1,7 @@
 package de.terrestris.shogun.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.hibernate.annotations.FetchMode;
 
 import de.terrestris.shogun.dao.DatabaseDao;
 import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
+import de.terrestris.shogun.service.UserAdministrationService;
 
 /**
  * Group POJO
@@ -43,6 +45,17 @@ public class Group extends BaseModel{
 	public static final String ROLENAME_USER = "ROLE_USER";
 	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
 	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
+	
+	/**
+	 * These roles will be assigned for new groups when they do not have 
+	 * roles already. This Set isn't applied in a constructor, but when
+	 * creating instances of the Group-class e.g. in the service.
+	 *
+	 * See for instance {@link UserAdministrationService#createGroup(Group)} &
+	 * {@link UserAdministrationService#getStandardRoles()}
+	 */
+	public static final Set<String> DEFAULT_ROLENAMES = new HashSet<String>(
+			Arrays.asList(ROLENAME_USER, ROLENAME_ANONYMOUS));
 
 	public static final String DEFAULT_ADMIN_GROUP = "default-admin-group";
 	public static final String DEFAULT_USER_GROUP = "default-user-group";
