@@ -533,16 +533,24 @@ public class DatabaseDao {
 	 * @return The object list fulfilling the filter request
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> getAllEntities(Class<?> clazz) {
+	public List<Object> getAllEntities(Class<?> clazz, boolean... initializeDeep) {
 
+		boolean initializeDeeply = initializeDeep.length > 0 ? initializeDeep[0] : false;
+		
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 
 		// this ensures that no cartesian product is returned when
 		// having sub objects, e.g. User <-> Modules
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-
-		return criteria.list();
+		
+		List <Object> resultSetlist = (List<Object>)criteria.list();
+		
+		if (initializeDeeply == true) {
+			this.initializeDeepList(resultSetlist, clazz);
+		}
+		
+		return resultSetlist;
 	}
 
 	/**
