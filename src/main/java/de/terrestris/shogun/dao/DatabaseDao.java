@@ -431,7 +431,7 @@ public class DatabaseDao {
 	protected void initializeDeep(Object obj, Class<?> mainClass) {
 		List<Object> list = new ArrayList<Object>();
 		list.add(obj);
-		this.initializeDeep(list, mainClass);
+		this.initializeDeepList(list, mainClass);
 	}
 	
 	
@@ -441,7 +441,7 @@ public class DatabaseDao {
 	 * @param list
 	 * @param mainClass
 	 */
-	protected void initializeDeep(List<Object> list, Class<?> mainClass) {
+	protected void initializeDeepList(List<? extends Object> list, Class<?> mainClass) {
 		List<Field> fields = getAllFields(new ArrayList<Field>(), mainClass);
 		List<Method> methods = new ArrayList<Method>();
 		
@@ -460,7 +460,7 @@ public class DatabaseDao {
 			}
 		}
 		
-		for (Iterator<Object> iterator = list.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = (Iterator<Object>) list.iterator(); iterator.hasNext();) {
 			Object obj = iterator.next();
 			if (obj == null) {
 				continue;
