@@ -23,7 +23,6 @@ import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.MapConfig;
 import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.model.WfsProxyConfig;
 import de.terrestris.shogun.model.WmsProxyConfig;
@@ -423,9 +422,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			Set<MapLayer> layers = new HashSet<MapLayer>(wmsMapLayers);
 			group.setMapLayers(layers);
 		}
-		
-		// always add certain roles to new groups:
-		group.setRoles(this.getStandardRoles());
 
 		// write new Group in DB
 		newGroup = (Group) this.getDatabaseDao().createEntity(
@@ -449,27 +445,6 @@ public class UserAdministrationService extends AbstractShogunService {
 		this.getDatabaseDao().updateEntity("Group", newGroup);
 
 		return newGroup;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Set<Role> getStandardRoles() {
-		Set<Role> standardRoles = new HashSet<Role>();
-		try {
-			
-			Set<String> defaultRoleNames = Group.DEFAULT_ROLENAMES;
-			for (String defaultRolename : defaultRoleNames) {
-				Role role = (Role) this.getDatabaseDao().getEntityByStringField(
-						Role.class, "name", defaultRolename);
-				standardRoles.add(role);
-			}
-		} catch (ShogunDatabaseAccessException sdae) {
-			LOGGER.error("Failed to determine the standard roles of a new" +
-					" group. " + sdae.getMessage(), sdae);
-		}
-		return standardRoles;
 	}
 
 	/**
@@ -702,7 +677,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			subadmin.setUser_password(hashed);
 
-			// save sub-admin to database
+			// save sub-admin to database 
 			User persistentSubadmin =
 				this.getDatabaseDao().createUser(
 						subadmin, Group.ROLENAME_ADMIN, false);
