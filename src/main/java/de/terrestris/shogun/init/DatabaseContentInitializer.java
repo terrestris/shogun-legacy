@@ -373,8 +373,7 @@ public class DatabaseContentInitializer {
 		// instanciate a new super admin, because we could not find any
 		if (currentSuperAdmin == null) {
 			LOGGER.info("  - We could not find a superuser. Create one.");
-			currentSuperAdmin = this.dbDao.createUser(new User(),
-					Group.ROLENAME_SUPERADMIN, false);
+			currentSuperAdmin = this.dbDao.createUser(new User(), false);
 		}
 
 		currentSuperAdmin.setUser_name(this.superAdminName);
@@ -421,8 +420,7 @@ public class DatabaseContentInitializer {
 				anon = new User();
 				anon.setUser_name("anonymousUser");
 				anon.setApp_user(APP_USER_AUTO_CREATED);
-				anon = this.dbDao.createUser(anon, Group.ROLENAME_ANONYMOUS,
-						false);
+				anon = this.dbDao.createUser(anon, false);
 			}
 
 			// TODO check for old properties first, before overwriting these
