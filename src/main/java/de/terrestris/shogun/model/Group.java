@@ -86,6 +86,8 @@ public class Group extends BaseModel{
 	private String group_module_list;
 	private Set<Integer> grantedUsers;
 	private Set<Integer> grantedMapLayers;
+	
+	private boolean deletable;
 
 	/**
 	 *
@@ -114,7 +116,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the group_nr
 	 */
-	@Column(name="GROUP_NR", nullable=false)
+	@Column(name="GROUP_NR", nullable=false, unique=true)
 	public String getGroup_nr() {
 		return group_nr;
 	}
@@ -462,6 +464,20 @@ public class Group extends BaseModel{
 	public void setGroup_module_list(String group_module_list) {
 		this.group_module_list = group_module_list;
 	}
+	
+	/**
+	 * @return the deletable
+	 */
+	public boolean isDeletable() {
+		return deletable;
+	}
+
+	/**
+	 * @param deletable the deletable to set
+	 */
+	public void setDeletable(boolean deletable) {
+		this.deletable = deletable;
+	}
 
 	/**
 	 * @return the grantedUsers
@@ -494,7 +510,6 @@ public class Group extends BaseModel{
 	public void setGrantedMapLayers(Set<Integer> grantedMapLayers) {
 		this.grantedMapLayers = grantedMapLayers;
 	}
-
 
 	/**
 	 * The method transforms the comma-separated list of module IDs stored in
