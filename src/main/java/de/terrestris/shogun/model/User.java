@@ -461,6 +461,23 @@ public class User extends BaseModel {
 	public boolean hasAnonymousRole() {
 		return this.hasRole(Group.ROLENAME_ANONYMOUS);
 	}
+	
+	/**
+	 * Returns all Roles of the user by iterating over all his groups.
+	 * 
+	 */
+	@Transient
+	public Set<Role> getRoles(){
+		Set<Role> myRoles = new HashSet<Role>();
+		Set<Group> myGroups = this.getGroups();
+		if(myGroups != null){
+			for(Group g : myGroups){
+				myRoles.addAll(g.getRoles());
+			}
+		}
+
+		return myRoles;
+	}
 
 	/**
 	 * Returns whether the user has the given role in his set of roles by
@@ -471,13 +488,8 @@ public class User extends BaseModel {
 	 */
 	private boolean hasRole(String searchRoleName) {
 		boolean hasRole = false;
-		for (Group g : this.getGroups()) {
-			for (Role r : g.getRoles()) {
-				hasRole = r.getName().equals(searchRoleName);
-				if (hasRole) {
-					break;
-				}
-			}
+		for (Role r : this.getRoles()) {
+			hasRole = r.getName().equals(searchRoleName);
 			if (hasRole) {
 				break;
 			}
