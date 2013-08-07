@@ -192,12 +192,9 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			Mail.send("localhost", user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
 
-			// TODO NBNBNBNB we should talk about this deprecated? method! -> uncommented...
-//			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
 			// write in DB
 			// do setSessionGroup only in case of beeing NO SuperAdmin
-			newuser = this.getDatabaseDao().createUser(user, "ROLE_USER", true);
+			newuser = this.getDatabaseDao().createUser(user, true);
 
 			LOGGER.debug(" USER RETURNED: " + newuser.getId());
 
@@ -232,10 +229,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			User user = iterator.next();
 
 //			List<Module> newModules = null;
-
-			// TODO NBNBNBNB we should talk about this deprecated? method! -> uncommented...
-			// create module object list
-//			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			// Check if logged-in user has the same group than the
 			// user to be updated
@@ -553,11 +546,6 @@ public class UserAdministrationService extends AbstractShogunService {
 		Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
 				Group.class.getSimpleName(), groupToUpdate);
 
-		// TODO NBNBNBNB we should talk about this deprecated? property/method! -> uncommented...
-		// Overwrite sub-admin settings
-//		subadmin.setUser_module_list(updatedGroup.getGroup_module_list());
-//		subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
 		// update the sub-admin
 		this.getDatabaseDao().updateUser(subadmin);
 
@@ -653,11 +641,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			subadmin.setUser_street(group.getStreet());
 			subadmin.setUser_lang(group.getLanguage());
 
-			// TODO NBNBNBNB we should talk about this deprecated? method/property! -> uncommented...
-//			subadmin.setUser_module_list(group.getGroup_module_list());
-			// create ModuleArray from Module-comma-separated list
-//			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
 			// TODO become more flexibel here, wrap to method
 			// set the default map conf
 			// TODO remove static ID !!!!!!!
@@ -700,8 +683,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			// save sub-admin to database 
 			User persistentSubadmin =
-				this.getDatabaseDao().createUser(
-						subadmin, Group.ROLENAME_ADMIN, false);
+				this.getDatabaseDao().createUser(subadmin, false);
 
 			// send a mail with the new password
 			String mailtext = "Sehr geehrter Nutzer " + subadmin.getUser_name()

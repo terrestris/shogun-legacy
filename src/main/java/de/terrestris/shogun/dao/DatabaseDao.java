@@ -1211,25 +1211,26 @@ public class DatabaseDao {
 
 
 	/**
-	 * // TODO check refactoring-MJMJMJMJMJ
-	 * 
 	 * Creates a new {@link User} object in the database.
-	 * The gets the role passed as String.
-	 * If needed the current group of the logged in user is stored
-	 * to the new user.
+	 * The roles, modules and granted layers of the user depend on the groups
+	 * he is assigned to. We dont have to care about this here.
 	 *
 	 * @param user the User object to create
-	 * @param role the role name
 	 * @param setSessionGroup flag controls if the current user group should be set to new user
 	 * @return
 	 * @throws Exception
 	 */
-	public User createUser(User user, String role, boolean setSessionGroup) throws ShogunDatabaseAccessException {
+	public User createUser(User user, boolean setSessionGroup) throws ShogunDatabaseAccessException {
 
 		try {
 
 			this.sessionFactory.getCurrentSession().save(user);
 
+			// TODO NB: What is the sense of setSessionGroup?
+			// Due to the use of getFirstGroupObjectFromSessionUser()
+			// it seems that the user is already associated with the
+			// group that we will update in the following code.
+			// So why do we do this?
 			if (setSessionGroup == true) {
 
 				try {
@@ -1250,13 +1251,6 @@ public class DatabaseDao {
 							"Error adding the saved user to current session group. " + e.getMessage());
 				}
 			}
-
-//			// create the mapping of new user and its role
-//			Role oRole = (Role)this.getEntityByStringField(Role.class, "name", role);
-//			Set<Role> roles = new HashSet<Role>();
-//			roles.add(oRole);
-
-//			user.setRoles(roles);
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
