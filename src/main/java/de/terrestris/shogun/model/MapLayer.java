@@ -12,6 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
@@ -63,7 +65,6 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private String transitionEffect = null;
 
 	private Set<LayerMetadata> metadata;
-//	private Set<User> users;
 	private Set<Group> groups;
 	
 	private User owner;
@@ -458,6 +459,40 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	public void setOwner(User owner) {
 		this.owner = owner;
+	}
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(13, 23). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getName()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MapLayer))
+			return false;
+		MapLayer other = (MapLayer) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getName(), other.getName()).
+				isEquals();
 	}
 }
 
