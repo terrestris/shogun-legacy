@@ -48,23 +48,34 @@ public class HibernateFilterItem extends FilterItem {
 	public Criterion makeCriterion(Class<?> mainClass) {
 
 		Criterion criterion = null;
-		
+
+		Class<?> originalGivenClass = mainClass;
 		Operator operator = this.getOperator();
 
 		String fieldName = this.getFieldName();
 		String originalFieldName = fieldName;
 		
+		boolean fieldNameContainsDot = (fieldName != null && fieldName.contains("."));
+		
 		// when we were called with a fieldname that contains a dot,
 		// we have to change the mainClass and the fieldname
-		if (fieldName != null && fieldName.contains(".")) {
+		if (fieldNameContainsDot) {
 			String[] parts = fieldName.split("\\.");
 			Class<?> clz = this.getClassFromFieldName(parts[0], mainClass);
 			mainClass = clz;
 			fieldName = parts[1];
 		}
-		LOGGER.debug("Will create a criterion for class '" +
-				mainClass.getSimpleName() + "', field '" + fieldName + "'," +
-				" original fieldname passed was '" + originalFieldName + "'.");
+		
+		String debugMsg = "Will create a '" + operator + "'-criterion" +
+				" for class '" + mainClass.getSimpleName() + "', field '" + fieldName + "'.";
+		
+		if (fieldNameContainsDot) {
+			debugMsg += " These values were determined from a fieldname" +
+				" with a dot in it. Originally we were passed '" + 
+				originalFieldName + "' as" + " fieldname and '" + 
+				originalGivenClass.getSimpleName() + "' as class.";
+		}
+		LOGGER.debug(debugMsg);
 		
 		
 		int operandCount = this.getOperands().size();
@@ -75,8 +86,10 @@ public class HibernateFilterItem extends FilterItem {
 					" '" + operator + "' needs operands and" +
 					" not only the fieldname.");
 		} else {
-			LOGGER.debug("Received " + operandCount + " operand(s) which" +
-					" probably need(s) conversion.");
+			String operandDsp  = "operand" + ((operandCount == 1) ? "" : "s");
+			String needDsp  = "need" + ((operandCount != 1) ? "" : "s");
+			LOGGER.debug("Received " + operandCount + " " + operandDsp +
+					" which probably " + needDsp + " conversion.");
 		}
 		
 		// Create an Object array with all operands casted to the final datatype
