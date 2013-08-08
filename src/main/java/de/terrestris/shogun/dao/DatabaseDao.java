@@ -253,8 +253,8 @@ public class DatabaseDao {
 					criteria.add(conjunction);
 
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while adding an AND connected filter", e);
+					throw new ShogunDatabaseAccessException("(getDataByFilter)" +
+							" Error while adding an AND connected filter", e);
 				}
 			}
 		}
@@ -1415,7 +1415,6 @@ public class DatabaseDao {
 				try {
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						
 						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
 							String ownFieldName = hfi.getFieldName().split("\\.")[0];
 							
@@ -1437,8 +1436,8 @@ public class DatabaseDao {
 					}
 
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while combining criteria with AND", e);
+					throw new ShogunDatabaseAccessException("(getTotal) Error" +
+							" while combining criteria with AND", e);
 				}
 			}
 		}
