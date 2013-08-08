@@ -295,23 +295,6 @@ public class User extends BaseModel {
 		this.mapConfig = mapConfig;
 	}
 
-	// TODO NBNBNBNB discuss about finally removing this (unneeded?) property...
-//	/**
-//	 * @return the simpleModuleList
-//	 */
-//	@Column(name="USER_MODULE_LIST")
-//	public String getUser_module_list() {
-//		return user_module_list;
-//	}
-//
-//	/**
-//	 * @param simpleModuleList the simpleModuleList to set
-//	 */
-//	public void setUser_module_list(String simpleModuleList) {
-//		this.user_module_list = simpleModuleList;
-//	}
-
-
 	/**
 	 * @return the wfsProxyConfig
 	 */
@@ -384,52 +367,6 @@ public class User extends BaseModel {
 		return allModulesOfUser;
 	}
 
-	// ----------------------------------------------------------------
-
-	// TODO NBNBNBNB what about this dirty method?? dao as argument!??
-	// due to group refactoring users are not directly associated to modules
-	// anymore
-
-//	/**
-//	 *
-//	 * @param databaseDAO
-//	 */
-//	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
-//		// create module object list from comma-separated list
-//		Set<Module> newModules = null;
-//
-//		if (this.getUser_module_list() != null
-//				&& this.getUser_module_list().equals("") == false) {
-//
-//			String[] moduleIdArray = this.getUser_module_list().split(",");
-//			List<Integer> intArray = new ArrayList<Integer>();
-//
-//			for (int i = 0; i < moduleIdArray.length; i++) {
-//				Integer inte = new Integer(moduleIdArray[i]);
-//				intArray.add(inte);
-//			}
-//
-//			List<? extends Object> modules = databaseDAO.getEntitiesByIds(
-//					intArray.toArray(), Module.class);
-//
-//			newModules = new HashSet<Module>(modules.size());
-//			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
-//				Module module = (Module) iterator2.next();
-//				newModules.add(module);
-//			}
-//
-//			modules = null;
-//
-//		} else {
-//			newModules = new HashSet<Module>();
-//		}
-//
-//		Set<Module> moduleSet = new HashSet<Module>(newModules);
-//
-//
-//		this.setModules(moduleSet);
-//	}
-
 	/**
 	 * Returns whether the user has role User.ROLENAME_SUPERADMIN in his set of
 	 * roles by comparing the name of all roles to the given string using
@@ -440,7 +377,6 @@ public class User extends BaseModel {
 	public boolean hasSuperAdminRole() {
 		return this.hasRole(Group.ROLENAME_SUPERADMIN);
 	}
-
 
 	/**
 	 * Returns whether the user has role User.ROLENAME_ADMIN in his set of
