@@ -50,9 +50,6 @@ public class Group extends BaseModel{
 	 * These roles will be assigned for new groups when they do not have 
 	 * roles already. This Set isn't applied in a constructor, but when
 	 * creating instances of the Group-class e.g. in the service.
-	 *
-	 * See for instance {@link UserAdministrationService#createGroup(Group)} &
-	 * {@link UserAdministrationService#getStandardRoles()}
 	 */
 	public static final Set<String> DEFAULT_ROLENAMES = new HashSet<String>(
 			Arrays.asList(ROLENAME_USER, ROLENAME_ANONYMOUS));
