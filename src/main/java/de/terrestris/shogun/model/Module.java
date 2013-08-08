@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -51,5 +53,39 @@ public class Module extends BaseModel {
 	 */
 	public void setModule_fullname(String module_fullname) {
 		this.module_fullname = module_fullname;
+	}
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(43, 23). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getModule_name()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Module))
+			return false;
+		Module other = (Module) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getModule_name(), other.getModule_name()).
+				isEquals();
 	}
 }
