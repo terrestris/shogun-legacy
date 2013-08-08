@@ -105,7 +105,6 @@ public class DatabaseDao {
 			Set<String> ignoreFields,
 			HibernatePagingObject hibernatePagingObject,
 			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
-
 		
 		boolean isPlainModelRequest = (fields == null && ignoreFields == null);
 		Class<?> clazz = hibernateSortObject.getMainClass();
@@ -192,26 +191,37 @@ public class DatabaseDao {
 		int filterItemCount = hibernateFilter.getFilterItemCount();
 
 		if (filterItemCount > 0) {
-
-			Disjunction dis = Restrictions.disjunction();
-
 			// OR connected filter items
 			if (hibernateFilter.getLogicalOperator().equals(LogicalOperator.OR)) {
-
 				try {
+					Disjunction dis = Restrictions.disjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(clazz);
-						if (criterion != null) {
-							dis.add(criterion);
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+							
+							criteria.createCriteria(ownFieldName, ownFieldName);
+							
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(clazz);
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+							
 						}
-
+						else {
+							Criterion criterion = hfi.makeCriterion(clazz);
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+						}
 					}
 					criteria.add(dis);
 
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while adding an OR connected filter", e);
+					throw new ShogunDatabaseAccessException("(getDataByFilter)" +
+							" Error while adding an OR connected filter: "
+							+ e.getMessage(), e);
 				}
 
 			} else {
@@ -239,9 +249,6 @@ public class DatabaseDao {
 								conjunction.add(criterion);
 							}
 						}
-					
-						
-						
 					}
 					criteria.add(conjunction);
 
@@ -253,6 +260,10 @@ public class DatabaseDao {
 		}
 		
 		// Ok we're done creating the criteria.
+		
+//		System.out.println("Querying for " + clazz.getSimpleName() + " with this SQL:");
+//		String niceSql = (new BasicFormatterImpl()).format(this.toSql(criteria));
+//		System.out.println(niceSql);
 		
 		// next we need to know whether we are being filtered with fields
 		// because we then do NOT get a List of instances of BaseModelInterface.
@@ -394,7 +405,8 @@ public class DatabaseDao {
 				// now we check if the readmethod of the field
 				// has NOT a transient annotation
 				try {
-					Method readmethod = new PropertyDescriptor(field.getName(), type).getReadMethod();
+					PropertyDescriptor pd = new PropertyDescriptor(field.getName(), type);
+					Method readmethod = pd.getReadMethod();
 					Annotation[] annotationsArr = readmethod.getAnnotations();
 					if (annotationsArr.length == 0) {
 						fields.add(field);
@@ -406,8 +418,11 @@ public class DatabaseDao {
 						}
 					}
 				} catch (IntrospectionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.error("Trying to determine the getter for field '" +
+							field.getName() + "' in " + type.getSimpleName() +
+							" threw IntrospectionException." +
+							" Is there a getter following the Java-Beans" +
+							" Specification?");
 				}
 			}
 			
@@ -583,7 +598,7 @@ public class DatabaseDao {
 	 * @return
 	 */
 	public Object getEntityById(int id, Class<?> clazz) {
-		return this.getEntityById(id, clazz, true);
+		return this.getEntityById(id, clazz, true); 
 	}
 	
 
@@ -1365,21 +1380,15 @@ public class DatabaseDao {
 			int filterItemCount = hibernateFilter.getFilterItemCount();
 
 			// FILTER
+			// OR connected filter items
 			if (hibernateFilter.getLogicalOperator().equals(LogicalOperator.OR)) {
-
-				Disjunction dis = Restrictions.disjunction();
-
 				try {
+					Disjunction dis = Restrictions.disjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						
-						
-						
 						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
 							String ownFieldName = hfi.getFieldName().split("\\.")[0];
-							
 							criteria.createCriteria(ownFieldName, ownFieldName);
-							
 							// todo move outside
 							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
 							if (criterion != null) {
@@ -1393,13 +1402,12 @@ public class DatabaseDao {
 								dis.add(criterion);
 							}
 						}
-						
 					}
 					criteria.add(dis);
-
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while combining criteria with OR", e);
+					throw new ShogunDatabaseAccessException("(getTotal) Error" +
+							" while adding an OR connected filter: " +
+							e.getMessage(), e);
 				}
 
 			} else {
@@ -1407,9 +1415,6 @@ public class DatabaseDao {
 				try {
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						
-						
-						
 						
 						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
 							String ownFieldName = hfi.getFieldName().split("\\.")[0];
@@ -1437,7 +1442,6 @@ public class DatabaseDao {
 				}
 			}
 		}
-
 		List<?> totalList = criteria.list();
 
 		return (Long)totalList.get(0);
