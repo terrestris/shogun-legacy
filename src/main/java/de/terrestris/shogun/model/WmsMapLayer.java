@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -120,5 +122,39 @@ public class WmsMapLayer extends MapLayer {
 		this.format = format;
 	}
 	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(37, 11). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getUrl()).
+				append(getLayers()).
+				toHashCode();
+	}
 
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof WmsMapLayer))
+			return false;
+		WmsMapLayer other = (WmsMapLayer) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getUrl(), other.getUrl()).
+				append(getLayers(), other.getLayers()).
+				isEquals();
+	}
 } 

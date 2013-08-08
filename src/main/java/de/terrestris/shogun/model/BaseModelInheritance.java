@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -121,6 +123,43 @@ public class BaseModelInheritance implements BaseModelInterface {
 	 */
 	public void setApp_user(String user) {
 		this.app_user = user;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(19, 29). // two randomly chosen prime numbers
+				append(getCreated_at()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof BaseModelInheritance))
+			return false;
+		BaseModelInheritance other = (BaseModelInheritance) obj;
+
+		return new EqualsBuilder().
+				append(getId(), other.getId()).
+				append(getCreated_at(), other.getCreated_at()).
+				isEquals();
 	}
 
 	/**

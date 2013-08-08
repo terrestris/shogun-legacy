@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -182,5 +184,41 @@ public class MapConfig extends BaseModel {
 	 */
 	public void setScales(String scales) {
 		this.scales = scales;
+	}
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(23, 19). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getMapId()).
+				append(getProjection()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MapConfig))
+			return false;
+		MapConfig other = (MapConfig) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getMapId(), other.getMapId()).
+				append(getProjection(), other.getProjection()).
+				isEquals();
 	}
 }

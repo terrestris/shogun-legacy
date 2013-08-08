@@ -5,6 +5,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -34,5 +36,39 @@ public class Role extends BaseModel {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(13, 37). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getName()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Role))
+			return false;
+		Role other = (Role) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getName(), other.getName()).
+				isEquals();
 	}
 }

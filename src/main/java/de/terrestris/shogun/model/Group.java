@@ -17,6 +17,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
@@ -24,7 +26,6 @@ import org.hibernate.annotations.FetchMode;
 
 import de.terrestris.shogun.dao.DatabaseDao;
 import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
-import de.terrestris.shogun.service.UserAdministrationService;
 
 /**
  * Group POJO
@@ -550,6 +551,40 @@ public class Group extends BaseModel{
 		}
 
 		newModules = null;
+	}
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(7, 17). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getName()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * 
+	 * According to 
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Group))
+			return false;
+		Group other = (Group) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getName(), other.getName()).
+				isEquals();
 	}
 
 }
