@@ -330,27 +330,8 @@ public class User extends BaseModel {
 		this.wmsProxyConfig = wmsProxyConfig;
 	}
 
-
 	/**
-	 * Will return the unification of all maplayers of all groups the user
-	 * belongs to.
-	 *
-	 * @return
-	 */
-	@Transient
-	public Set<MapLayer> getMapLayers() {
-		Set<MapLayer> allMapLayers = new HashSet<MapLayer>();
-		Set<Group> groups = this.getGroups();
-		if (groups != null) {
-			for (Group group : groups) {
-				allMapLayers.addAll(group.getMapLayers());
-			}
-		}
-		return allMapLayers;
-	}
-
-	/**
-	 * Will return the unification of all maplayers of all groups the user
+	 * Will return the unification of all modules of all groups the user
 	 * belongs to.
 	 *
 	 * @return
