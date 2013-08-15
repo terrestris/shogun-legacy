@@ -21,6 +21,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.ForeignKey;
 
 import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
+import de.terrestris.shogun.serializer.SimpleUserSerializer;
 
 
 /**
@@ -445,8 +446,8 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 * @return the owner
 	 */
 	@ManyToOne
-	@JsonIgnore
 	@Fetch(FetchMode.SELECT)
+	@JsonSerialize(using=SimpleUserSerializer.class)
 	// foreign key needed here, otherwise hibernate will generate name which is too long ( > 30 chars)
 	@ForeignKey(name="FKOWNERID")
 	public User getOwner() {
