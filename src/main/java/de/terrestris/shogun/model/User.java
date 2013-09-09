@@ -38,6 +38,8 @@ public class User extends BaseModel {
 
 	private String user_name;
 	private String user_longname;
+	private String user_firstname;
+	private String user_lastname;
 	private String user_email;
 	private String user_street;
 	private String user_postcode;
@@ -85,6 +87,33 @@ public class User extends BaseModel {
 		this.user_longname = user_longname;
 	}
 
+	/**
+	 * @return the user_firstname
+	 */
+	public String getUser_firstname() {
+		return user_firstname;
+	}
+
+	/**
+	 * @param user_firstname the user_firstname to set
+	 */
+	public void setUser_firstname(String user_firstname) {
+		this.user_firstname = user_firstname;
+	}
+
+	/**
+	 * @return the user_lastname
+	 */
+	public String getUser_lastname() {
+		return user_lastname;
+	}
+
+	/**
+	 * @param user_lastname the user_lastname to set
+	 */
+	public void setUser_lastname(String user_lastname) {
+		this.user_lastname = user_lastname;
+	}
 
 	/**
 	 * @return the user_email
