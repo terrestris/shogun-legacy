@@ -6,6 +6,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -87,5 +89,16 @@ public class Module extends BaseModel {
 				appendSuper(super.equals(other)).
 				append(getModule_name(), other.getModule_name()).
 				isEquals();
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("module_name", module_name)
+			.append("module_fullname", module_fullname)
+			.toString();
 	}
 }

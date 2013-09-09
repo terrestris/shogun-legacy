@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -493,6 +495,40 @@ public abstract class MapLayer extends BaseModelInheritance {
 				appendSuper(super.equals(other)).
 				append(getName(), other.getName()).
 				isEquals();
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("name", name)
+			.append("mapId", type)
+			.append("isBaseLayer", isBaseLayer)
+			.append("alwaysInRange", alwaysInRange)
+			.append("visibility", visibility)
+			.append("displayInLayerSwitcher", displayInLayerSwitcher)
+			.append("attribution", attribution)
+			.append("gutter", gutter)
+			.append("isBaseLayer", isBaseLayer)
+			.append("projection", projection)
+			.append("units", units)
+			.append("scales", scales)
+			.append("resolutions", resolutions)
+			.append("maxExtent", maxExtent)
+			.append("minExtent", minExtent)
+			.append("maxResolution", maxResolution)
+			.append("minResolution", minResolution)
+			.append("maxScale", maxScale)
+			.append("minScale", minScale)
+			.append("numZoomLevels", numZoomLevels)
+			.append("displayOutsideMaxExtent", displayOutsideMaxExtent)
+			.append("transitionEffect", transitionEffect)
+			.append("metadata", metadata)
+			.append("groups", groups)
+			.append("owner", owner)
+			.toString();
 	}
 }
 

@@ -7,6 +7,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -70,5 +72,15 @@ public class Role extends BaseModel {
 				appendSuper(super.equals(other)).
 				append(getName(), other.getName()).
 				isEquals();
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("name", name)
+			.toString();
 	}
 }

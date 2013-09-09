@@ -6,6 +6,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -156,5 +158,20 @@ public class WmsMapLayer extends MapLayer {
 				append(getUrl(), other.getUrl()).
 				append(getLayers(), other.getLayers()).
 				isEquals();
+	}
+
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("url", url)
+			.append("layers", layers)
+			.append("transparent", transparent)
+			.append("singleTile", singleTile)
+			.append("ratio", ratio)
+			.append("format", format)
+			.toString();
 	}
 } 
