@@ -86,7 +86,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			mailtext += "Ihr SHOGun-Passwort wurde geändert und lautet \n\n";
 			mailtext += newPassword + "\n\n";
 
-			Mail.send("localhost", user.getUser_email(),
+			Mail.send("localhost", 25, user.getUser_email(),
 					"admin", "Passwort-Änderung bei SHOGun", mailtext);
 
 		} catch (Exception e) {
@@ -190,7 +190,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			mailtext += "Ihr Passwort zur Terrestris Suite lautet \n\n";
 			mailtext += pw + "\n\n";
 
-			Mail.send("localhost", user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
+			Mail.send("localhost", 25, user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
 
 			// write in DB
 			// do setSessionGroup only in case of beeing NO SuperAdmin
@@ -693,7 +693,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			try {
 
-				Mail.send("localhost", subadmin.getUser_email(), "admin",
+				Mail.send("localhost", 25, subadmin.getUser_email(), "admin",
 						"Registrierung bei SHOGun", mailtext);
 			} catch (Exception e) {
 				throw new ShogunServiceException(e.getMessage());

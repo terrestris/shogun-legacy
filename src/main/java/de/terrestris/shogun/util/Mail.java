@@ -20,12 +20,13 @@ public class Mail {
 	 * 
 	 * @throws MailSendException
 	 */
-	public static void send(String host, String to, String from, String subject,
+	public static void send(String host, Integer port, String to, String from, String subject,
 			String msgText) throws MailSendException {
 		
 		try {
 			JavaMailSenderImpl sender = new JavaMailSenderImpl();
 			sender.setHost(host);
+			sender.setPort(port);
 
 			SimpleMailMessage msg = new SimpleMailMessage();
 			
