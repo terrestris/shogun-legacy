@@ -6,6 +6,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -220,5 +222,25 @@ public class MapConfig extends BaseModel {
 				append(getMapId(), other.getMapId()).
 				append(getProjection(), other.getProjection()).
 				isEquals();
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("name", name)
+			.append("mapId", mapId)
+			.append("title", title)
+			.append("projection", projection)
+			.append("units", units)
+			.append("maxResolution", maxResolution)
+			.append("maxExtent", maxExtent)
+			.append("center", center)
+			.append("resolutions", resolutions)
+			.append("scales", scales)
+			.append("zoom", zoom)
+			.toString();
 	}
 }

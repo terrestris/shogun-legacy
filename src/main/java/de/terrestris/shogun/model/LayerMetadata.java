@@ -7,6 +7,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 import de.terrestris.shogun.model.BaseModel;
@@ -95,5 +97,16 @@ public class LayerMetadata extends BaseModel {
 				append(getKey(), other.getKey()).
 				append(getValue(), other.getValue()).
 				isEquals();
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("key", key)
+			.append("value", value)
+			.toString();
 	}
 }

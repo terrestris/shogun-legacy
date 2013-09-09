@@ -10,6 +10,8 @@ import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -163,22 +165,14 @@ public class BaseModel implements BaseModelInterface {
 	}
 
 	/**
-	 * Returns a string-representation of an instance of the class.<br><br>
 	 *
-	 * The string representation of this class (or child-classes) consists of
-	 * the simple name of the class, followed by the #-sign, followed by the
-	 * instance id-field, followed by '@', followed by the unsigned hexadecimal
-	 * representation of the hash code of the object.<br><br>
-	 *
-	 * Example output for an instance with id=1 of the class 'User':<br><br>
-	 *
-	 * <code>User#1@3ac6acd3</code><br>
-	 *
-	 * @return String The string-representation of an instance of the class.
 	 */
 	public String toString(){
-		return this.getClass().getSimpleName() +
-			"#" + id +
-			"@" + Integer.toHexString(hashCode());
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.append("id", id)
+			.append("created_at", created_at)
+			.append("updated_at",updated_at)
+			.append("app_user", app_user)
+			.toString();
 	}
 }

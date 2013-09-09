@@ -3,6 +3,9 @@ package de.terrestris.shogun.model;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 /**
  * BaseProxyConfig Super Class
  * 
@@ -44,5 +47,16 @@ public class BaseProxyConfig extends BaseModel {
 	 */
 	public void setValidatorClass(String validatorClass) {
 		this.validatorClass = validatorClass;
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("mandatoryParameters", mandatoryParameters)
+			.append("validatorClass", validatorClass)
+			.toString();
 	}
 }

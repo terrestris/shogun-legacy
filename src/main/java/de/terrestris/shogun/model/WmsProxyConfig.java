@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -156,5 +158,21 @@ public class WmsProxyConfig extends OwsProxyConfig {
 		this.transparent = transparent;
 	}
 	
-	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("layers", layers)
+			.append("srs", srs)
+			.append("styles", styles)
+			.append("bbox", bbox)
+			.append("width", width)
+			.append("height", height)
+			.append("format", format)
+			.append("exceptions", exceptions)
+			.append("transparent", transparent)
+			.toString();
+	}
 }

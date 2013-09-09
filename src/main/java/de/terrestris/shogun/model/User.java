@@ -14,6 +14,8 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -554,5 +556,22 @@ public class User extends BaseModel {
 				appendSuper(super.equals(other)).
 				append(getUser_longname(), other.getUser_longname()).
 				isEquals();
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("user_name", user_name)
+			.append("user_firstname", user_firstname)
+			.append("user_lastname", user_lastname)
+			.append("user_longname", user_longname)
+			.append("user_email", user_email)
+			.append("user_country", user_country)
+			.append("active", active)
+			.append("mapConfig", mapConfig)
+			.toString();
 	}
 }

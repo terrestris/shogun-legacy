@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
@@ -109,5 +111,20 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	 */
 	public void setMaxfeatures(String maxfeatures) {
 		this.maxfeatures = maxfeatures;
+	}
+	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("typename", typename)
+			.append("srs", srs)
+			.append("bbox", bbox)
+			.append("outputformat", outputformat)
+			.append("exceptions", exceptions)
+			.append("maxfeatures", maxfeatures)
+			.toString();
 	}
 }
