@@ -40,13 +40,19 @@ public class User extends BaseModel {
 	private String user_longname;
 	private String user_firstname;
 	private String user_lastname;
+	private String user_title;
 	private String user_email;
 	private String user_street;
 	private String user_postcode;
 	private String user_city;
 	private String user_country;
+	private String user_bureau;
+	private String user_department;
+	private String user_unit;
+	private String user_description;
 	private String user_password;
 	private String user_lang;
+
 	private Boolean active = true;
 
 	private Set<Group> groups;
@@ -113,6 +119,20 @@ public class User extends BaseModel {
 	 */
 	public void setUser_lastname(String user_lastname) {
 		this.user_lastname = user_lastname;
+	}
+
+	/**
+	 * @return the user_title
+	 */
+	public String getUser_title() {
+		return user_title;
+	}
+
+	/**
+	 * @param user_title the user_title to set
+	 */
+	public void setUser_title(String user_title) {
+		this.user_title = user_title;
 	}
 
 	/**
@@ -194,6 +214,62 @@ public class User extends BaseModel {
 		this.user_country = user_country;
 	}
 
+
+	/**
+	 * @return the user_bureau
+	 */
+	public String getUser_bureau() {
+		return user_bureau;
+	}
+
+	/**
+	 * @param user_bureau the user_bureau to set
+	 */
+	public void setUser_bureau(String user_bureau) {
+		this.user_bureau = user_bureau;
+	}
+
+	/**
+	 * @return the user_department
+	 */
+	public String getUser_department() {
+		return user_department;
+	}
+
+	/**
+	 * @param user_department the user_department to set
+	 */
+	public void setUser_department(String user_department) {
+		this.user_department = user_department;
+	}
+
+	/**
+	 * @return the user_unit
+	 */
+	public String getUser_unit() {
+		return user_unit;
+	}
+
+	/**
+	 * @param user_unit the user_unit to set
+	 */
+	public void setUser_unit(String user_unit) {
+		this.user_unit = user_unit;
+	}
+
+	/**
+	 * @return the user_description
+	 */
+	public String getUser_description() {
+		return user_description;
+	}
+
+	/**
+	 * @param user_description the user_description to set
+	 */
+	public void setUser_description(String user_description) {
+		this.user_description = user_description;
+	}
 
 	/**
 	 * @return the user_password
