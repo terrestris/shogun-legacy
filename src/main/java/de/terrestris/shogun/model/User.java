@@ -22,7 +22,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * User POJO
@@ -327,7 +327,7 @@ public class User extends BaseModel {
 	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}
