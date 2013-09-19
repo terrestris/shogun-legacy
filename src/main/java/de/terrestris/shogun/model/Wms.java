@@ -18,7 +18,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * Wms POJO
@@ -112,7 +112,7 @@ public class Wms extends BaseModel {
 	 */
 	@OneToMany(fetch = FetchType.LAZY, targetEntity=WmsLayer.class)
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<WmsLayer> getWmsLayers() {
 		return wmsLayers;
 	}

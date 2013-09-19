@@ -21,7 +21,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.ForeignKey;
 
-import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 import de.terrestris.shogun.serializer.SimpleUserSerializer;
 
 
@@ -431,7 +431,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
 //	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}

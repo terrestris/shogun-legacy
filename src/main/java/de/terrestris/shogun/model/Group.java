@@ -27,7 +27,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import de.terrestris.shogun.dao.DatabaseDao;
-import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * Group POJO
@@ -362,7 +362,7 @@ public class Group extends BaseModel{
 			inverseJoinColumns = { @JoinColumn(name = "USER_FK",
 					nullable = true, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -383,7 +383,7 @@ public class Group extends BaseModel{
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<Module> getModules() {
 		return modules;
 	}
@@ -409,7 +409,7 @@ public class Group extends BaseModel{
 		}
 	)
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}
@@ -439,7 +439,7 @@ public class Group extends BaseModel{
 		}
 	)
 	@Fetch(FetchMode.SUBSELECT)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<Role> getRoles() {
 		return roles;
 	}
