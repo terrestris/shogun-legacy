@@ -18,5 +18,7 @@ public interface BaseModelInterface {
 	
 	public String getApp_user();
 	public void setApp_user(String user);
+	
+	public String info();
 
 }
