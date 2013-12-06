@@ -129,8 +129,8 @@ public class BaseModel implements BaseModelInterface {
 
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -143,8 +143,8 @@ public class BaseModel implements BaseModelInterface {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -174,5 +174,18 @@ public class BaseModel implements BaseModelInterface {
 			.append("updated_at",updated_at)
 			.append("app_user", app_user)
 			.toString();
+	}
+
+	/**
+	 * Returns a short string which contains the most basic info about the
+	 * object instance: the simple class name and the id.
+	 *
+	 * Useful e.g. for logging purposes.
+	 * @return
+	 */
+	public String info(){
+		String identity = this.getClass().getSimpleName() +
+			" (id=" + this.id + ")";
+		return identity;
 	}
 }

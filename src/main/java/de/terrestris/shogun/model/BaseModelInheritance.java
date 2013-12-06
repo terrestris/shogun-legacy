@@ -175,4 +175,17 @@ public class BaseModelInheritance implements BaseModelInterface {
 			.append("app_user", app_user)
 			.toString();
 	}
+	
+	/**
+	 * Returns a short string which contains the most basic info about the
+	 * object instance: the simple class name and the id.
+	 *
+	 * Useful e.g. for logging purposes.
+	 * @return
+	 */
+	public String info(){
+		String identity = this.getClass().getSimpleName() +
+			" (id=" + this.id + ")";
+		return identity;
+	}
 }
