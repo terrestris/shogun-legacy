@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
 import de.terrestris.shogun.dao.DatabaseDao;
+import de.terrestris.shogun.hibernatecriteria.filter.FilterItem;
 
 /**
  * Class for a Hibernate filter condition
