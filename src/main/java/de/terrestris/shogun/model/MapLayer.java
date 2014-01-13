@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -68,8 +69,16 @@ public abstract class MapLayer extends BaseModelInheritance {
 
 	private Set<LayerMetadata> metadata;
 	private Set<Group> groups;
-	
+
+	/**
+	 * The creator of the MapLayer
+	 */
 	private User owner;
+
+	/**
+	 * Set of additional users which also have the same rights as the {@link #owner}
+	 */
+	private Set<User> additionalOwners;
 
 	/**
 	 * @return the name
@@ -462,11 +471,43 @@ public abstract class MapLayer extends BaseModelInheritance {
 	public void setOwner(User owner) {
 		this.owner = owner;
 	}
-	
+
+	/**
+	 * @return the additionalOwners
+	 */
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=User.class)
+	@JoinTable(
+			name = "TBL_MAPLAYER_TBL_ADDOWNERS",
+			joinColumns = {
+				@JoinColumn(
+					name = "MAPLAYER_ID",
+					nullable = false,
+					updatable = false
+				)
+			},
+			inverseJoinColumns = {
+				@JoinColumn(
+					name = "ADD_OWNER_ID",
+					nullable = false,
+					updatable = false
+				)
+			}
+		)
+	public Set<User> getAdditionalOwners() {
+		return additionalOwners;
+	}
+
+	/**
+	 * @param additionalOwners the additionalOwners to set
+	 */
+	public void setAdditionalOwners(Set<User> additionalOwners) {
+		this.additionalOwners = additionalOwners;
+	}
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -480,8 +521,8 @@ public abstract class MapLayer extends BaseModelInheritance {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -496,7 +537,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 				append(getName(), other.getName()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */
