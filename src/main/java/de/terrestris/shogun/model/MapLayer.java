@@ -493,6 +493,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 				)
 			}
 		)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<User> getAdditionalOwners() {
 		return additionalOwners;
 	}
