@@ -39,6 +39,7 @@ import org.hibernate.loader.criteria.CriteriaLoader;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -1472,10 +1473,18 @@ public class DatabaseDao {
 	}
 
 	/**
-	 * Determines the ID of the logged in user from Security Context
+	 * Determines the ID of the logged in user from Security Context.
+	 * 
+	 * TODO this is the only method in the dbDao that is secured through the 
+	 *      @PreAuthorize annotation. It is possibly secured since
+	 *      {@link UserAdministrationController#getLoggedInUserId()} directly
+	 *      calls into the database dao instead of using the appropriate
+	 *      {@link UserAdministrationService}. We might consider adding a
+	 *      dedicated method to that service.
 	 *
 	 * @return the name of the logged in user or NULL if not found
 	 */
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public Integer getUserIdFromSession() {
 
 		String username = this.getUserNameFromSession();
