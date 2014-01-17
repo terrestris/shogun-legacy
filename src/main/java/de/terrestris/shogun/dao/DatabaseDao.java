@@ -1523,6 +1523,39 @@ public class DatabaseDao {
 		return u;
 		
 	}
+	
+	/**
+	 * Checks whether the user identified by given userName belongs to at least
+	 * one group which has the given roleName.
+	 *
+	 * @param userName
+	 * @param roleName
+	 * @return
+	 */
+	public boolean hasUserRoleByUsernameAndRolename(String userName, String roleName) {
+		boolean hasRole = false;
+		
+		Criteria criteria = this.getSessionFactory().getCurrentSession().createCriteria(User.class);
+		criteria.add(Restrictions.eq("user_name", userName)); 
+		criteria.createCriteria("groups", "g");
+		criteria.createCriteria("g.roles", "r");
+		criteria.add(Restrictions.eq("r.name", roleName));
+		criteria.setProjection(Projections.rowCount());
+		
+		long rowCnt = 0;
+		
+		try {
+			rowCnt = ((Number)criteria.uniqueResult()).longValue();
+			hasRole = (rowCnt > 0l);
+		} catch (HibernateException he) {
+			LOGGER.error("Failed to determine whether"
+					+ " user with username '" + userName + "'"
+					+ " has the role with name '" + roleName + "':"
+					+ " " + he.getMessage());
+		}
+		
+		return hasRole;
+	}
 
 	/**
 	 * Returns the IDs of all groups ID of the logged in user
