@@ -12,9 +12,9 @@ import de.terrestris.shogun.model.User;
 /**
  * A serializer that takes the user object of a model
  * and returns an id of the corresponding user.
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 
 public class SimpleUserSerializer extends JsonSerializer<User> {
@@ -24,6 +24,8 @@ public class SimpleUserSerializer extends JsonSerializer<User> {
 			SerializerProvider provider) throws IOException,
 			JsonProcessingException {
 		jgen.writeNumber(value.getId());
+		jgen.writeStringField("ownerName", value.getUser_firstname() + " " +
+				value.getUser_lastname());
 	}
 
 }
