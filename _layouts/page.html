@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>{% if page.title %} {{ page.title }} | {% endif %} {{ site.name }}</title>
+        <link rel="stylesheet" href="{{site.baseurl}}/stylesheets/stylesheet.css" />
+    </head>
+
+    <body>
+        <!-- HEADER -->
+        <div id="header_wrap" class="outer">
+            <header class="inner">
+              <h1 id="project_title">SHOGun</h1>
+              <h2 id="project_tagline">SHOGun - a Java based WebGIS framework </h2>
+  
+            <section>
+                <a href="index.html">Home</a>
+                <a href="blog.html">Blog</a>
+            <section>
+            </header>
+        </div>
+
+        <div id="main_content_wrap" class="outer">
+            <section id="main_content" class="inner">
+                <h2>{{ page.title }}</h2>
+                <div>{{ content }}</div>
+            </section>
+        </div>
+		
+        <!-- FOOTER  -->
+        <div id="footer_wrap" class="outer">
+            <footer class="inner">
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+            </footer>
+        </div>
+
+</body>
+
+</html>
