@@ -476,7 +476,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 * @return the additionalOwners
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=User.class)
-	@Fetch(value = FetchMode.SUBSELECT)
+	@Fetch(value = FetchMode.JOIN)
 	@JoinTable(
 			name = "TBL_MAPLAYER_TBL_ADDOWNERS",
 			joinColumns = {
