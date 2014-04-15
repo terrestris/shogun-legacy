@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Conjunction;
@@ -59,6 +60,12 @@ import de.terrestris.shogun.model.User;
 @Transactional
 @Primary
 public class DatabaseDao {
+	
+	/**
+	 * the logger instance
+	 */
+	private static Logger LOGGER = Logger.getLogger(DatabaseDao.class);
+
 
 	/**
 	 * the Hibernate SessionFactory reference
