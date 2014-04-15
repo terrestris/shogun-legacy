@@ -17,10 +17,12 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import de.terrestris.shogun.dao.DatabaseDao;
+import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
 /**
  * Group POJO
@@ -334,6 +336,7 @@ public class Group extends BaseModel{
 			inverseJoinColumns = { @JoinColumn(name = "USER_FK",
 					nullable = true, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -354,6 +357,7 @@ public class Group extends BaseModel{
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
 					nullable = false, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<Module> getModules() {
 		return modules;
 	}
@@ -374,6 +378,7 @@ public class Group extends BaseModel{
 			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
 					nullable = false, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}

@@ -11,8 +11,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+
+import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
 
 /**
@@ -384,6 +387,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	@OneToMany(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<LayerMetadata> getMetadata() {
 		return metadata;
 	}
@@ -401,6 +405,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -418,6 +423,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}

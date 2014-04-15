@@ -231,8 +231,8 @@ public class User extends BaseModel {
 	 */
 	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	@JsonIgnore
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}
@@ -385,7 +385,7 @@ public class User extends BaseModel {
 	 * @return the roles
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
-	@JsonSerialize(using=LeanBaseModelSerializer.class)
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	@Fetch(FetchMode.SUBSELECT)
 	public Set<Role> getRoles() {
 		return roles;
