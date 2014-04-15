@@ -108,7 +108,7 @@ public class Wms extends BaseModel {
 	/**
 	 * @return the wmsLayers
 	 */
-	@OneToMany(fetch = FetchType.EAGER, targetEntity=WmsLayer.class)
+	@OneToMany(fetch = FetchType.LAZY, targetEntity=WmsLayer.class)
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<WmsLayer> getWmsLayers() {

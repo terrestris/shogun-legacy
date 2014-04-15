@@ -402,7 +402,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the users
 	 */
-	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
+	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSerializer.class)
@@ -420,7 +420,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the groups
 	 */
-	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
+	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSerializer.class)

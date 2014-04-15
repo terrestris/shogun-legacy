@@ -330,7 +330,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the users
 	 */
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "TBL_GROUP_TBL_USER", joinColumns = {
 			@JoinColumn(name = "GROUP_FK", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "USER_FK",
@@ -351,7 +351,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the modules
 	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
+	@ManyToMany(fetch = FetchType.LAZY, targetEntity=Module.class)
 	@JoinTable(name = "TBL_GROUP_TBL_MODULE",  joinColumns = {
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
@@ -372,7 +372,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the mapLayers
 	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=MapLayer.class)
+	@ManyToMany(fetch = FetchType.LAZY, targetEntity=MapLayer.class)
 	@JoinTable(name = "TBL_GROUP_TBL_MAPLAYER",  joinColumns = {
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
