@@ -82,7 +82,16 @@ public class DatabaseDao {
 	 */
 	private SessionFactory sessionFactory;
 
-
+	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject,
+			HibernateFilter hibernateFilter,
+			Set<String> fields,
+			HibernatePagingObject hibernatePagingObject,
+			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
+		return getDataByFilter(hibernateSortObject, hibernateFilter, fields,
+				hibernatePagingObject, hibernateAdditionalFilter,true);
+	}
+	
+	
 	/**
 	 * Retrieves entities of the database by a given filter, sort-object
 	 * and paging-object
@@ -98,12 +107,27 @@ public class DatabaseDao {
 	@SuppressWarnings("unchecked")
 	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject,
 			HibernateFilter hibernateFilter,
+			Set<String> fields,
 			HibernatePagingObject hibernatePagingObject,
-			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
+			HibernateFilter hibernateAdditionalFilter,
+			boolean deepInitialize) throws ShogunDatabaseAccessException {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
 				hibernateSortObject.getMainClass());
 
+		// Fields
+		if (fields != null) {
+			ProjectionList pl = Projections.projectionList();
+			
+			for (Iterator<String> iterator = fields.iterator(); iterator.hasNext();) {
+				String field = iterator.next();
+//				System.out.println("  -> " + field);
+				pl.add(Projections.property( field));
+			}
+			criteria.setProjection(Projections.distinct(pl));
+
+		}
+		
 		// PAGING
 		if (hibernatePagingObject != null) {
 			criteria.setFirstResult(hibernatePagingObject.getStart());
@@ -176,10 +200,28 @@ public class DatabaseDao {
 					Conjunction conjunction = Restrictions.conjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							conjunction.add(criterion);
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+							
+							criteria.createCriteria(ownFieldName, ownFieldName);
+							
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								conjunction.add(criterion);
+							}
+							
 						}
+						else {
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								conjunction.add(criterion);
+							}
+						}
+					
+						
+						
 					}
 					criteria.add(conjunction);
 
@@ -188,34 +230,87 @@ public class DatabaseDao {
 							"Error while adding an AND connected filter", e);
 				}
 			}
-
 		}
+		
+		// Ok we're done creating the criteria.
+		
+		// next we need to know whether we are being filtered with fields
+		// because we then do NOT get a List of instances of BaseModelInterface.
+		
+		List<Object> list = null;
+		
+		if (fields != null) {
+			// We are filtered and will have to create a sane hashmap instead of
+			// relying on the serilisation of BaseModelInterface classes.
+			
+			// Please beware that we can NOT setResultTransformer here,
+			// otherwise we'll loose all but the first filtered field.
+			
+//			System.out.println("SQL: " + this.toSql(criteria));
+			
+			List<Object[]> rawListOfResults = criteria.list();
+			
+			List<Object> saneResultList = new ArrayList<Object>();
+			for (Object[] rawRow : rawListOfResults) {
+				HashMap<String, Object> newRowMap = new HashMap<String, Object>();
+				int fieldIdx = 0;
+				for (Iterator<String> fieldIter = fields.iterator(); fieldIter.hasNext();) {
+					String fieldName = fieldIter.next();
+					
+					Object fieldVal = null;
+					
+					if (rawRow != null) {
+						fieldVal = rawRow[fieldIdx];
+					}
 
-		// this ensures that no cartesian product is returned when
-		// having sub objects, e.g. User <-> Modules
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+					// store the pair in the newRowMap. 
+					newRowMap.put(fieldName, fieldVal);
 
-		return criteria.list();
+					fieldIdx++;
+				}
+				// OK, one result row has been trasformed, store it back
+				saneResultList.add(newRowMap);
+			}
+			
+			// now overwrite the list we'll rerturn to the caller.
+			list = saneResultList;
+		} else {
+			// We are NOT filtered, we can rely on the serialization process
+			// that takes instances of ou models and transforms them
+			// to (possibly huge) JSON structures.
+			
+			// Please beware that we can only setResultTransformer here,
+			// otherwise we'd loose all but the first filtered field.
+			
+			// this ensures that no cartesian product is returned when
+			// having sub objects, e.g. User <-> Modules
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			
+			list = criteria.list();
+		}
+		
+		// Since we have modelled entities with sub entities with the lazy
+		// fetching strategy, we have to check whether we should 
+		// initialize the needed fields.
+		//
+		// This will only happen
+		//   * if we got a raw result,
+		//   * and we weren't being filtered for only a subset of fields
+		//   * and if we have been explicitly been told to go deep.
+		if (list != null && deepInitialize == true && fields == null) {
+			this.initializeDeep(list, hibernateSortObject.getMainClass());
+		}
+		
+		return list;
 	}
 
-
 	/**
-	 * Method returns distinct field values of a defined entity type. <br>
-	 * For example: retrieving all streets of the user table without
-	 * duplicated values
-	 * <br>
-	 * <br>
-	 * You can decide whether the returned field values should be
-	 * filtered by the current group logged in in the session or
-	 * if all values are returned
-	 *
-	 * @param clazz The model which should be filtered as Class object
-	 * @param field The field which should be returned
-	 * @param groupDependent flag to decide whether it is filtered by the
-	 * 						 current group
-	 *
-	 * @return List of String representations of the values of the desired field
-	 *
+	 * TODO move to a better place or use existing functionality elsewhere.
+	 * TODO we have a very similar method in {@link HibernateFilterItem}.
+	 * 
+	 * @param fields
+	 * @param type
+	 * @return
 	 */
 	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
 		for (Field field: type.getDeclaredFields()) {
@@ -299,6 +394,41 @@ public class DatabaseDao {
 
 
 	/**
+	 * Method returns distinct field values of a defined entity type. <br>
+	 * For example: retrieving all streets of the user table without
+	 * duplicated values
+	 * <br>
+	 * <br>
+	 * You can decide whether the returned field values should be
+	 * filtered by the current group logged in in the session or
+	 * if all values are returned
+	 *
+	 * @param clazz The model which should be filtered as Class object
+	 * @param field The field which should be returned
+	 * @param groupDependent flag to decide whether it is filtered by the
+	 * 						 current group
+	 *
+	 * @return List of String representations of the values of the desired field
+	 *
+	 */
+	public List<String> getDistinctEntitiesByField(Class<?> clazz, String field,
+			boolean groupDependent) {
+
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
+				clazz);
+
+		criteria.setProjection(Projections.distinct(Projections.projectionList()
+				.add(Projections.property(field), field)));
+
+		// this ensures that no cartesian product is returned when
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return criteria.list();
+	}
+
+
+	/**
 	 * Returns an list of all Objects of a given Entity class,
 	 * which is specified by the parameter clazz<br>
 	 * For example: Get a all Modules which are stored in tbl_module <br>
@@ -342,6 +472,16 @@ public class DatabaseDao {
 		return records;
 	}
 
+	/**
+	 * 
+	 * @param id
+	 * @param clazz
+	 * @return
+	 */
+	public Object getEntityById(int id, Class<?> clazz) {
+		return this.getEntityById(id, clazz, true);
+	}
+	
 
 	/**
 	 * Returns an object of a certain entity defined by its ID.
@@ -350,7 +490,7 @@ public class DatabaseDao {
 	 * @param clazz The entity to be queried
 	 * @return the object matching the passed entity and the passed ID
 	 */
-	public Object getEntityById(int id, Class<?> clazz) {
+	public Object getEntityById(int id, Class<?> clazz, boolean initializeDeep) {
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -358,6 +498,10 @@ public class DatabaseDao {
 		// we expect a single record or null
 		Object result = criteria.uniqueResult();
 
+		if (initializeDeep) {
+			this.initializeDeep(result, clazz);
+		}
+		
 		return result;
 	}
 
@@ -1067,7 +1211,7 @@ public class DatabaseDao {
 			criteria.add(afConjunction);
 		}
 
-		criteria.setProjection(Projections.count("id"));
+		criteria.setProjection(Projections.rowCount());
 
 		if (hibernateFilter != null) {
 
@@ -1081,10 +1225,28 @@ public class DatabaseDao {
 				try {
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							dis.add(criterion);
+						
+						
+						
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+							
+							criteria.createCriteria(ownFieldName, ownFieldName);
+							
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+							
 						}
+						else {
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+						}
+						
 					}
 					criteria.add(dis);
 
@@ -1098,9 +1260,27 @@ public class DatabaseDao {
 				try {
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							criteria.add(criterion);
+						
+						
+						
+						
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+							
+							criteria.createCriteria(ownFieldName, ownFieldName);
+							
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								criteria.add(criterion);
+							}
+							
+						} else {
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							
+							if (criterion != null) {
+								criteria.add(criterion);
+							}
 						}
 					}
 
@@ -1178,14 +1358,10 @@ public class DatabaseDao {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 
-		criteria.add(Restrictions.ilike("user_name", authResult.getName()));
+		criteria.add(Restrictions.eq("user_name", authResult.getName()));
 
-		if (criteria.list().size() > 0) {
-			return (User)criteria.list().get(0);
-		}
-		else {
-			return null;
-		}
+		return (User) criteria.uniqueResult();
+		
 	}
 
 	/**
