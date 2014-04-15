@@ -73,7 +73,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @return List<Object>
 	 * @throws ShogunServiceException
 	 */
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	// @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	@Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
 	public Map<String, Object> getEntities(Request request) throws ShogunServiceException {
 
@@ -81,6 +81,7 @@ public class ShogunService extends AbstractShogunService {
 		HibernateFilter hibernateFilter = null;
 		HibernateFilter hibernateAdditionalFilter = null;
 		HibernatePagingObject hibernatePaging = null;
+		Set<String> fields = null;
 
 		try {
 
@@ -101,6 +102,9 @@ public class ShogunService extends AbstractShogunService {
 
 			hibernateSortObject = HibernateSortObject.create(clazz, sortObject);
 			hibernateFilter = HibernateFilter.create(clazz, filter);
+			
+			fields = request.getFields();
+			
 			// needed to be able to have another global conjunction
 			// temporary solution
 			hibernateAdditionalFilter = HibernateFilter.create(clazz, additionalFilter);
@@ -113,7 +117,9 @@ public class ShogunService extends AbstractShogunService {
 			List<Object> dataList = null;
 			dataList = this.getDatabaseDao().getDataByFilter(
 				hibernateSortObject,
-				hibernateFilter, hibernatePaging,
+				hibernateFilter,
+				fields,
+				hibernatePaging,
 				hibernateAdditionalFilter
 			);
 
