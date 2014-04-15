@@ -37,16 +37,23 @@
 		<property name="units" value="m" />
 		<property name="zoom" value="6" />
 	</bean>
-	
-	<!-- A bean to be used by the initialize database bean that represents the 
-		standard user group object, that e.g. the anonymous user will get. -->
-	<bean id="stdGroup" class="de.terrestris.shogun.model.Group">
+
+	<!-- A bean to be used by the initialize database bean that represents the
+		standard Group object, that e.g. the anonymous user will get. -->
+	<bean id="stdAnonymousGroup" class="de.terrestris.shogun.model.Group">
 		<property name="group_nr" value="default-group" />
 		<property name="name" value="default-group" />
 		<property name="company" value="SHOGun" />
 	</bean>
 
-	
+	<!-- A bean to be used by the initialize database bean that represents the
+		admin Group object, that e.g. the admin user will get. -->
+	<bean id="stdSuperAdminGroup" class="de.terrestris.shogun.model.Group">
+		<property name="group_nr" value="default-admin-group" />
+		<property name="name" value="default-admin-group" />
+		<property name="company" value="SHOGun" />
+	</bean>
+
 	<!-- This bean initializes needed database objects 
 		 like users, roles etc, refers the above 
 		 created beans 
@@ -63,18 +70,6 @@
 			 Defaults to true -->
 		<property name="autoCreateAnonymousUser">
 			<value type="java.lang.Boolean">true</value>
-		</property>
-		
-		<!-- The list of roles available for assignment. Missing ones will be 
-			 added. We currently will not delete roles that might already
-			 exist in the database. -->
-		<property name="availableRoles">
-			<list value-type="java.lang.String">
-				<value>ROLE_SUPERADMIN</value>
-				<value>ROLE_ADMIN</value>
-				<value>ROLE_USER</value>
-				<value>ROLE_ANONYMOUS</value>
-			</list>
 		</property>
 		
 		<!-- The list of modules available for assignment. Missing ones will be 
@@ -142,20 +137,24 @@
 				<value>OverviewMapPanel</value>
 			</list>
 		</property>
-		
-		<!-- the relevant properties referencing 
-			 other the standard beans -->
-		<property name="mapConfig">
-			<ref local="stdMapConfig"/>
+
+		<property name="mapConfigs">
+			<list>
+				<ref local="stdMapConfig" />
+			</list>
 		</property>
 		
 		<property name="wmsMapLayer">
 			<ref local="stdWmsMapLayer"/>
 		</property>
 		
-		<property name="defaultGroup">
-			<ref local="stdGroup"/>
-		</property>
+		<property name="defaultAnonymousGroup">
+            <ref local="stdAnonymousGroup"/>
+        </property>
+
+        <property name="defaultSuperAdminGroup">
+            <ref local="stdSuperAdminGroup"/>
+        </property>
 		
 	</bean>
 	
