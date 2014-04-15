@@ -58,8 +58,36 @@
 		<authentication-provider>
 			 <password-encoder hash="md5"/>
 			 <jdbc-user-service data-source-ref="dataSource"
-				users-by-username-query="select user_name as username, user_password as password, 1 from tbl_user where user_name = ?"
-				authorities-by-username-query="SELECT tbl_user.user_name as username, tbl_role.name as authorities FROM tbl_user, tbl_role, tbl_user_tbl_role WHERE tbl_user_tbl_role.tbl_user_id = tbl_user.id AND tbl_user_tbl_role.roles_id = tbl_role.id AND tbl_user.user_name = ?"
+				users-by-username-query="
+					SELECT
+						user_name AS username,
+						user_password AS password,
+						1
+					FROM
+						tbl_user
+					WHERE
+						user_name = ?
+				"
+				authorities-by-username-query="
+					SELECT DISTINCT
+						tbl_user.user_name AS username, tbl_role.name AS authorities
+					FROM
+						tbl_user,
+						tbl_group_tbl_user,
+						tbl_group,
+						tbl_group_tbl_role,
+						tbl_role
+					WHERE
+						tbl_group_tbl_user.group_fk = tbl_group.id
+					AND
+						tbl_group_tbl_user.user_fk = tbl_user.id
+					AND
+						tbl_group_tbl_role.group_id = tbl_group.id
+					AND
+						tbl_group_tbl_role.role_id = tbl_role.id
+					AND
+						tbl_user.user_name = ?
+					"
 			 />
 		</authentication-provider>
 
