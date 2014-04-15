@@ -18,8 +18,11 @@ import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import de.terrestris.shogun.dao.DatabaseDao;
+import de.terrestris.shogun.serializer.LeanBaseModelSerializer;
 
 /**
  * User POJO
@@ -226,6 +229,7 @@ public class User extends BaseModel {
 	 */
 	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	@JsonIgnore
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}
@@ -272,6 +276,7 @@ public class User extends BaseModel {
 			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
 					nullable = false, updatable = false) })
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}
@@ -379,6 +384,7 @@ public class User extends BaseModel {
 	 * @return the roles
 	 */
 	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
+	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<Role> getRoles() {
 		return roles;
 	}
