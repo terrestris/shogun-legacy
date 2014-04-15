@@ -14,8 +14,6 @@ import de.terrestris.shogun.model.WmsMapLayer;
  * @author terrestris GmbH & Co. KG
  * @author Marc Jansen
  * @author Christian Mayer
- * 
- * @version $Id$
  *
  */
 @JsonAutoDetect

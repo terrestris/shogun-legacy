@@ -73,7 +73,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @return List<Object>
 	 * @throws ShogunServiceException
 	 */
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	@Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
 	public Map<String, Object> getEntities(Request request) throws ShogunServiceException {
 
@@ -81,6 +81,8 @@ public class ShogunService extends AbstractShogunService {
 		HibernateFilter hibernateFilter = null;
 		HibernateFilter hibernateAdditionalFilter = null;
 		HibernatePagingObject hibernatePaging = null;
+		Set<String> fields = null;
+		Set<String> ignoreFields = null;
 
 		try {
 
@@ -101,6 +103,10 @@ public class ShogunService extends AbstractShogunService {
 
 			hibernateSortObject = HibernateSortObject.create(clazz, sortObject);
 			hibernateFilter = HibernateFilter.create(clazz, filter);
+			
+			fields = request.getFields();
+			ignoreFields = request.getIgnoreFields();
+			
 			// needed to be able to have another global conjunction
 			// temporary solution
 			hibernateAdditionalFilter = HibernateFilter.create(clazz, additionalFilter);
@@ -113,7 +119,10 @@ public class ShogunService extends AbstractShogunService {
 			List<Object> dataList = null;
 			dataList = this.getDatabaseDao().getDataByFilter(
 				hibernateSortObject,
-				hibernateFilter, hibernatePaging,
+				hibernateFilter,
+				fields,
+				ignoreFields,
+				hibernatePaging,
 				hibernateAdditionalFilter
 			);
 
@@ -170,11 +179,11 @@ public class ShogunService extends AbstractShogunService {
 
 			BaseModelInheritance wmsMapLayerInstanceToAdd = (BaseModelInheritance)this.getDatabaseDao().getEntityById(leftEntityId, leftClazz);
 
-			List<Object> allUsers = this.getDatabaseDao().getAllEntities(rightClazz);
+//			List<Object> allUsers = this.getDatabaseDao().getAllEntities(rightClazz);
 
 			List<? extends Object> allnewAssocedUsers = this.getDatabaseDao().getEntitiesByIds(assocications.toArray(), rightClazz);
 
-			for (Iterator iterator = allnewAssocedUsers.iterator(); iterator.hasNext();) {
+			for (Iterator<?> iterator = allnewAssocedUsers.iterator(); iterator.hasNext();) {
 
 
 				BaseModel currentAssocedUser = (BaseModel) iterator.next();
@@ -200,7 +209,7 @@ public class ShogunService extends AbstractShogunService {
 
 			List<? extends Object> allNotAssocedUsers = this.getDatabaseDao().getEntitiesByExcludingIds(assocications.toArray(), rightClazz);
 
-			for (Iterator iterator = allNotAssocedUsers.iterator(); iterator.hasNext();) {
+			for (Iterator<?> iterator = allNotAssocedUsers.iterator(); iterator.hasNext();) {
 
 				BaseModel currentNotAssocedUser = (BaseModel) iterator.next();
 
@@ -259,8 +268,8 @@ public class ShogunService extends AbstractShogunService {
 					String dspNameProp = propertyDescriptor.getDisplayName();
 					Method writeMethod = propertyDescriptor.getWriteMethod();
 
-					Class classCandidate = ((ManyToMany)annotation).targetEntity();
-					String sClassCandidate = classCandidate.getSimpleName();
+					Class<?> classCandidate = ((ManyToMany)annotation).targetEntity();
+//					String sClassCandidate = classCandidate.getSimpleName();
 
 					if (classCandidate.isAssignableFrom(targetClass)) {
 
@@ -392,7 +401,7 @@ public class ShogunService extends AbstractShogunService {
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 	public List<Object> getDistictFieldValues(String entity, String field) throws ShogunServiceException {
 
-		Class entityClass = null;
+		Class<?> entityClass = null;
 		try {
 			entityClass = Class.forName(entity);
 		} catch (ClassNotFoundException cnfEx) {
@@ -566,8 +575,8 @@ public class ShogunService extends AbstractShogunService {
 	 * @param objectType
 	 * @return
 	 */
-	private Class getHibernateModelByObjectType(String objectType) {
-		Class mappedClazz = null;
+	private Class<?> getHibernateModelByObjectType(String objectType) {
+		Class<?> mappedClazz = null;
 		for (String dbEntityPackage : this.dbEntitiesPackages) {
 			try {
 				mappedClazz = Class.forName(dbEntityPackage + "." + objectType);

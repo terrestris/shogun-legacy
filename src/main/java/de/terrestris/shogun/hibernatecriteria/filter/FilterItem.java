@@ -37,7 +37,6 @@ public class FilterItem implements Serializable {
 	 * 
 	 */
 	public enum Operator {
-		
 		Equals,
 		Smaller, 
 		Greater, 
@@ -47,9 +46,10 @@ public class FilterItem implements Serializable {
 		ILike, 
 		Between, 
 		Any, 
-		NotNull, 
+		NotNull,
 		Statement,
-		In, 
+		In,
+		NotIn,
 		NotEquals, 
 		NotLike, 
 		IsNull,

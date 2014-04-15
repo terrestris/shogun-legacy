@@ -7,12 +7,23 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.ForeignKey;
+
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
+import de.terrestris.shogun.serializer.SimpleUserSerializer;
 
 
 /**
@@ -57,9 +68,17 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private String transitionEffect = null;
 
 	private Set<LayerMetadata> metadata;
-	private Set<User> users;
 	private Set<Group> groups;
 
+	/**
+	 * The creator of the MapLayer
+	 */
+	private User owner;
+
+	/**
+	 * Set of additional users which also have the same rights as the {@link #owner}
+	 */
+	private Set<User> additionalOwners;
 
 	/**
 	 * @return the name
@@ -383,7 +402,9 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 * @return the metadata
 	 */
 	@OneToMany(fetch = FetchType.EAGER)
-	@Fetch(FetchMode.SELECT)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
 	public Set<LayerMetadata> getMetadata() {
 		return metadata;
 	}
@@ -395,29 +416,31 @@ public abstract class MapLayer extends BaseModelInheritance {
 		this.metadata = metadata;
 	}
 
-	/**
-	 * @return the users
-	 */
-	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
-	@JsonIgnore
-	@Fetch(FetchMode.SELECT)
-	public Set<User> getUsers() {
-		return users;
-	}
-
-	/**
-	 * @param users the users to set
-	 */
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
+//	/**
+//	 * @return the users
+//	 */
+//	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
+//	@JsonIgnore
+//	@Fetch(FetchMode.SUBSELECT)
+//	@JsonSerialize(using=LeanBaseModelSerializer.class)
+//	public Set<User> getUsers() {
+//		return users;
+//	}
+//
+//	/**
+//	 * @param users the users to set
+//	 */
+//	public void setUsers(Set<User> users) {
+//		this.users = users;
+//	}
 
 	/**
 	 * @return the groups
 	 */
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
-	@JsonIgnore
-	@Fetch(FetchMode.SELECT)
+//	@JsonIgnore
+	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}
@@ -429,5 +452,126 @@ public abstract class MapLayer extends BaseModelInheritance {
 		this.groups = groups;
 	}
 
+	/**
+	 * @return the owner
+	 */
+	@ManyToOne
+	@Fetch(FetchMode.SELECT)
+	@JsonSerialize(using=SimpleUserSerializer.class)
+	// foreign key needed here, otherwise hibernate will generate name which is too long ( > 30 chars)
+	@ForeignKey(name="FKOWNERID")
+	public User getOwner() {
+		return owner;
+	}
+
+	/**
+	 * @param owner
+	 *            the owner to set
+	 */
+	public void setOwner(User owner) {
+		this.owner = owner;
+	}
+
+	/**
+	 * @return the additionalOwners
+	 */
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=User.class)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinTable(
+			name = "TBL_MAPLAYER_TBL_ADDOWNERS",
+			joinColumns = {
+				@JoinColumn(
+					name = "MAPLAYER_ID",
+					nullable = false,
+					updatable = false
+				)
+			},
+			inverseJoinColumns = {
+				@JoinColumn(
+					name = "ADD_OWNER_ID",
+					nullable = false,
+					updatable = false
+				)
+			}
+		)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	public Set<User> getAdditionalOwners() {
+		return additionalOwners;
+	}
+
+	/**
+	 * @param additionalOwners the additionalOwners to set
+	 */
+	public void setAdditionalOwners(Set<User> additionalOwners) {
+		this.additionalOwners = additionalOwners;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 *
+	 * According to
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(13, 23). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getName()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 *
+	 * According to
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MapLayer))
+			return false;
+		MapLayer other = (MapLayer) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getName(), other.getName()).
+				isEquals();
+	}
+
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("name", name)
+			.append("mapId", type)
+			.append("isBaseLayer", isBaseLayer)
+			.append("alwaysInRange", alwaysInRange)
+			.append("visibility", visibility)
+			.append("displayInLayerSwitcher", displayInLayerSwitcher)
+			.append("attribution", attribution)
+			.append("gutter", gutter)
+			.append("isBaseLayer", isBaseLayer)
+			.append("projection", projection)
+			.append("units", units)
+			.append("scales", scales)
+			.append("resolutions", resolutions)
+			.append("maxExtent", maxExtent)
+			.append("minExtent", minExtent)
+			.append("maxResolution", maxResolution)
+			.append("minResolution", minResolution)
+			.append("maxScale", maxScale)
+			.append("minScale", minScale)
+			.append("numZoomLevels", numZoomLevels)
+			.append("displayOutsideMaxExtent", displayOutsideMaxExtent)
+			.append("transitionEffect", transitionEffect)
+			.append("metadata", metadata)
+			.append("groups", groups)
+			.append("owner", owner)
+			.toString();
+	}
 }
 

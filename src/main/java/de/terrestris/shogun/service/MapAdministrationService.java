@@ -3,8 +3,6 @@
  */
 package de.terrestris.shogun.service;
 
-import java.util.Set;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,15 +65,13 @@ public class MapAdministrationService extends AbstractShogunService {
 	@Transactional
 	public WmsMapLayer createWmsMapLayer(WmsMapLayer wmsMapLayer) {
 		
-		// create the instance itself
-		WmsMapLayer newWmsMapLayer = (WmsMapLayer)this.getDatabaseDao().createEntity(WmsMapLayer.class.getSimpleName(), wmsMapLayer);
-		
+		// always set the owner to the currently logged in user.
 		// add the newly created wmsmaplayer to he current logged in user
 		User user = this.getDatabaseDao().getUserObjectFromSession();
-		Set<MapLayer> currentMapLayersSet = user.getMapLayers();
-		currentMapLayersSet.add(newWmsMapLayer);
+		wmsMapLayer.setOwner(user);
 		
-		this.getDatabaseDao().updateUser(user);
+		// create the instance itself
+		WmsMapLayer newWmsMapLayer = (WmsMapLayer)this.getDatabaseDao().createEntity(WmsMapLayer.class.getSimpleName(), wmsMapLayer);
 		
 		return newWmsMapLayer;
 	}

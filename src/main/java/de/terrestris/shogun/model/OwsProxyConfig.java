@@ -3,6 +3,9 @@ package de.terrestris.shogun.model;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 /**
  * OwsProxyConfig Super Class
  * 
@@ -61,4 +64,15 @@ public class OwsProxyConfig extends BaseProxyConfig {
 		this.service = service;
 	}
 	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("version", version)
+			.append("request", request)
+			.append("service", service)
+			.toString();
+	}
 }

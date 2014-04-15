@@ -1,6 +1,5 @@
 package de.terrestris.shogun.hibernatecriteria.sort;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -16,7 +15,7 @@ public class HibernateSortObject {
 	/**
 	 * 
 	 */
-	private Class<? extends Serializable> mainClass = null;
+	private Class<?> mainClass = null;
 
 	/**
 	 * 
@@ -27,7 +26,7 @@ public class HibernateSortObject {
 	 * 
 	 * @param mainClass
 	 */
-	public HibernateSortObject(Class<? extends Serializable> mainClass) {
+	public HibernateSortObject(Class<?> mainClass) {
 		super();
 		this.mainClass = mainClass;
 	}
@@ -48,7 +47,7 @@ public class HibernateSortObject {
 	 * @param plainSortObject
 	 * @return
 	 */
-	public static HibernateSortObject create(Class<? extends Serializable> clazz,
+	public static HibernateSortObject create(Class<?> clazz,
 			de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
 
 		HibernateSortObject hibernateSortObject = null;
@@ -76,14 +75,14 @@ public class HibernateSortObject {
 	 * Only one sortItem is used here, which is defined only by the field and direction.
 	 * 
 	 * For more elaborated use-cases please consider using the method 
-	 * HibernateSortObject create(Class<? extends Serializable> clazz, de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
+	 * HibernateSortObject create(Class clazz, de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
 	 * 
 	 * @param clazz
 	 * @param field
 	 * @param dir
 	 * @return
 	 */
-	public static HibernateSortObject create(Class<? extends Serializable> clazz, String field, String dir) {
+	public static HibernateSortObject create(Class<?> clazz, String field, String dir) {
 		
 		SortItem sortItem = new SortItem();
 		sortItem.setDir(dir);
@@ -95,7 +94,7 @@ public class HibernateSortObject {
 		Sort plainSortObject = new Sort();
 		plainSortObject.setSortItems(sortItems);
 		
-		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<? extends Serializable>) clazz, plainSortObject);
+		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<?>) clazz, plainSortObject);
 		
 		return hibernateSortObject;
 	}
@@ -106,15 +105,15 @@ public class HibernateSortObject {
 	 * Sort direction is set to ASC.
 	 * 
 	 * For more elaborated use-cases please consider using the method 
-	 * HibernateSortObject create(Class<? extends Serializable> clazz, de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
+	 * HibernateSortObject create(Class clazz, de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
 	 * 
 	 * @param clazz
 	 * @param field
 	 * @return
 	 */
-	public static HibernateSortObject create(Class<? extends Serializable> clazz, String field) {
+	public static HibernateSortObject create(Class<?> clazz, String field) {
 		
-		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<? extends Serializable>) clazz, field, "ASC");
+		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<?>) clazz, field, "ASC");
 		
 		return hibernateSortObject;
 	}
@@ -122,14 +121,14 @@ public class HibernateSortObject {
 	/**
 	 * @return the mainClass
 	 */
-	public Class<? extends Serializable> getMainClass() {
+	public Class<?> getMainClass() {
 		return mainClass;
 	}
 
 	/**
 	 * @param mainClass the mainClass to set
 	 */
-	public void setMainClass(Class<? extends Serializable> mainClass) {
+	public void setMainClass(Class<?> mainClass) {
 		this.mainClass = mainClass;
 	}
 

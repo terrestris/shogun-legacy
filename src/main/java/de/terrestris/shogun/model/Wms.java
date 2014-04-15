@@ -11,7 +11,14 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * Wms POJO
@@ -103,7 +110,9 @@ public class Wms extends BaseModel {
 	/**
 	 * @return the wmsLayers
 	 */
-	@OneToMany(fetch = FetchType.EAGER, targetEntity=WmsLayer.class)
+	@OneToMany(fetch = FetchType.LAZY, targetEntity=WmsLayer.class)
+	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<WmsLayer> getWmsLayers() {
 		return wmsLayers;
 	}
@@ -115,4 +124,14 @@ public class Wms extends BaseModel {
 		this.wmsLayers = wmsLayers;
 	}
 	
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("supportedVersion", supportedVersion)
+			.append("baseUrl", baseUrl)
+			.toString();
+	}
 }
