@@ -383,7 +383,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 * @return the metadata
 	 */
 	@OneToMany(fetch = FetchType.EAGER)
-	@Fetch(FetchMode.SELECT)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<LayerMetadata> getMetadata() {
 		return metadata;
 	}
@@ -400,7 +400,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
 	@JsonIgnore
-	@Fetch(FetchMode.SELECT)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -417,7 +417,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 */
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
 	@JsonIgnore
-	@Fetch(FetchMode.SELECT)
+	@Fetch(FetchMode.SUBSELECT)
 	public Set<Group> getGroups() {
 		return groups;
 	}
