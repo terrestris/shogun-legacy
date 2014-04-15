@@ -9,28 +9,28 @@
 
 	<!-- HTTP configuration for login/logout -->
 	<http auto-config='false' entry-point-ref="authenticationEntryPoint">
-	
+
 		<!-- interceptors for special URLs -->
 		<intercept-url pattern="/index*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<intercept-url pattern="/config/getAppContext.action" access="ROLE_ANONYMOUS, ROLE_USER, ROLE_ADMIN"/>
-		
+
 		<!-- default interception -->
 		<intercept-url pattern="/*" access="ROLE_USER, ROLE_ADMIN" />
-		
+
 		<custom-filter position="FORM_LOGIN_FILTER" ref="authenticationFilter" />
-		
+
 		<!-- Logout configuration -->
 		<logout invalidate-session="true" logout-success-url="/index.html"
 			logout-url="/j_spring_security_logout" />
-			
+
 		<remember-me key="xaab.springmvclogin" />
-		
+
 		<!-- TODO read for more specific configuration -->
 		<session-management session-fixation-protection="newSession">
 			<concurrency-control max-sessions="1"
 				error-if-maximum-exceeded="false" />
 		</session-management>
-		
+
 	</http>
 
 	<!-- Filter for User/Password authentication, let us intercept
@@ -40,21 +40,21 @@
 	</beans:bean>
 
 	<!-- the entry point for authentication, via URL -->
-	<beans:bean id="authenticationEntryPoint" 
+	<beans:bean id="authenticationEntryPoint"
 		class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
 		<beans:property name="loginFormUrl" value="/index.html" />
 	</beans:bean>
-	
-	<!-- This is an entry point for a custom Authentication Manager, 
+
+	<!-- This is an entry point for a custom Authentication Manager,
 		 use this when taking care yourself about the authentication
 	<beans:bean id="customAuthProvider" class="de.terrestris.shogun.security.CustomAuthenticationProvider">
 	</beans:bean>
 	 -->
-	 
-	<!-- The Authentication Manager, manages a database based 
+
+	<!-- The Authentication Manager, manages a database based
 		 authentication -->
 	<authentication-manager alias="authenticationManager" >
-	
+
 		<authentication-provider>
 			 <password-encoder hash="md5"/>
 			 <jdbc-user-service data-source-ref="dataSource"
@@ -62,12 +62,12 @@
 				authorities-by-username-query="SELECT tbl_user.user_name as username, tbl_role.name as authorities FROM tbl_user, tbl_role, tbl_user_tbl_role WHERE tbl_user_tbl_role.tbl_user_id = tbl_user.id AND tbl_user_tbl_role.roles_id = tbl_role.id AND tbl_user.user_name = ?"
 			 />
 		</authentication-provider>
-		
-		<!-- 
+
+		<!--
 		<authentication-provider ref="customAuthProvider">
 		</authentication-provider>
 		-->
-		
+
 	</authentication-manager>
 
 </beans:beans>
