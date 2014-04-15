@@ -1,6 +1,11 @@
 package de.terrestris.shogun.dao;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,11 +15,14 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.SessionFactoryImplementor;
@@ -23,6 +31,7 @@ import org.hibernate.impl.SessionImpl;
 import org.hibernate.loader.OuterJoinLoader;
 import org.hibernate.loader.criteria.CriteriaLoader;
 import org.hibernate.persister.entity.OuterJoinLoadable;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.Authentication;
@@ -43,6 +52,7 @@ import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
+import de.terrestris.shogun.service.ShogunService;
 
 
 /**
@@ -207,20 +217,84 @@ public class DatabaseDao {
 	 * @return List of String representations of the values of the desired field
 	 *
 	 */
-	public List<String> getDistinctEntitiesByField(Class<?> clazz, String field,
-			boolean groupDependent) {
+	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+		for (Field field: type.getDeclaredFields()) {
+			fields.add(field);
+		}
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
-				clazz);
+		if (type.getSuperclass() != null) {
+			fields = getAllFields(fields, type.getSuperclass());
+		}
 
-		criteria.setProjection(Projections.distinct(Projections.projectionList()
-				.add(Projections.property(field), field)));
+		return fields;
+	}
 
-		// this ensures that no cartesian product is returned when
-		// having sub objects, e.g. User <-> Modules
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-
-		return criteria.list();
+	/**
+	 * TODO turn the logic around... initializeDeep(List, Class) should make 
+	 * many calls to this method, not the other way around. 
+	 * 
+	 * 
+	 * @param obj
+	 * @param mainClass
+	 */
+	private void initializeDeep(Object obj, Class<?> mainClass) {
+		List<Object> list = new ArrayList<Object>();
+		list.add(obj);
+		this.initializeDeep(list, mainClass);
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @param list
+	 * @param mainClass
+	 */
+	private void initializeDeep(List<Object> list, Class<?> mainClass) {
+		List<Field> fields = getAllFields(new ArrayList<Field>(), mainClass);
+		List<Method> methods = new ArrayList<Method>();
+		
+		for (Field field : fields) {
+			if (field.getType().isAssignableFrom(Set.class)) {
+				// yes, we have to initialize this field via its getter
+				
+//				System.out.println("Initialize the field " + field.getName() + " via its getter.");
+				
+				Method method = null;
+				try {
+					method = new PropertyDescriptor(field.getName(), mainClass).getReadMethod();
+				} catch (IntrospectionException e) {
+					LOGGER.error("Failed to determine getter for field '" +
+							field.getName() + "' of class '" +
+							mainClass.getSimpleName() + "'.");
+				}
+				methods.add(method);
+			}
+		}
+		
+		for (Iterator<Object> iterator = list.iterator(); iterator.hasNext();) {
+			Object obj = iterator.next();
+			for (Method method : methods) {
+				String errMsg = "Failed to invoke getter '" +
+						method.getName() + "' of class '" +
+						mainClass.getSimpleName() + "': ";
+				try {
+					Hibernate.initialize(method.invoke(obj));
+				} catch (HibernateException e) {
+					LOGGER.error(errMsg + " HibernateException '" +
+							e.getMessage() + "'.");
+				} catch (IllegalArgumentException e) {
+					LOGGER.error(errMsg + " IllegalArgumentException '" +
+							e.getMessage() + "'.");
+				} catch (IllegalAccessException e) {
+					LOGGER.error(errMsg + " IllegalAccessException '" +
+							e.getMessage() + "'.");
+				} catch (InvocationTargetException e) {
+					LOGGER.error(errMsg + " InvocationTargetException '" +
+							e.getMessage() + "'.");
+				}
+			}
+		}
 	}
 
 
