@@ -37,7 +37,6 @@ public class FilterItem implements Serializable {
 	 * 
 	 */
 	public enum Operator {
-		
 		Equals,
 		Smaller, 
 		Greater, 

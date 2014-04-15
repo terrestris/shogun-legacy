@@ -1,6 +1,8 @@
 package de.terrestris.shogun.hibernatecriteria.filter;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import org.hibernatespatial.criterion.SpatialRestrictions;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
+
+import de.terrestris.shogun.dao.DatabaseDao;
 
 /**
  * Class for a Hibernate filter condition
