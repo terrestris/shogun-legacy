@@ -70,7 +70,8 @@
 				"
 				authorities-by-username-query="
 					SELECT DISTINCT
-						tbl_user.user_name AS username, tbl_role.name AS authorities
+						tbl_user.user_name AS username,
+						tbl_role.name AS authorities
 					FROM
 						tbl_user,
 						tbl_group_tbl_user,
@@ -87,7 +88,7 @@
 						tbl_group_tbl_role.role_id = tbl_role.id
 					AND
 						tbl_user.user_name = ?
-					"
+				"
 			 />
 		</authentication-provider>
 
