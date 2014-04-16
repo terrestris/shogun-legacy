@@ -435,9 +435,6 @@ public class DatabaseContentInitializer {
 			// TODO check for old properties first, before overwriting these
 
 			// Set the auto created mapconf
-			// HashSet<MapConfig> mapConfigSet = new HashSet<MapConfig>();
-			// mapConfigSet.add(mapConfig);
-			// anon.setMapConfigs(mapConfigSet);
 			anon.setMapConfig(mapConfig);
 
 			// set the auto created WmsMapLayer

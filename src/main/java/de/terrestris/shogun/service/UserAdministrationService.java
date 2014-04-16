@@ -228,8 +228,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			// user to be updated
 			User user = iterator.next();
 
-//			List<Module> newModules = null;
-
 			// Check if logged-in user has the same group than the
 			// user to be updated
 			List<Integer> groupsOfSessionUser = this.getDatabaseDao().getGroupIdsFromSession();
@@ -647,10 +645,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			MapConfig mapConfig =
 				(MapConfig)this.getDatabaseDao().getEntityById(1, MapConfig.class);
 			if (mapConfig != null) {
-	//				Set newMapConfSet = new HashSet<MapConfig>();
-	//				newMapConfSet.add(mapConfig);
-	//				subadmin.setMapConfigs(newMapConfSet);
-
 				subadmin.setMapConfig(mapConfig);
 			}
 			// TODO become more flexibel here, wrap to method

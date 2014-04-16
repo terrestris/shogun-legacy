@@ -269,7 +269,6 @@ public class ShogunService extends AbstractShogunService {
 					Method writeMethod = propertyDescriptor.getWriteMethod();
 
 					Class<?> classCandidate = ((ManyToMany)annotation).targetEntity();
-//					String sClassCandidate = classCandidate.getSimpleName();
 
 					if (classCandidate.isAssignableFrom(targetClass)) {
 
@@ -410,8 +409,6 @@ public class ShogunService extends AbstractShogunService {
 		}
 
 		// TODO use param for entity MODEL_CLASS_MAP.get(objectType)
-		// List<String> codes = gmDAO.getDistinctEntitiesByField(Address.class,
-		// field, true);
 		List<String> codes = this.getDatabaseDao().getDistinctEntitiesByField(
 				entityClass, field, true);
 		List returnList = new ArrayList();

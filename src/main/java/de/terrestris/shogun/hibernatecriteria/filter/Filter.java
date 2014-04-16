@@ -52,8 +52,6 @@ public class Filter {
 		this.logicalOperator = logicalOperator;
 	}
 
-
-
 	/**
 	 *
 	 * @param index
@@ -70,13 +68,5 @@ public class Filter {
 	public int getFilterItemCount() {
 		return filterItems.size();
 	}
-//
-//
-//
-//
-//	public FilterItem[] getFilterItemArray() {
-//		return filterItems.toArray(new FilterItem[0]);
-//	}
-
 
 }

@@ -94,7 +94,6 @@ public class Group extends BaseModel{
 	 */
 	public Group() {
 		super();
-//		this.setRoles(new HashSet<String>());
 		this.setUsers(new HashSet<User>());
 	}
 

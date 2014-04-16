@@ -61,7 +61,6 @@ public class User extends BaseModel {
 	private MapConfig mapConfig;
 	private WfsProxyConfig wfsProxyConfig;
 	private WmsProxyConfig wmsProxyConfig;
-//	private String user_module_list;
 
 
 	/**
@@ -338,53 +337,6 @@ public class User extends BaseModel {
 	public void setGroups(Set<Group> groups) {
 		this.groups = groups;
 	}
-
-//	/**
-//	 * @return the modules
-//	 */
-//	@ManyToMany(fetch = FetchType.LAZY, targetEntity=Module.class)
-//	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = {
-//			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
-//			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
-//					nullable = false, updatable = false) })
-//	@JsonSerialize(using=LeanBaseModelSerializer.class)
-//	@Fetch(FetchMode.SUBSELECT)
-//	public Set<Module> getModules() {
-//		return modules;
-//	}
-//
-//	/**
-//	 *
-//	 * @param modules the modules to set
-//	 */
-//	@JsonIgnore
-//	public void setModules(Set<Module> modules) {
-//		this.modules = modules;
-//	}
-
-//	/**
-//	 * We have to use a Set instead of List, due to a know limitation
-//	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-//	 *
-//	 * @return the mapConfigs
-//	 */
-//	@OneToMany(fetch = FetchType.LAZY, targetEntity=MapConfig.class)
-//	@Cache(usage = CacheConcurrencyStrategy.NONE)
-//	public Set<MapConfig> getMapConfigs() {
-//		return mapConfigs;
-//	}
-//
-//	/**
-//	 * We have to use a Set instead of List, due to a know limitation
-//	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-//	 *
-//	 * @param mapConfigs the mapConfigs to set
-//	 */
-//	@JsonIgnore
-//	public void setMapConfigs(Set<MapConfig> mapConfigs) {
-//		this.mapConfigs = mapConfigs;
-//	}
-
 
 	/**
 	 * @return the mapConfig
