@@ -187,7 +187,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			//TODO remove this static mail text
 			String mailtext = "Sehr geehrter Nutzer " + user.getUser_name()
 					+ "\n\n";
-			mailtext += "Ihr Passwort zur Terrestris Suite lautet \n\n";
+			mailtext += "Ihr SHOGun-Passwort lautet \n\n";
 			mailtext += pw + "\n\n";
 
 			Mail.send("localhost", 25, user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
