@@ -1,27 +1,26 @@
 package de.terrestris.shogun.hibernatecriteria.filter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Class represents a filter usable in Hibernate queries
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class HibernateFilter extends Filter {
-	
-	/**
-	 * 
-	 */
-	private Class<? extends Serializable> mainClass = null;
 
 	/**
-	 * 
+	 *
+	 */
+	private Class<?> mainClass = null;
+
+	/**
+	 *
 	 * @param mainClass
 	 */
-	public HibernateFilter(Class<? extends Serializable> mainClass) {
+	public HibernateFilter(Class<?> mainClass) {
 		super();
 		this.mainClass = mainClass;
 	}
@@ -29,12 +28,12 @@ public class HibernateFilter extends Filter {
 	/**
 	 * Static method creating a Hibernate filter object by a given
 	 * JSON request object.
-	 * 
+	 *
 	 * @param clazz
 	 * @param plainFilter
 	 * @return
 	 */
-	public static HibernateFilter create(Class<? extends Serializable> clazz,
+	public static HibernateFilter create(Class<?> clazz,
 			de.terrestris.shogun.jsonrequest.Filter plainFilter) {
 
 		HibernateFilter hibernateFilter = null;
@@ -48,9 +47,9 @@ public class HibernateFilter extends Filter {
 				// decide from request
 				hibernateFilter.setLogicalOperator(LogicalOperator.valueOf(plainFilter.getLogicalOperator()));
 			} else {
-				
+
 				// should be done in father class
-				
+
 //				// set default (AND)
 //				hibernateFilter.setLogicalOperator(Operator.valueOf("AND"));
 			}
@@ -87,59 +86,59 @@ public class HibernateFilter extends Filter {
 				}
 			}
 		}
-		
+
 		return hibernateFilter;
 	}
-	
-	
+
+
 	/**
 	 * Method creates a Hibernate filter object in a simplified way.
 	 * Only one filterItem is used here, which is defined by its fieldname, operator and operands.
-	 * 
-	 * For more elaborated use-cases please consider using the method 
-	 * HibernateFilter create(Class<? extends Serializable> clazz, de.terrestris.shogun.jsonrequest.Filter plainFilter)
-	 * 
+	 *
+	 * For more elaborated use-cases please consider using the method
+	 * HibernateFilter create(Class clazz, de.terrestris.shogun.jsonrequest.Filter plainFilter)
+	 *
 	 * @param clazz
 	 * @param fieldName
 	 * @param operator
 	 * @param operands
 	 * @return
 	 */
-	public static HibernateFilter create(Class<? extends Serializable> clazz, String fieldName, 
+	public static HibernateFilter create(Class<?> clazz, String fieldName,
 			String operator, String[] operands) {
-		
+
 		de.terrestris.shogun.jsonrequest.Filter filter = new de.terrestris.shogun.jsonrequest.Filter();
-		
+
 		de.terrestris.shogun.jsonrequest.FilterItem filterItem = new de.terrestris.shogun.jsonrequest.FilterItem();
 		filterItem.setFieldName(fieldName);
 		filterItem.setOperator(operator);
-		
+
 		filterItem.setOperands(operands);
-		
+
 		List<de.terrestris.shogun.jsonrequest.FilterItem> filterItems = new ArrayList<de.terrestris.shogun.jsonrequest.FilterItem>();
 		filterItems.add(filterItem);
-		
+
 		filter.setFilterItems(filterItems );
-		
-		HibernateFilter hibernateFilter = HibernateFilter.create((Class<? extends Serializable>) clazz, filter);
-		
+
+		HibernateFilter hibernateFilter = HibernateFilter.create((Class<?>) clazz, filter);
+
 		return hibernateFilter;
 
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
-	public Class<? extends Serializable> getMainClass() {
+	public Class<?> getMainClass() {
 		return mainClass;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param mainClass
 	 */
-	public void setMainClass(Class<? extends Serializable> mainClass) {
+	public void setMainClass(Class<?> mainClass) {
 		this.mainClass = mainClass;
 	}
 

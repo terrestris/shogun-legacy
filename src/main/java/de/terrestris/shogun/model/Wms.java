@@ -11,30 +11,37 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * Wms POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_WMS")
 public class Wms extends BaseModel {
-	
+
 	private String supportedVersion;
 	private String baseUrl;
 	private Set<WmsLayer> wmsLayers;
-	
+
 	/**
 	 * The default Constructor
 	 */
 	public Wms() {
 
 	}
-	
+
 	/**
 	 * An alternative constructor for backwards compatibility: Field `wmsLayers`
 	 * is of type Set<WmsLayer>, no longer List<WmsLayer>.
@@ -47,7 +54,7 @@ public class Wms extends BaseModel {
 		this.supportedVersion = supportedVersion;
 		this.baseUrl = baseUrl;
 		this.wmsLayers = new HashSet<WmsLayer>(wmsLayers);
-		
+
 		this.setCreated_at(new Date());
 		this.setUpdated_at(new Date());
 	}
@@ -63,11 +70,11 @@ public class Wms extends BaseModel {
 		this.supportedVersion = supportedVersion;
 		this.baseUrl = baseUrl;
 		this.wmsLayers = wmsLayers;
-		
+
 		this.setCreated_at(new Date());
 		this.setUpdated_at(new Date());
 	}
-	
+
 	/**
 	 * @return the supportedVersion
 	 */
@@ -75,15 +82,15 @@ public class Wms extends BaseModel {
 	public String getSupportedVersion() {
 		return supportedVersion;
 	}
-	
+
 	/**
 	 * @param supportedVersion the supportedVersion to set
 	 */
 	public void setSupportedVersion(String supportedVersion) {
 		this.supportedVersion = supportedVersion;
 	}
-	
-	
+
+
 	/**
 	 * @return the baseUrl
 	 */
@@ -91,7 +98,7 @@ public class Wms extends BaseModel {
 	public String getBaseUrl() {
 		return baseUrl;
 	}
-	
+
 	/**
 	 * @param baseUrl the baseUrl to set
 	 */
@@ -99,11 +106,13 @@ public class Wms extends BaseModel {
 		this.baseUrl = baseUrl;
 	}
 
-	
+
 	/**
 	 * @return the wmsLayers
 	 */
-	@OneToMany(fetch = FetchType.EAGER, targetEntity=WmsLayer.class)
+	@OneToMany(fetch = FetchType.LAZY, targetEntity=WmsLayer.class)
+	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<WmsLayer> getWmsLayers() {
 		return wmsLayers;
 	}
@@ -114,5 +123,15 @@ public class Wms extends BaseModel {
 	public void setWmsLayers(Set<WmsLayer> wmsLayers) {
 		this.wmsLayers = wmsLayers;
 	}
-	
+
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("supportedVersion", supportedVersion)
+			.append("baseUrl", baseUrl)
+			.toString();
+	}
 }

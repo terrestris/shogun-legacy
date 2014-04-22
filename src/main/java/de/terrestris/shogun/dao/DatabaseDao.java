@@ -1,19 +1,34 @@
 package de.terrestris.shogun.dao;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javassist.Modifier;
+
+import org.apache.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.SessionFactoryImplementor;
@@ -24,6 +39,7 @@ import org.hibernate.loader.criteria.CriteriaLoader;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -40,7 +56,6 @@ import de.terrestris.shogun.model.BaseModel;
 import de.terrestris.shogun.model.BaseModelInheritance;
 import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
-import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
 
 
@@ -59,6 +74,12 @@ import de.terrestris.shogun.model.User;
 @Transactional
 @Primary
 public class DatabaseDao {
+
+	/**
+	 * the logger instance
+	 */
+	private static Logger LOGGER = Logger.getLogger(DatabaseDao.class);
+
 
 	/**
 	 * the Hibernate SessionFactory reference
@@ -81,11 +102,51 @@ public class DatabaseDao {
 	@SuppressWarnings("unchecked")
 	public List<Object> getDataByFilter(HibernateSortObject hibernateSortObject,
 			HibernateFilter hibernateFilter,
+			Set<String> fields,
+			Set<String> ignoreFields,
 			HibernatePagingObject hibernatePagingObject,
 			HibernateFilter hibernateAdditionalFilter) throws ShogunDatabaseAccessException {
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
-				hibernateSortObject.getMainClass());
+		boolean isPlainModelRequest = (fields == null && ignoreFields == null);
+		Class<?> clazz = hibernateSortObject.getMainClass();
+
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+
+		// Fields
+		if (fields != null) {
+			ProjectionList pl = Projections.projectionList();
+
+			for (Iterator<String> iterator = fields.iterator(); iterator.hasNext();) {
+				String field = iterator.next();
+				pl.add(Projections.property( field));
+			}
+			criteria.setProjection(Projections.distinct(pl));
+
+		}
+
+		// Ignore Fields
+		// -> get all fields of the class and remove the ignorefields, works like a blacklist
+		Set<String> cleanedFieldNames = new HashSet<String>();
+		if (ignoreFields != null) {
+			ProjectionList pl = Projections.projectionList();
+			List<Field> allFields = getAllFields(new ArrayList<Field>(), clazz);
+
+			for (Iterator<Field> iterator = allFields.iterator(); iterator.hasNext();) {
+				Field field = (Field) iterator.next();
+
+				if (!ignoreFields.contains(field.getName())) {
+					cleanedFieldNames.add(field.getName());
+				}
+
+			}
+
+			for (Iterator<String> iterator = cleanedFieldNames.iterator(); iterator.hasNext();) {
+				String cleanField = iterator.next();
+
+				pl.add(Projections.property(cleanField), cleanField);
+			}
+			criteria.setProjection(Projections.distinct(pl));
+		}
 
 		// PAGING
 		if (hibernatePagingObject != null) {
@@ -115,7 +176,7 @@ public class DatabaseDao {
 			Criterion afCriterion = null;
 			try {
 				HibernateFilterItem hfi = (HibernateFilterItem) hibernateAdditionalFilter.getFilterItem(0);
-				afCriterion = hfi.makeCriterion(hibernateAdditionalFilter.getMainClass());
+				afCriterion = hfi.makeCriterion(clazz);
 				afConjunction.add(afCriterion);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -131,26 +192,37 @@ public class DatabaseDao {
 		int filterItemCount = hibernateFilter.getFilterItemCount();
 
 		if (filterItemCount > 0) {
-
-			Disjunction dis = Restrictions.disjunction();
-
 			// OR connected filter items
 			if (hibernateFilter.getLogicalOperator().equals(LogicalOperator.OR)) {
-
 				try {
+					Disjunction dis = Restrictions.disjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							dis.add(criterion);
-						}
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
 
+							criteria.createCriteria(ownFieldName, ownFieldName);
+
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(clazz);
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+
+						}
+						else {
+							Criterion criterion = hfi.makeCriterion(clazz);
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+						}
 					}
 					criteria.add(dis);
 
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while adding an OR connected filter", e);
+					throw new ShogunDatabaseAccessException("(getDataByFilter)" +
+							" Error while adding an OR connected filter: "
+							+ e.getMessage(), e);
 				}
 
 			} else {
@@ -159,26 +231,277 @@ public class DatabaseDao {
 					Conjunction conjunction = Restrictions.conjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							conjunction.add(criterion);
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+
+							criteria.createCriteria(ownFieldName, ownFieldName);
+
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(clazz);
+							if (criterion != null) {
+								conjunction.add(criterion);
+							}
+
+						}
+						else {
+							Criterion criterion = hfi.makeCriterion(clazz);
+							if (criterion != null) {
+								conjunction.add(criterion);
+							}
 						}
 					}
 					criteria.add(conjunction);
 
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while adding an AND connected filter", e);
+					throw new ShogunDatabaseAccessException("(getDataByFilter)" +
+							" Error while adding an AND connected filter", e);
+				}
+			}
+		}
+
+		// Ok we're done creating the criteria.
+
+//		System.out.println("Querying for " + clazz.getSimpleName() + " with this SQL:");
+//		String niceSql = (new BasicFormatterImpl()).format(this.toSql(criteria));
+//		System.out.println(niceSql);
+
+		// next we need to know whether we are being filtered with fields
+		// because we then do NOT get a List of instances of BaseModelInterface.
+
+		List<Object> list = null;
+
+		if (isPlainModelRequest == false) {
+			// We are filtered and will have to create a sane hashmap instead of
+			// relying on the serilisation of BaseModelInterface classes.
+
+			// Please beware that we can NOT setResultTransformer here,
+			// otherwise we'll loose all but the first filtered field.
+
+			if (fields == null && cleanedFieldNames.size() > 0) {
+				fields = cleanedFieldNames;
+			}
+			// we dont really know what criteria.list() will return, can be List<Object> or List<Object[]>
+			// will be determined later
+			List<Object> rawListOfResults = criteria.list();
+			List<Object> saneResultList = new ArrayList<Object>();
+			for (Object rawRow : rawListOfResults) {
+
+				Map<String, Object> newRowMap = new HashMap<String, Object>();
+				int fieldIdx = 0;
+				for (Iterator<String> fieldIter = fields.iterator(); fieldIter.hasNext();) {
+					String fieldName = fieldIter.next();
+					Object fieldVal = null;
+
+					if (rawRow != null) {
+						if (rawRow.getClass().isArray()) {
+							Object[] objArr = (Object[]) rawRow;
+							fieldVal = objArr[fieldIdx];
+						} else {
+							fieldVal = rawRow;
+						}
+					}
+
+					// store the pair in the newRowMap.
+					newRowMap.put(fieldName, fieldVal);
+
+					fieldIdx++;
+				}
+				// OK, one result row has been trasformed, store it back
+				saneResultList.add(newRowMap);
+			}
+
+			// now overwrite the list we'll rerturn to the caller.
+			list = saneResultList;
+		} else {
+			// We are NOT filtered, we can rely on the serialization process
+			// that takes instances of ou models and transforms them
+			// to (possibly huge) JSON structures.
+
+			// Please beware that we can only setResultTransformer here,
+			// otherwise we'd loose all but the first filtered field.
+
+			// this ensures that no cartesian product is returned when
+			// having sub objects, e.g. User <-> Modules
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+			// we need to set the fetch mode for all sets in our class, as most
+			// of them are defined to be fetched lazily:
+
+			criteria = this.setEagerFetchModeForCollections(criteria, clazz);
+
+			list = criteria.list();
+		}
+
+		// Since we have modelled entities with sub entities with the lazy
+		// fetching strategy, we have to check whether we should
+		// initialize the needed fields.
+		//
+		// This will only happen
+		//   * if we got a raw result,
+		//   * and we weren't being filtered for only a subset of fields
+		//   * and if we have been explicitly been told to go deep.
+
+		// as we do not use LAZY at the moment, this will not be fired!
+//		if (list != null && deepInitialize == true && fields == null) {
+//			this.initializeDeep(list, hibernateSortObject.getMainClass());
+//		}
+
+		return list;
+	}
+
+	private Criteria setEagerFetchModeForCollections(Criteria criteria,
+			Class<?> clazz) {
+
+		List<Field> fields = getAllFields(new ArrayList<Field>(), clazz);
+
+		for (Field field : fields) {
+
+			boolean isJsonIgnore = false;
+
+			Method getterMethod;
+			try {
+				getterMethod = new PropertyDescriptor(field.getName(), clazz).getReadMethod();
+				Annotation[] anoArr = getterMethod.getAnnotations();
+				for (Annotation annotation : anoArr) {
+					if (annotation instanceof JsonIgnore) {
+						isJsonIgnore = true;
+					}
+				}
+			} catch (IntrospectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
+
+
+			if (!isJsonIgnore && field.getType().isAssignableFrom(Set.class)) {
+				// yes, we have to set the fetch mode
+				criteria.setFetchMode(field.getName(), FetchMode.JOIN);
+			}
+		}
+
+		return criteria;
+	}
+
+	/**
+	 * TODO move to a better place or use existing functionality elsewhere.
+	 * TODO we have a very similar method in {@link HibernateFilterItem}.
+	 *
+	 * @param fields
+	 * @param type
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IntrospectionException
+	 */
+	public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+		for (Field field: type.getDeclaredFields()) {
+
+			// check if the filed is not a constant
+			if(Modifier.isStatic(field.getModifiers()) == false &&
+					Modifier.isFinal(field.getModifiers()) == false) {
+
+				// now we check if the readmethod of the field
+				// has NOT a transient annotation
+				try {
+					PropertyDescriptor pd = new PropertyDescriptor(field.getName(), type);
+					Method readmethod = pd.getReadMethod();
+					Annotation[] annotationsArr = readmethod.getAnnotations();
+					if (annotationsArr.length == 0) {
+						fields.add(field);
+					} else {
+						for (Annotation annotation : annotationsArr) {
+							if(annotation.annotationType().equals(javax.persistence.Transient.class) == false) {
+								fields.add(field);
+							}
+						}
+					}
+				} catch (IntrospectionException e) {
+					LOGGER.error("Trying to determine the getter for field '" +
+							field.getName() + "' in " + type.getSimpleName() +
+							" threw IntrospectionException." +
+							" Is there a getter following the Java-Beans" +
+							" Specification?");
 				}
 			}
 
 		}
 
-		// this ensures that no cartesian product is returned when
-		// having sub objects, e.g. User <-> Modules
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		if (type.getSuperclass() != null) {
+			fields = getAllFields(fields, type.getSuperclass());
+		}
 
-		return criteria.list();
+		return fields;
+	}
+
+	/**
+	 * TODO turn the logic around... initializeDeep(List, Class) should make
+	 * many calls to this method, not the other way around.
+	 *
+	 *
+	 * @param obj
+	 * @param mainClass
+	 */
+	protected void initializeDeep(Object obj, Class<?> mainClass) {
+		List<Object> list = new ArrayList<Object>();
+		list.add(obj);
+		this.initializeDeepList(list, mainClass);
+	}
+
+
+
+	/**
+	 *
+	 * @param list
+	 * @param mainClass
+	 */
+	protected void initializeDeepList(List<? extends Object> list, Class<?> mainClass) {
+		List<Field> fields = getAllFields(new ArrayList<Field>(), mainClass);
+		List<Method> methods = new ArrayList<Method>();
+
+		for (Field field : fields) {
+			if (field.getType().isAssignableFrom(Set.class)) {
+				// yes, we have to initialize this field via its getter
+				Method method = null;
+				try {
+					method = new PropertyDescriptor(field.getName(), mainClass).getReadMethod();
+				} catch (IntrospectionException e) {
+					LOGGER.error("Failed to determine getter for field '" +
+							field.getName() + "' of class '" +
+							mainClass.getSimpleName() + "'.");
+				}
+				methods.add(method);
+			}
+		}
+
+		for (Iterator<Object> iterator = (Iterator<Object>) list.iterator(); iterator.hasNext();) {
+			Object obj = iterator.next();
+			if (obj == null) {
+				continue;
+			}
+			for (Method method : methods) {
+				String errMsg = "Failed to invoke getter '" +
+						method.getName() + "' of class '" +
+						mainClass.getSimpleName() + "': ";
+				try {
+					Hibernate.initialize(method.invoke(obj));
+				} catch (HibernateException e) {
+					LOGGER.error(errMsg + " HibernateException '" +
+							e.getMessage() + "'.");
+				} catch (IllegalArgumentException e) {
+					LOGGER.error(errMsg + " IllegalArgumentException '" +
+							e.getMessage() + "'.");
+				} catch (IllegalAccessException e) {
+					LOGGER.error(errMsg + " IllegalAccessException '" +
+							e.getMessage() + "'.");
+				} catch (InvocationTargetException e) {
+					LOGGER.error(errMsg + " InvocationTargetException '" +
+							e.getMessage() + "'.");
+				}
+			}
+		}
 	}
 
 
@@ -226,7 +549,9 @@ public class DatabaseDao {
 	 * @return The object list fulfilling the filter request
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> getAllEntities(Class<?> clazz) {
+	public List<Object> getAllEntities(Class<?> clazz, boolean... initializeDeep) {
+
+		boolean initializeDeeply = initializeDeep.length > 0 ? initializeDeep[0] : false;
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -235,7 +560,13 @@ public class DatabaseDao {
 		// having sub objects, e.g. User <-> Modules
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
-		return criteria.list();
+		List <Object> resultSetlist = (List<Object>)criteria.list();
+
+		if (initializeDeeply == true) {
+			this.initializeDeepList(resultSetlist, clazz);
+		}
+
+		return resultSetlist;
 	}
 
 	/**
@@ -261,6 +592,16 @@ public class DatabaseDao {
 		return records;
 	}
 
+	/**
+	 *
+	 * @param id
+	 * @param clazz
+	 * @return
+	 */
+	public Object getEntityById(int id, Class<?> clazz) {
+		return this.getEntityById(id, clazz, true);
+	}
+
 
 	/**
 	 * Returns an object of a certain entity defined by its ID.
@@ -269,7 +610,7 @@ public class DatabaseDao {
 	 * @param clazz The entity to be queried
 	 * @return the object matching the passed entity and the passed ID
 	 */
-	public Object getEntityById(int id, Class<?> clazz) {
+	public Object getEntityById(int id, Class<?> clazz, boolean initializeDeep) {
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -277,7 +618,28 @@ public class DatabaseDao {
 		// we expect a single record or null
 		Object result = criteria.uniqueResult();
 
+		if (initializeDeep) {
+			this.initializeDeep(result, clazz);
+		}
+
 		return result;
+	}
+
+	// method used to keep the old behaviour, which means
+	// getting entities without initializing lazy fields
+	public List<? extends Object> getEntitiesByIds(Object[] values, Class<?> clazz) {
+		return this.getEntitiesByIds(values, clazz, null);
+	}
+
+	public List<? extends Object> getEntitiesByIds(Set<?> values, Class<?> clazz) {
+		Object[] objectValues = new Object[values.size()];
+		int i = 0;
+		for (Iterator<?> iterator = values.iterator(); iterator.hasNext();) {
+			Object object = (Object) iterator.next();
+			objectValues[i] = object;
+			i++;
+		}
+		return this.getEntitiesByIds(objectValues, clazz, null);
 	}
 
 	/**
@@ -288,12 +650,38 @@ public class DatabaseDao {
 	 * @return the objects matching the passed entity and the passed IDs
 	 */
 	@SuppressWarnings("unchecked")
-	public List<? extends Object> getEntitiesByIds(Object[] values, Class clazz) {
-
+	public List<? extends Object> getEntitiesByIds(Object[] values, Class<?> clazz, String[] eagerfields) {
+		final int maxInElems = 999;
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
-		if (values.length > 0) {
+
+		if (eagerfields != null && eagerfields.length > 0) {
+			for (String field : eagerfields) {
+				criteria.setFetchMode(field, FetchMode.JOIN);
+			}
+		}
+
+		if (values.length > 0 && values.length <= maxInElems) {
 			criteria.add(Restrictions.in("id", values));
+		} else if (values.length > maxInElems) {
+			List<Criterion> listOfInRestrictions = new ArrayList<Criterion>();
+			int numSubArrays = (int) Math.ceil(((double) values.length) / ((double) maxInElems));
+			int start = 0;
+			for (int i = 0; i < numSubArrays; i++) {
+				// int start = i * maxInElems;
+				int end = (i + 1) * maxInElems;
+				if (end > values.length) {
+					end =  values.length;
+				}
+				Object[] subArr = Arrays.copyOfRange(values, start, end);
+				listOfInRestrictions.add(Restrictions.in("id", subArr));
+				start = end;
+			}
+			Disjunction disj = Restrictions.disjunction();
+			for (Criterion restrictions : listOfInRestrictions) {
+				disj.add(restrictions);
+			}
+			criteria.add(disj);
 		} else {
 			// we add a restriction that can never be fullfilled
 			// this is the case when e.g. an empty object has been passed
@@ -315,7 +703,7 @@ public class DatabaseDao {
 	 * @return the objects matching the passed entity and NOT matching the passed IDs
 	 */
 	@SuppressWarnings("unchecked")
-	public List<? extends Object> getEntitiesByExcludingIds(Object[] values, Class clazz) {
+	public List<? extends Object> getEntitiesByExcludingIds(Object[] values, Class<?> clazz) {
 
 		Criteria criteria = null;
 		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
@@ -350,7 +738,7 @@ public class DatabaseDao {
 	 * @throws ShogunDatabaseAccessException
 	 */
 	public Object getEntityByStringField(
-			Class clazz, String fieldname, String value) throws ShogunDatabaseAccessException {
+			Class<?> clazz, String fieldname, String value) throws ShogunDatabaseAccessException {
 
 		HashMap<String, String> fieldsAndValues = new HashMap<String, String>();
 		fieldsAndValues.put(fieldname, value);
@@ -398,7 +786,7 @@ public class DatabaseDao {
 	 * @param value
 	 * @return
 	 */
-	public List<Object> getEntitiesByIntegerField(Class clazz, String fieldname, Integer value) {
+	public List<Object> getEntitiesByIntegerField(Class<?> clazz, String fieldname, Integer value) {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(fieldname, value));
@@ -457,6 +845,7 @@ public class DatabaseDao {
 				String value = fieldsAndValues.get(fieldname);
 				criteria.add(Restrictions.ilike(fieldname, value));
 			}
+
 			returnList = (List<T>) criteria.list();
 
 		} catch (Exception e) {
@@ -530,7 +919,7 @@ public class DatabaseDao {
 	 *
 	 * @param objsToCreate the new objects to be created in the DB
 	 * @return the objects that were created in the database
-	 * @throws ShogunDatabaseAccessException 
+	 * @throws ShogunDatabaseAccessException
 	 */
 	@Transactional
 	public <T extends BaseModel> List<T> createEntities(List<T> objsToCreate) {
@@ -580,7 +969,7 @@ public class DatabaseDao {
 	 * @param clazz Entity class of the object to be deleted
 	 * @param id the ID of the record to be deleted
 	 */
-	public void deleteEntity(Class clazz, Integer id) {
+	public void deleteEntity(Class<?> clazz, Integer id) {
 
 		// delete the object record
 		Object record = this.sessionFactory.getCurrentSession().load(clazz, id);
@@ -609,7 +998,7 @@ public class DatabaseDao {
 	 * @param column Column name which is used to determine the record
 	 * @param value The value which is used to determine the record
 	 */
-	public void deleteEntityByValue(Class clazz, String column, String value) {
+	public void deleteEntityByValue(Class<?> clazz, String column, String value) {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
 		criteria.add(Restrictions.eq(column, value));
@@ -632,7 +1021,7 @@ public class DatabaseDao {
 	 *
 	 * @throws Exception
 	 */
-	public void deleteEntityGroupDependent(Class clazz, Integer id) throws ShogunDatabaseAccessException {
+	public void deleteEntityGroupDependent(Class<?> clazz, Integer id) throws ShogunDatabaseAccessException {
 
 		// get group ID of logged in User and check if there is the
 		// user to be deleted is a child of the current group
@@ -714,7 +1103,7 @@ public class DatabaseDao {
 
 			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 
-			criteria.add(Restrictions.ilike("user_name", name));
+			criteria.add(Restrictions.eq("user_name", name));
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
@@ -723,7 +1112,10 @@ public class DatabaseDao {
 
 		// we have to ensure that the modules are distinct
 		// @see http://docs.jboss.org/hibernate/orm/3.6/javadocs/org/hibernate/Criteria.html#createAlias(java.lang.String, java.lang.String, int)
-		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
+//		criteria.createAlias("modules", "module", CriteriaSpecification.INNER_JOIN);
+
+		criteria.setFetchMode("mapLayers", FetchMode.JOIN);
+
 
 		// this ensures that no cartesian product is returned when
 		// having sub objects, e.g. User <-> Modules
@@ -836,22 +1228,25 @@ public class DatabaseDao {
 
 	/**
 	 * Creates a new {@link User} object in the database.
-	 * The gets the role passed as String.
-	 * If needed the current group of the logged in user is stored
-	 * to the new user.
+	 * The roles, modules and granted layers of the user depend on the groups
+	 * he is assigned to. We dont have to care about this here.
 	 *
 	 * @param user the User object to create
-	 * @param role the role name
 	 * @param setSessionGroup flag controls if the current user group should be set to new user
 	 * @return
 	 * @throws Exception
 	 */
-	public User createUser(User user, String role, boolean setSessionGroup) throws ShogunDatabaseAccessException {
+	public User createUser(User user, boolean setSessionGroup) throws ShogunDatabaseAccessException {
 
 		try {
 
 			this.sessionFactory.getCurrentSession().save(user);
 
+			// TODO NB: What is the sense of setSessionGroup?
+			// Due to the use of getFirstGroupObjectFromSessionUser()
+			// it seems that the user is already associated with the
+			// group that we will update in the following code.
+			// So why do we do this?
 			if (setSessionGroup == true) {
 
 				try {
@@ -872,13 +1267,6 @@ public class DatabaseDao {
 							"Error adding the saved user to current session group. " + e.getMessage());
 				}
 			}
-
-			// create the mapping of new user and its role
-			Role oRole = (Role)this.getEntityByStringField(Role.class, "name", role);
-			Set<Role> roles = new HashSet<Role>();
-			roles.add(oRole);
-
-			user.setRoles(roles);
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
@@ -986,30 +1374,41 @@ public class DatabaseDao {
 			criteria.add(afConjunction);
 		}
 
-		criteria.setProjection(Projections.count("id"));
+		criteria.setProjection(Projections.rowCount());
 
 		if (hibernateFilter != null) {
 
 			int filterItemCount = hibernateFilter.getFilterItemCount();
 
 			// FILTER
+			// OR connected filter items
 			if (hibernateFilter.getLogicalOperator().equals(LogicalOperator.OR)) {
-
-				Disjunction dis = Restrictions.disjunction();
-
 				try {
+					Disjunction dis = Restrictions.disjunction();
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							dis.add(criterion);
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+							criteria.createCriteria(ownFieldName, ownFieldName);
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								dis.add(criterion);
+							}
+
+						}
+						else {
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								dis.add(criterion);
+							}
 						}
 					}
 					criteria.add(dis);
-
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while combining criteria with OR", e);
+					throw new ShogunDatabaseAccessException("(getTotal) Error" +
+							" while adding an OR connected filter: " +
+							e.getMessage(), e);
 				}
 
 			} else {
@@ -1017,19 +1416,32 @@ public class DatabaseDao {
 				try {
 					for (int i = 0; i < filterItemCount; i++) {
 						HibernateFilterItem hfi = (HibernateFilterItem) hibernateFilter.getFilterItem(i);
-						Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
-						if (criterion != null) {
-							criteria.add(criterion);
+						if (hfi.getFieldName() != null && hfi.getFieldName().contains(".")) {
+							String ownFieldName = hfi.getFieldName().split("\\.")[0];
+
+							criteria.createCriteria(ownFieldName, ownFieldName);
+
+							// todo move outside
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+							if (criterion != null) {
+								criteria.add(criterion);
+							}
+
+						} else {
+							Criterion criterion = hfi.makeCriterion(hibernateFilter.getMainClass());
+
+							if (criterion != null) {
+								criteria.add(criterion);
+							}
 						}
 					}
 
 				} catch (Exception e) {
-					throw new ShogunDatabaseAccessException(
-							"Error while combining criteria with AND", e);
+					throw new ShogunDatabaseAccessException("(getTotal) Error" +
+							" while combining criteria with AND", e);
 				}
 			}
 		}
-
 		List<?> totalList = criteria.list();
 
 		return (Long)totalList.get(0);
@@ -1061,10 +1473,18 @@ public class DatabaseDao {
 	}
 
 	/**
-	 * Determines the ID of the logged in user from Security Context
+	 * Determines the ID of the logged in user from Security Context.
+	 *
+	 * TODO this is the only method in the dbDao that is secured through the
+	 *      @PreAuthorize annotation. It is possibly secured since
+	 *      {@link UserAdministrationController#getLoggedInUserId()} directly
+	 *      calls into the database dao instead of using the appropriate
+	 *      {@link UserAdministrationService}. We might consider adding a
+	 *      dedicated method to that service.
 	 *
 	 * @return the name of the logged in user or NULL if not found
 	 */
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public Integer getUserIdFromSession() {
 
 		String username = this.getUserNameFromSession();
@@ -1092,19 +1512,59 @@ public class DatabaseDao {
 	 */
 	public User getUserObjectFromSession() {
 
+		LOGGER.debug("Starting to get user object from session.");
+
 		// get the authorization context, incl. user name
 		Authentication authResult = SecurityContextHolder.getContext().getAuthentication();
 
+		LOGGER.debug("Got authResult: " + authResult.getName());
+		LOGGER.debug("Creating criteria now to get the user.");
+
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
 
-		criteria.add(Restrictions.ilike("user_name", authResult.getName()));
+		criteria.add(Restrictions.eq("user_name", authResult.getName()));
 
-		if (criteria.list().size() > 0) {
-			return (User)criteria.list().get(0);
+		LOGGER.debug("Requesting user now");
+
+		User u = (User) criteria.uniqueResult();
+
+		LOGGER.debug("Got user from session: " + u.getId());
+
+		return u;
+
+	}
+
+	/**
+	 * Checks whether the user identified by given userName belongs to at least
+	 * one group which has the given roleName.
+	 *
+	 * @param userName
+	 * @param roleName
+	 * @return
+	 */
+	public boolean hasUserRoleByUsernameAndRolename(String userName, String roleName) {
+		boolean hasRole = false;
+
+		Criteria criteria = this.getSessionFactory().getCurrentSession().createCriteria(User.class);
+		criteria.add(Restrictions.eq("user_name", userName));
+		criteria.createCriteria("groups", "g");
+		criteria.createCriteria("g.roles", "r");
+		criteria.add(Restrictions.eq("r.name", roleName));
+		criteria.setProjection(Projections.rowCount());
+
+		long rowCnt = 0;
+
+		try {
+			rowCnt = ((Number)criteria.uniqueResult()).longValue();
+			hasRole = (rowCnt > 0l);
+		} catch (HibernateException he) {
+			LOGGER.error("Failed to determine whether"
+					+ " user with username '" + userName + "'"
+					+ " has the role with name '" + roleName + "':"
+					+ " " + he.getMessage());
 		}
-		else {
-			return null;
-		}
+
+		return hasRole;
 	}
 
 	/**
@@ -1169,20 +1629,11 @@ public class DatabaseDao {
 	 * @return flag SuperAdmin=true/false
 	 */
 	public boolean isSuperAdmin() {
-
 		// get the logged-in user and check if he has the SuperAdmin role
 		User sessionUser = this.getUserObjectFromSession();
-		Set<Role> roles = sessionUser.getRoles();
-
-		for (Role role : roles) {
-			if (role.getName().equals(User.ROLENAME_SUPERADMIN)) {
-				return true;
-			}
-		}
-
-		return false;
+		return sessionUser.hasSuperAdminRole();
 	}
-	
+
 	/**
 	 * Helper function to print out the SQL from a criteria object
 	 *

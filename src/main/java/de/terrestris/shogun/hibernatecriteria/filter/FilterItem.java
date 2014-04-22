@@ -6,52 +6,52 @@ import java.util.Vector;
 
 /**
  * This class represents a filter item
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class FilterItem implements Serializable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4913019526806074963L;
 
 	/**
-	 * 
+	 *
 	 */
 	private String fieldName;
 
 	/**
-	 * 
+	 *
 	 */
 	private Operator operator;
 
 	/**
-	 * 
+	 *
 	 */
 	private List<FilterOperand> operands = new Vector<FilterOperand>();
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 */
 	public enum Operator {
-		
 		Equals,
-		Smaller, 
-		Greater, 
-		SmallerEq, 
-		GreaterEq, 
+		Smaller,
+		Greater,
+		SmallerEq,
+		GreaterEq,
 		Like,
-		ILike, 
-		Between, 
-		Any, 
-		NotNull, 
+		ILike,
+		Between,
+		Any,
+		NotNull,
 		Statement,
-		In, 
-		NotEquals, 
-		NotLike, 
+		In,
+		NotIn,
+		NotEquals,
+		NotLike,
 		IsNull,
 		DWithin
 	}
@@ -103,5 +103,5 @@ public class FilterItem implements Serializable {
 	public void setOperands(List<FilterOperand> operands) {
 		this.operands = operands;
 	}
-	
+
 }

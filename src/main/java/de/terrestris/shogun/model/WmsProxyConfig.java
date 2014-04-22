@@ -4,21 +4,23 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * WmsProxyConfig POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO remove this for 0.1 release?
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_WMSPROXYCONFIG")
 public class WmsProxyConfig extends OwsProxyConfig {
-	
+
 	private String layers;
 	private String srs;
 	private String styles;
@@ -28,8 +30,8 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	private String format;
 	private String exceptions;
 	private String transparent;
-	
-	
+
+
 	/**
 	 * @return the layers
 	 */
@@ -43,7 +45,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setLayers(String layers) {
 		this.layers = layers;
 	}
-	
+
 	/**
 	 * @return the srs
 	 */
@@ -57,7 +59,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setSrs(String srs) {
 		this.srs = srs;
 	}
-	
+
 	/**
 	 * @return the styles
 	 */
@@ -71,7 +73,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setStyles(String styles) {
 		this.styles = styles;
 	}
-	
+
 	/**
 	 * @return the bbox
 	 */
@@ -85,7 +87,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setBbox(String bbox) {
 		this.bbox = bbox;
 	}
-	
+
 	/**
 	 * @return the width
 	 */
@@ -99,7 +101,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setWidth(String width) {
 		this.width = width;
 	}
-	
+
 	/**
 	 * @return the height
 	 */
@@ -113,7 +115,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setHeight(String height) {
 		this.height = height;
 	}
-	
+
 	/**
 	 * @return the format
 	 */
@@ -127,7 +129,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setFormat(String format) {
 		this.format = format;
 	}
-	
+
 	/**
 	 * @return the exceptions
 	 */
@@ -141,7 +143,7 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setExceptions(String exceptions) {
 		this.exceptions = exceptions;
 	}
-	
+
 	/**
 	 * @return the transparent
 	 */
@@ -155,6 +157,22 @@ public class WmsProxyConfig extends OwsProxyConfig {
 	public void setTransparent(String transparent) {
 		this.transparent = transparent;
 	}
-	
-	
+
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("layers", layers)
+			.append("srs", srs)
+			.append("styles", styles)
+			.append("bbox", bbox)
+			.append("width", width)
+			.append("height", height)
+			.append("format", format)
+			.append("exceptions", exceptions)
+			.append("transparent", transparent)
+			.toString();
+	}
 }

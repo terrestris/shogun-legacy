@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.terrestris.shogun.jsonmodel;
 
@@ -10,13 +10,13 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import de.terrestris.shogun.model.WmsProxyConfig;
 
 /**
- * 
+ *
  * @author terrestris GmbH & Co. KG
  *
  */
 @JsonAutoDetect
 public class WmsProxyConfigList {
-	
+
     List<WmsProxyConfig> wmsProxyConfigs;
 
 	/**
@@ -32,5 +32,5 @@ public class WmsProxyConfigList {
 	public void setWmsProxyConfigs(List<WmsProxyConfig> wmsProxyConfigs) {
 		this.wmsProxyConfigs = wmsProxyConfigs;
 	}
-    
+
 }

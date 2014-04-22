@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.terrestris.shogun.jsonmodel;
 
@@ -11,13 +11,13 @@ import de.terrestris.shogun.model.Group;
 
 /**
  * The POJO for a list of Group items.
- * 
+ *
  * @author terrestris GmbH & Co. KG
  *
  */
 @JsonAutoDetect
 public class GroupList {
-	
+
 	List<Group> groups;
 
 	/**

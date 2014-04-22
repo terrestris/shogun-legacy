@@ -6,32 +6,32 @@ import java.util.Vector;
 /**
  * Class defining the filter for a query
  * Has one or more filter items (criteria)
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class Filter {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public enum LogicalOperator {
 		AND,
 		OR
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private List<FilterItem> filterItems = new Vector<FilterItem>();
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private LogicalOperator logicalOperator = LogicalOperator.AND;
-	
+
 	/**
-	 * 
+	 *
 	 * @param filterItem
 	 */
 	public void addFilterItem(FilterItem filterItem) {
@@ -51,11 +51,9 @@ public class Filter {
 	public void setLogicalOperator(LogicalOperator logicalOperator) {
 		this.logicalOperator = logicalOperator;
 	}
-	
-
 
 	/**
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */
@@ -64,19 +62,11 @@ public class Filter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public int getFilterItemCount() {
 		return filterItems.size();
 	}
-//	
-//	
-//
-//
-//	public FilterItem[] getFilterItemArray() {
-//		return filterItems.toArray(new FilterItem[0]);
-//	}
-	
-	
+
 }

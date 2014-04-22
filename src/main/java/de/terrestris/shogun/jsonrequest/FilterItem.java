@@ -2,9 +2,9 @@ package de.terrestris.shogun.jsonrequest;
 
 /**
  * Class represents a filter criteria as POJO Given by the client
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class FilterItem {
 

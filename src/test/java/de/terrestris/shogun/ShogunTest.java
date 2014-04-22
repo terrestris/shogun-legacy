@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for SHOGun
- * 
+ *
  * TODO implement
  */
 public class ShogunTest {

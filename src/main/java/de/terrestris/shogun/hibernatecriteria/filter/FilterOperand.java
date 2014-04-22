@@ -1,17 +1,17 @@
 package de.terrestris.shogun.hibernatecriteria.filter;
 
 /**
- * 
+ *
  */
 public class FilterOperand {
 
 	/**
-	 * 
+	 *
 	 */
 	private Object operand;
-	
+
 	/**
-	 * 
+	 *
 	 * @param operand
 	 */
 	public FilterOperand(Object operand) {
@@ -19,7 +19,7 @@ public class FilterOperand {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Object getOperand() {
@@ -27,7 +27,7 @@ public class FilterOperand {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param operand
 	 */
 	public void setOperand(Object operand) {

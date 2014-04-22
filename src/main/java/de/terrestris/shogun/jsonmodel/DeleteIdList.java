@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.terrestris.shogun.jsonmodel;
 
@@ -9,13 +9,13 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * The POJO for a list of entities.
- * 
+ *
  * @author terrestris GmbH & Co. KG
  *
  */
 @JsonAutoDetect
 public class DeleteIdList {
-	
+
 	List<Integer> deleteIds;
 
 	/**

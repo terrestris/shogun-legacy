@@ -15,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
@@ -24,7 +23,6 @@ import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.MapConfig;
 import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.model.Role;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.model.WfsProxyConfig;
 import de.terrestris.shogun.model.WmsProxyConfig;
@@ -88,7 +86,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			mailtext += "Ihr SHOGun-Passwort wurde geändert und lautet \n\n";
 			mailtext += newPassword + "\n\n";
 
-			Mail.send("localhost", user.getUser_email(),
+			Mail.send("localhost", 25, user.getUser_email(),
 					"admin", "Passwort-Änderung bei SHOGun", mailtext);
 
 		} catch (Exception e) {
@@ -189,16 +187,14 @@ public class UserAdministrationService extends AbstractShogunService {
 			//TODO remove this static mail text
 			String mailtext = "Sehr geehrter Nutzer " + user.getUser_name()
 					+ "\n\n";
-			mailtext += "Ihr Passwort zur Terrestris Suite lautet \n\n";
+			mailtext += "Ihr SHOGun-Passwort lautet \n\n";
 			mailtext += pw + "\n\n";
 
-			Mail.send("localhost", user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
-
-			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
+			Mail.send("localhost", 25, user.getUser_email(), "admin", "Registrierung bei SHOGun", mailtext);
 
 			// write in DB
 			// do setSessionGroup only in case of beeing NO SuperAdmin
-			newuser = this.getDatabaseDao().createUser(user, "ROLE_USER", true);
+			newuser = this.getDatabaseDao().createUser(user, true);
 
 			LOGGER.debug(" USER RETURNED: " + newuser.getId());
 
@@ -231,13 +227,6 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			// user to be updated
 			User user = iterator.next();
-
-			List<Module> newModules = null;
-
-			// create module object list
-			user.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
-			newModules = null;
 
 			// Check if logged-in user has the same group than the
 			// user to be updated
@@ -275,16 +264,9 @@ public class UserAdministrationService extends AbstractShogunService {
 				user.setMapConfig(oldUser.getMapConfig());
 			}
 
-			// if mapLayers is empty in request from client, keep the old
-			// one
-			if (user.getMapLayers() == null) {
-				user.setMapLayers(oldUser.getMapLayers());
-			}
-
-			// if roles is empty in request from client, keep the old
-			// one
-			if (user.getRoles() == null) {
-				user.setRoles(oldUser.getRoles());
+			// if groups is empty in request from client, keep the old one
+			if (user.getGroups() == null) {
+				user.setGroups(oldUser.getGroups());
 			}
 
 			// write in DB
@@ -562,10 +544,6 @@ public class UserAdministrationService extends AbstractShogunService {
 		Group updatedGroup = (Group) this.getDatabaseDao().updateEntity(
 				Group.class.getSimpleName(), groupToUpdate);
 
-		// Overwrite sub-admin settings
-		subadmin.setUser_module_list(updatedGroup.getGroup_module_list());
-		subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
-
 		// update the sub-admin
 		this.getDatabaseDao().updateUser(subadmin);
 
@@ -660,10 +638,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			subadmin.setUser_name("subadmin_" + group.getGroup_nr());
 			subadmin.setUser_street(group.getStreet());
 			subadmin.setUser_lang(group.getLanguage());
-			subadmin.setUser_module_list(group.getGroup_module_list());
-
-			// create ModuleArray from Module-comma-separated list
-			subadmin.transformSimpleModuleListToModuleObjects(this.getDatabaseDao());
 
 			// TODO become more flexibel here, wrap to method
 			// set the default map conf
@@ -671,10 +645,6 @@ public class UserAdministrationService extends AbstractShogunService {
 			MapConfig mapConfig =
 				(MapConfig)this.getDatabaseDao().getEntityById(1, MapConfig.class);
 			if (mapConfig != null) {
-	//				Set newMapConfSet = new HashSet<MapConfig>();
-	//				newMapConfSet.add(mapConfig);
-	//				subadmin.setMapConfigs(newMapConfSet);
-
 				subadmin.setMapConfig(mapConfig);
 			}
 			// TODO become more flexibel here, wrap to method
@@ -707,8 +677,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			// save sub-admin to database
 			User persistentSubadmin =
-				this.getDatabaseDao().createUser(
-						subadmin, User.ROLENAME_ADMIN, false);
+				this.getDatabaseDao().createUser(subadmin, false);
 
 			// send a mail with the new password
 			String mailtext = "Sehr geehrter Nutzer " + subadmin.getUser_name()
@@ -718,7 +687,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			try {
 
-				Mail.send("localhost", subadmin.getUser_email(), "admin",
+				Mail.send("localhost", 25, subadmin.getUser_email(), "admin",
 						"Registrierung bei SHOGun", mailtext);
 			} catch (Exception e) {
 				throw new ShogunServiceException(e.getMessage());

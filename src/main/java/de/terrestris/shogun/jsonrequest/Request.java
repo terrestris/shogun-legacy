@@ -1,13 +1,15 @@
 package de.terrestris.shogun.jsonrequest;
 
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * Class represents a complex request to the backend with filter, sort criteria
  * etc...
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 public class Request {
@@ -16,15 +18,24 @@ public class Request {
 	 * The model class-name which is requested
 	 */
 	private String object_type;
-	
+
 	/**
 	 * Filter conditions
 	 */
 	private Filter filter;
-	
+
 	/**
-	 * Additional Filter conditions that are added as global conjunction. 
-	 * 
+	 *
+	 */
+	private Set<String> fields;
+
+	/**
+	 *
+	 */
+	private Set<String> ignoreFields;
+	/**
+	 * Additional Filter conditions that are added as global conjunction.
+	 *
 	 * This is only a intermediate solution.
 	 */
 	private Filter globalAndFilter;
@@ -33,9 +44,9 @@ public class Request {
 	 * Sort criteria
 	 */
 	private Sort sortObject;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private Paging pagingObject;
 
@@ -45,7 +56,7 @@ public class Request {
 	public void finalize() throws Throwable {
 	}
 
-	
+
 
 	public String getObject_type() {
 		return object_type;
@@ -56,7 +67,7 @@ public class Request {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return filter
 	 */
 	 public Filter getFilter() {
@@ -64,14 +75,28 @@ public class Request {
 	 }
 
 	/**
-	 * 
+	 *
 	 * @param filter
 	 */
 	public void setFilter(Filter filter) {
 		this.filter = filter;
 	}
 
-	
+
+	/**
+	 * @return the fields
+	 */
+	public Set<String> getFields() {
+		return fields;
+	}
+
+	/**
+	 * @param fields the fields to set
+	 */
+	public void setFields(Set<String> fields) {
+		this.fields = fields;
+	}
+
 	/**
 	 * @return the globalAndFilter
 	 */
@@ -113,7 +138,19 @@ public class Request {
 	public void setPagingObject(Paging pagingObject) {
 		this.pagingObject = pagingObject;
 	}
-	
-	
+
+	public Set<String> getIgnoreFields() {
+		// TODO Auto-generated method stub
+		return ignoreFields;
+	}
+
+	/**
+	 * @param ignoreFields the ignoreFields to set
+	 */
+	public void setIgnoreFields(Set<String> ignoreFields) {
+		this.ignoreFields = ignoreFields;
+	}
+
+
 
 }

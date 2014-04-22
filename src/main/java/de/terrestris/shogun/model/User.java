@@ -1,25 +1,28 @@
 package de.terrestris.shogun.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
-import de.terrestris.shogun.dao.DatabaseDao;
+import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * User POJO
@@ -35,36 +38,35 @@ import de.terrestris.shogun.dao.DatabaseDao;
 @Embeddable
 public class User extends BaseModel {
 
-	public static final String ROLENAME_SUPERADMIN = "ROLE_SUPERADMIN";
-	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
-	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
-
 	private String user_name;
 	private String user_longname;
+	private String user_firstname;
+	private String user_lastname;
+	private String user_title;
 	private String user_email;
 	private String user_street;
 	private String user_postcode;
 	private String user_city;
 	private String user_country;
+	private String user_bureau;
+	private String user_department;
+	private String user_unit;
+	private String user_description;
 	private String user_password;
 	private String user_lang;
+
 	private Boolean active = true;
 
 	private Set<Group> groups;
-	private Set<Module> modules;
-	private Set<MapLayer> mapLayers;
-//	private Set<MapConfig> mapConfigs;
 	private MapConfig mapConfig;
 	private WfsProxyConfig wfsProxyConfig;
 	private WmsProxyConfig wmsProxyConfig;
-	private Set<Role> roles;
-	private String user_module_list;
 
 
 	/**
 	 * @return the user_name
 	 */
-	@Column(name="USER_NAME", length=50)
+	@Column(name="USER_NAME", length=50, unique=true)
 	public String getUser_name() {
 		return user_name;
 	}
@@ -92,6 +94,47 @@ public class User extends BaseModel {
 		this.user_longname = user_longname;
 	}
 
+	/**
+	 * @return the user_firstname
+	 */
+	public String getUser_firstname() {
+		return user_firstname;
+	}
+
+	/**
+	 * @param user_firstname the user_firstname to set
+	 */
+	public void setUser_firstname(String user_firstname) {
+		this.user_firstname = user_firstname;
+	}
+
+	/**
+	 * @return the user_lastname
+	 */
+	public String getUser_lastname() {
+		return user_lastname;
+	}
+
+	/**
+	 * @param user_lastname the user_lastname to set
+	 */
+	public void setUser_lastname(String user_lastname) {
+		this.user_lastname = user_lastname;
+	}
+
+	/**
+	 * @return the user_title
+	 */
+	public String getUser_title() {
+		return user_title;
+	}
+
+	/**
+	 * @param user_title the user_title to set
+	 */
+	public void setUser_title(String user_title) {
+		this.user_title = user_title;
+	}
 
 	/**
 	 * @return the user_email
@@ -174,6 +217,62 @@ public class User extends BaseModel {
 
 
 	/**
+	 * @return the user_bureau
+	 */
+	public String getUser_bureau() {
+		return user_bureau;
+	}
+
+	/**
+	 * @param user_bureau the user_bureau to set
+	 */
+	public void setUser_bureau(String user_bureau) {
+		this.user_bureau = user_bureau;
+	}
+
+	/**
+	 * @return the user_department
+	 */
+	public String getUser_department() {
+		return user_department;
+	}
+
+	/**
+	 * @param user_department the user_department to set
+	 */
+	public void setUser_department(String user_department) {
+		this.user_department = user_department;
+	}
+
+	/**
+	 * @return the user_unit
+	 */
+	public String getUser_unit() {
+		return user_unit;
+	}
+
+	/**
+	 * @param user_unit the user_unit to set
+	 */
+	public void setUser_unit(String user_unit) {
+		this.user_unit = user_unit;
+	}
+
+	/**
+	 * @return the user_description
+	 */
+	public String getUser_description() {
+		return user_description;
+	}
+
+	/**
+	 * @param user_description the user_description to set
+	 */
+	public void setUser_description(String user_description) {
+		this.user_description = user_description;
+	}
+
+	/**
 	 * @return the user_password
 	 */
 	@JsonIgnore
@@ -226,6 +325,8 @@ public class User extends BaseModel {
 	 */
 	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	@JsonIgnore
+	@Fetch(FetchMode.SUBSELECT)
+	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<Group> getGroups() {
 		return groups;
 	}
@@ -236,76 +337,6 @@ public class User extends BaseModel {
 	public void setGroups(Set<Group> groups) {
 		this.groups = groups;
 	}
-
-	/**
-	 * We probably should use a set in future, due to a know limitation
-	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-	 *
-	 * @return the modules
-	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
-	@JoinTable(name = "TBL_USER_TBL_MODULE",  joinColumns = {
-			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
-			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
-					nullable = false, updatable = false) })
-	public Set<Module> getModules() {
-		return modules;
-	}
-
-	/**
-	 * We probably should use a set in future, due to a know limitation
-	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-	 *
-	 * @param modules the modules to set
-	 */
-	@JsonIgnore
-	public void setModules(Set<Module> modules) {
-		this.modules = modules;
-	}
-
-
-	/**
-	 * @return the mapLayers
-	 */
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "TBL_USER_TBL_MAPLAYER",  joinColumns = {
-			@JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
-			inverseJoinColumns = { @JoinColumn(name = "MAPLAYER_ID",
-					nullable = false, updatable = false) })
-	public Set<MapLayer> getMapLayers() {
-		return mapLayers;
-	}
-
-	/**
-	 * @param mapLayers the mapLayers to set
-	 */
-	public void setMapLayers(Set<MapLayer> mapLayers) {
-		this.mapLayers = mapLayers;
-	}
-
-//	/**
-//	 * We have to use a Set instead of List, due to a know limitation
-//	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-//	 *
-//	 * @return the mapConfigs
-//	 */
-//	@OneToMany(fetch = FetchType.EAGER, targetEntity=MapConfig.class)
-//	@Cache(usage = CacheConcurrencyStrategy.NONE)
-//	public Set<MapConfig> getMapConfigs() {
-//		return mapConfigs;
-//	}
-//
-//	/**
-//	 * We have to use a Set instead of List, due to a know limitation
-//	 * http://jeremygoodell.com/2009/03/26/cannot-simultaneously-fetch-multiple-bags.aspx
-//	 *
-//	 * @param mapConfigs the mapConfigs to set
-//	 */
-//	@JsonIgnore
-//	public void setMapConfigs(Set<MapConfig> mapConfigs) {
-//		this.mapConfigs = mapConfigs;
-//	}
-
 
 	/**
 	 * @return the mapConfig
@@ -322,22 +353,6 @@ public class User extends BaseModel {
 	public void setMapConfig(MapConfig mapConfig) {
 		this.mapConfig = mapConfig;
 	}
-
-	/**
-	 * @return the simpleModuleList
-	 */
-	@Column(name="USER_MODULE_LIST")
-	public String getUser_module_list() {
-		return user_module_list;
-	}
-
-	/**
-	 * @param simpleModuleList the simpleModuleList to set
-	 */
-	public void setUser_module_list(String simpleModuleList) {
-		this.user_module_list = simpleModuleList;
-	}
-
 
 	/**
 	 * @return the wfsProxyConfig
@@ -374,62 +389,22 @@ public class User extends BaseModel {
 		this.wmsProxyConfig = wmsProxyConfig;
 	}
 
-
 	/**
-	 * @return the roles
-	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Role.class)
-	public Set<Role> getRoles() {
-		return roles;
-	}
-
-	/**
-	 * @param roles the roles to set
-	 */
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
-
-
-	// ----------------------------------------------------------------
-
-
-	/**
+	 * Will return the unification of all modules of all groups the user
+	 * belongs to.
 	 *
-	 * @param databaseDAO
+	 * @return
 	 */
-	public void transformSimpleModuleListToModuleObjects(DatabaseDao databaseDAO) {
-		// create module object list from comma-separated list
-		Set<Module> newModules = null;
-
-		if (this.getUser_module_list() != null
-				&& this.getUser_module_list().equals("") == false) {
-
-			String[] moduleIdArray = this.getUser_module_list().split(",");
-			List<Integer> intArray = new ArrayList<Integer>();
-
-			for (int i = 0; i < moduleIdArray.length; i++) {
-				Integer inte = new Integer(moduleIdArray[i]);
-				intArray.add(inte);
+	@Transient
+	public Set<Module> getModules() {
+		Set<Module> allModulesOfUser = new HashSet<Module>();
+		Set<Group> groups = this.getGroups();
+		if(groups != null){
+			for (Group group : groups) {
+				allModulesOfUser.addAll(group.getModules());
 			}
-
-			List<? extends Object> modules = databaseDAO.getEntitiesByIds(
-					intArray.toArray(), Module.class);
-
-			newModules = new HashSet<Module>(modules.size());
-			for (Iterator<?> iterator2 = modules.iterator(); iterator2.hasNext();) {
-				Module module = (Module) iterator2.next();
-				newModules.add(module);
-			}
-
-			modules = null;
-
-		} else {
-			newModules = new HashSet<Module>();
 		}
-
-		Set<Module> moduleSet = new HashSet<Module>(newModules);
-		this.setModules(moduleSet);
+		return allModulesOfUser;
 	}
 
 	/**
@@ -440,9 +415,8 @@ public class User extends BaseModel {
 	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
 	 */
 	public boolean hasSuperAdminRole() {
-		return this.hasRole(User.ROLENAME_SUPERADMIN);
+		return this.hasRole(Group.ROLENAME_SUPERADMIN);
 	}
-
 
 	/**
 	 * Returns whether the user has role User.ROLENAME_ADMIN in his set of
@@ -452,7 +426,7 @@ public class User extends BaseModel {
 	 * @return whether the user has the queried role User.ROLENAME_SUPERADMIN.
 	 */
 	public boolean hasAdminRole() {
-		return this.hasRole(User.ROLENAME_ADMIN);
+		return this.hasRole(Group.ROLENAME_ADMIN);
 	}
 
 	/**
@@ -463,24 +437,93 @@ public class User extends BaseModel {
 	 * @return whether the user has the queried role User.ROLENAME_ANONYMOUS.
 	 */
 	public boolean hasAnonymousRole() {
-		return this.hasRole(User.ROLENAME_ANONYMOUS);
+		return this.hasRole(Group.ROLENAME_ANONYMOUS);
+	}
+
+	/**
+	 * Returns all Roles of the user by iterating over all his groups.
+	 *
+	 */
+	@Transient
+	public Set<Role> getRoles(){
+		Set<Role> myRoles = new HashSet<Role>();
+		Set<Group> myGroups = this.getGroups();
+		if(myGroups != null){
+			for(Group g : myGroups){
+				myRoles.addAll(g.getRoles());
+			}
+		}
+
+		return myRoles;
 	}
 
 	/**
 	 * Returns whether the user has the given role in his set of roles by
 	 * Comparing the name of all roles to the given string.
 	 *
-	 * @param rolename The rolename to check this users set of roles for
+	 * @param searchRoleName The rolename to check this users set of roles for
 	 * @return whether the user has the queried role or not.
 	 */
-	private boolean hasRole(String rolename) {
-		for (Iterator<Role> iterator = this.getRoles().iterator(); iterator.hasNext();) {
-			Role role = (Role) iterator.next();
-
-			if (role.getName().equals(rolename)) {
-				return true;
+	private boolean hasRole(String searchRoleName) {
+		boolean hasRole = false;
+		for (Role r : this.getRoles()) {
+			hasRole = r.getName().equals(searchRoleName);
+			if (hasRole) {
+				break;
 			}
 		}
-		return false;
+		return hasRole;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 *
+	 * According to
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(37, 13). // two randomly chosen prime numbers
+				appendSuper(super.hashCode()).
+				append(getUser_longname()).
+				append(getUser_email()).
+				toHashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 *
+	 * According to
+	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+	 * it is recommended only to use getter-methods when using ORM like Hibernate
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof User))
+			return false;
+		User other = (User) obj;
+
+		return new EqualsBuilder().
+				appendSuper(super.equals(other)).
+				append(getUser_longname(), other.getUser_longname()).
+				isEquals();
+	}
+
+	/**
+	 *
+	 */
+	public String toString(){
+		return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+			.appendSuper(super.toString())
+			.append("user_name", user_name)
+			.append("user_firstname", user_firstname)
+			.append("user_lastname", user_lastname)
+			.append("user_longname", user_longname)
+			.append("user_email", user_email)
+			.append("user_country", user_country)
+			.append("active", active)
+			.append("mapConfig", mapConfig)
+			.toString();
 	}
 }
