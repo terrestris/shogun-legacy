@@ -129,8 +129,8 @@ public class BaseModelInheritance implements BaseModelInterface {
 
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -143,8 +143,8 @@ public class BaseModelInheritance implements BaseModelInterface {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -175,7 +175,7 @@ public class BaseModelInheritance implements BaseModelInterface {
 			.append("app_user", app_user)
 			.toString();
 	}
-	
+
 	/**
 	 * Returns a short string which contains the most basic info about the
 	 * object instance: the simple class name and the id.

@@ -12,7 +12,7 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-    <!-- Using c3p0 connection pooling. 
+    <!-- Using c3p0 connection pooling.
          See http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/jdbc.html#jdbc-datasource
     -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
@@ -21,20 +21,20 @@
         <property name="user"><value>${jdbc.username}</value></property>
         <property name="password"><value>${jdbc.password}</value></property>
     </bean>
-    
+
     <context:property-placeholder location="WEB-INF/jdbc.properties" />
 
 	<!-- database connection via JDBC driver -->
 	<!-- <bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource"> -->
-		<!-- <property name="driverClassName"><value>oracle.jdbc.driver.OracleDriver</value></property> 
-			<property name="url"><value>jdbc:oracle:thin:@<host>:<port>:<dbname></value></property> 
+		<!-- <property name="driverClassName"><value>oracle.jdbc.driver.OracleDriver</value></property>
+			<property name="url"><value>jdbc:oracle:thin:@<host>:<port>:<dbname></value></property>
 			<property name="username"><value>scott</value></property> <property name="password"><value>xxxxx</value></property> -->
-		<!-- <property name="driverClassName"><value>org.postgresql.Driver</value></property> 
-			<property name="url"><value>jdbc:postgresql://localhost/shogun-mvn</value></property> 
+		<!-- <property name="driverClassName"><value>org.postgresql.Driver</value></property>
+			<property name="url"><value>jdbc:postgresql://localhost/shogun-mvn</value></property>
 			<property name="username"><value>mayer</value></property> <property name="password"><value></value></property> -->
 
-		<!-- enter your absolute path as "url" to store the H2 database, "~" for 
+		<!-- enter your absolute path as "url" to store the H2 database, "~" for
 			home is also supported.
 		-->
 		<!-- <property name="driverClassName">
@@ -47,11 +47,11 @@
 		<property name="password">
 			<value></value>
 		</property> -->
-		
+
 		<!--
 			enter your absolute path as "url" to store the derby
 			database in, if you want to create a db, append ";create=true"
-		
+
 		<property name="driverClassName">
 			<value>org.apache.derby.jdbc.EmbeddedDriver</value>
 		</property>
@@ -64,7 +64,7 @@
 		</property>
 		-->
 	<!-- </bean> -->
-	
+
 	<!-- the packages containing hibernate models -->
 	<bean id="dbEntitiesPackages" class="java.util.ArrayList">
 		<constructor-arg>
@@ -95,7 +95,7 @@
 		</property>
 	</bean>
 
-	<!-- Transaction manager for a single Hibernate SessionFactory (alternative 
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative
 		to JTA) -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 

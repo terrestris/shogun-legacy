@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.terrestris.shogun.jsonmodel;
 
@@ -10,13 +10,13 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import de.terrestris.shogun.model.Module;
 
 /**
- * 
+ *
  * @author terrestris GmbH & Co. KG
  *
  */
 @JsonAutoDetect
 public class ModuleList {
-	
+
 	List<Module> modules;
 
 	/**

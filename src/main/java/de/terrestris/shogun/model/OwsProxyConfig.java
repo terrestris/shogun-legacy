@@ -8,20 +8,20 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * OwsProxyConfig Super Class
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO remove this for 0.1 release
- * 
+ *
  */
 @MappedSuperclass
 public class OwsProxyConfig extends BaseProxyConfig {
-	
+
 	private String version;
 	private String request;
 	private String service;
-	
-	
+
+
 	/**
 	 * @return the version
 	 */
@@ -35,7 +35,7 @@ public class OwsProxyConfig extends BaseProxyConfig {
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
+
 	/**
 	 * @return the request
 	 */
@@ -49,7 +49,7 @@ public class OwsProxyConfig extends BaseProxyConfig {
 	public void setRequest(String request) {
 		this.request = request;
 	}
-	
+
 	/**
 	 * @return the service
 	 */
@@ -63,7 +63,7 @@ public class OwsProxyConfig extends BaseProxyConfig {
 	public void setService(String service) {
 		this.service = service;
 	}
-	
+
 	/**
 	 *
 	 */

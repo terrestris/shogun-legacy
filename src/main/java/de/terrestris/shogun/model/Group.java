@@ -48,9 +48,9 @@ public class Group extends BaseModel{
 	public static final String ROLENAME_USER = "ROLE_USER";
 	public static final String ROLENAME_ADMIN = "ROLE_ADMIN";
 	public static final String ROLENAME_ANONYMOUS = "ROLE_ANONYMOUS";
-	
+
 	/**
-	 * These roles will be assigned for new groups when they do not have 
+	 * These roles will be assigned for new groups when they do not have
 	 * roles already. This Set isn't applied in a constructor, but when
 	 * creating instances of the Group-class e.g. in the service.
 	 */
@@ -86,7 +86,7 @@ public class Group extends BaseModel{
 	private String group_module_list;
 	private Set<Integer> grantedUsers;
 	private Set<Integer> grantedMapLayers;
-	
+
 	private boolean deletable;
 
 	/**
@@ -464,7 +464,7 @@ public class Group extends BaseModel{
 	public void setGroup_module_list(String group_module_list) {
 		this.group_module_list = group_module_list;
 	}
-	
+
 	/**
 	 * @return the deletable
 	 */
@@ -554,11 +554,11 @@ public class Group extends BaseModel{
 
 		newModules = null;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -572,8 +572,8 @@ public class Group extends BaseModel{
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -588,7 +588,7 @@ public class Group extends BaseModel{
 				append(getName(), other.getName()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */

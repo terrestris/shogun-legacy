@@ -6,13 +6,13 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
-		
+
 	<!-- flag for enabling/disabling the automatic init-script on startup -->
 	<bean id="databaseInitializationEnabled" class="java.lang.Boolean">
 		<constructor-arg value="true"></constructor-arg>
 	</bean>
 
-	<!-- A bean to be used by the initialize database bean that represents the 
+	<!-- A bean to be used by the initialize database bean that represents the
 		standard WmsMapLayer object, that e.g. the anonymous user will get. -->
 	<bean id="stdWmsMapLayer" class="de.terrestris.shogun.model.WmsMapLayer">
 		<property name="url" value="http://ows.terrestris.de/osm-basemap/service/" />
@@ -23,8 +23,8 @@
 		<property name="type" value="WMS" />
 		<property name="isBaseLayer" value="true" />
 	</bean>
-	
-	<!-- A bean to be used by the initialize database bean that represents the 
+
+	<!-- A bean to be used by the initialize database bean that represents the
 		standard MapConfig object, that e.g. the anonymous user will get. -->
 	<bean id="stdMapConfig" class="de.terrestris.shogun.model.MapConfig">
 		<property name="center" value="1485021.845244, 6773120.0339171" />
@@ -54,12 +54,12 @@
 		<property name="company" value="SHOGun" />
 	</bean>
 
-	<!-- This bean initializes needed database objects 
-		 like users, roles etc, refers the above 
-		 created beans 
+	<!-- This bean initializes needed database objects
+		 like users, roles etc, refers the above
+		 created beans
 	-->
-	<bean id="databaseContentInitializer" 
-	  class="de.terrestris.shogun.init.DatabaseContentInitializer" 
+	<bean id="databaseContentInitializer"
+	  class="de.terrestris.shogun.init.DatabaseContentInitializer"
 	  init-method="initializeDatabaseContent">
 		<!-- The name of the user who will get the SUPERADMIN role -->
 		<property name="superAdminName" value="terrestris"/>
@@ -71,8 +71,8 @@
 		<property name="autoCreateAnonymousUser">
 			<value type="java.lang.Boolean">true</value>
 		</property>
-		
-		<!-- The list of modules available for assignment. Missing ones will be 
+
+		<!-- The list of modules available for assignment. Missing ones will be
 			 added. We currently will not delete modules that might already
 			 exist in the database. -->
 		<property name="availableModules">
@@ -127,8 +127,8 @@
 				</bean>
 			</list>
 		</property>
-		
-		<!-- The list of modules for the anonymous user. We currently will not 
+
+		<!-- The list of modules for the anonymous user. We currently will not
 			 delete modules that the user might already have. -->
 		<property name="modulesForAnonymous">
 			<list value-type="java.lang.String">
@@ -143,11 +143,11 @@
 				<ref local="stdMapConfig" />
 			</list>
 		</property>
-		
+
 		<property name="wmsMapLayer">
 			<ref local="stdWmsMapLayer"/>
 		</property>
-		
+
 		<property name="defaultAnonymousGroup">
             <ref local="stdAnonymousGroup"/>
         </property>
@@ -155,7 +155,7 @@
         <property name="defaultSuperAdminGroup">
             <ref local="stdSuperAdminGroup"/>
         </property>
-		
+
 	</bean>
-	
+
 </beans>

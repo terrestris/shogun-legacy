@@ -487,10 +487,10 @@ public class User extends BaseModel {
 	public boolean hasAnonymousRole() {
 		return this.hasRole(Group.ROLENAME_ANONYMOUS);
 	}
-	
+
 	/**
 	 * Returns all Roles of the user by iterating over all his groups.
-	 * 
+	 *
 	 */
 	@Transient
 	public Set<Role> getRoles(){
@@ -522,11 +522,11 @@ public class User extends BaseModel {
 		}
 		return hasRole;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -541,8 +541,8 @@ public class User extends BaseModel {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -557,7 +557,7 @@ public class User extends BaseModel {
 				append(getUser_longname(), other.getUser_longname()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */

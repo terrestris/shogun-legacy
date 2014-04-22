@@ -10,25 +10,25 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * WfsProxyConfig POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO remove this for 0.1 release?
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_WFSPROXYCONFIG")
 public class WfsProxyConfig extends OwsProxyConfig {
-	
+
 	private String typename;
 	private String srs;
 	private String bbox;
 	private String outputformat;
 	private String exceptions;
 	private String maxfeatures;
-	
-	
+
+
 	/**
 	 * @return the typename
 	 */
@@ -42,7 +42,7 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	public void setTypename(String typename) {
 		this.typename = typename;
 	}
-	
+
 	/**
 	 * @return the srs
 	 */
@@ -56,7 +56,7 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	public void setSrs(String srs) {
 		this.srs = srs;
 	}
-	
+
 	/**
 	 * @return the bbox
 	 */
@@ -70,7 +70,7 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	public void setBbox(String bbox) {
 		this.bbox = bbox;
 	}
-	
+
 	/**
 	 * @return the outputformat
 	 */
@@ -84,7 +84,7 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	public void setOutputformat(String outputformat) {
 		this.outputformat = outputformat;
 	}
-	
+
 	/**
 	 * @return the exceptions
 	 */
@@ -98,7 +98,7 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	public void setExceptions(String exceptions) {
 		this.exceptions = exceptions;
 	}
-	
+
 	/**
 	 * @return the maxfeatures
 	 */
@@ -112,7 +112,7 @@ public class WfsProxyConfig extends OwsProxyConfig {
 	public void setMaxfeatures(String maxfeatures) {
 		this.maxfeatures = maxfeatures;
 	}
-	
+
 	/**
 	 *
 	 */

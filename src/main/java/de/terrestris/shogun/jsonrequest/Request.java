@@ -7,9 +7,9 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 /**
  * Class represents a complex request to the backend with filter, sort criteria
  * etc...
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 public class Request {
@@ -18,24 +18,24 @@ public class Request {
 	 * The model class-name which is requested
 	 */
 	private String object_type;
-	
+
 	/**
 	 * Filter conditions
 	 */
 	private Filter filter;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private Set<String> fields;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private Set<String> ignoreFields;
 	/**
-	 * Additional Filter conditions that are added as global conjunction. 
-	 * 
+	 * Additional Filter conditions that are added as global conjunction.
+	 *
 	 * This is only a intermediate solution.
 	 */
 	private Filter globalAndFilter;
@@ -44,9 +44,9 @@ public class Request {
 	 * Sort criteria
 	 */
 	private Sort sortObject;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private Paging pagingObject;
 
@@ -56,7 +56,7 @@ public class Request {
 	public void finalize() throws Throwable {
 	}
 
-	
+
 
 	public String getObject_type() {
 		return object_type;
@@ -67,7 +67,7 @@ public class Request {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return filter
 	 */
 	 public Filter getFilter() {
@@ -75,14 +75,14 @@ public class Request {
 	 }
 
 	/**
-	 * 
+	 *
 	 * @param filter
 	 */
 	public void setFilter(Filter filter) {
 		this.filter = filter;
 	}
 
-	
+
 	/**
 	 * @return the fields
 	 */
@@ -150,7 +150,7 @@ public class Request {
 	public void setIgnoreFields(Set<String> ignoreFields) {
 		this.ignoreFields = ignoreFields;
 	}
-	
-	
+
+
 
 }

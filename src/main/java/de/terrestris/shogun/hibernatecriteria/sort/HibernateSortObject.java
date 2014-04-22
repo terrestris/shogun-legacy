@@ -8,22 +8,22 @@ import de.terrestris.shogun.jsonrequest.Sort;
 import de.terrestris.shogun.jsonrequest.SortItem;
 
 /**
- * 
+ *
  */
 public class HibernateSortObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private Class<?> mainClass = null;
 
 	/**
-	 * 
+	 *
 	 */
 	private List<HibernateSortItem> sortItems = new Vector<HibernateSortItem>();
 
 	/**
-	 * 
+	 *
 	 * @param mainClass
 	 */
 	public HibernateSortObject(Class<?> mainClass) {
@@ -32,7 +32,7 @@ public class HibernateSortObject {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param sortItem
 	 */
 	public void addSortItem(HibernateSortItem sortItem) {
@@ -42,7 +42,7 @@ public class HibernateSortObject {
 	/**
 	 * Static method creating a Hibernate sorting object by a given
 	 * JSON request object.
-	 * 
+	 *
 	 * @param clazz
 	 * @param plainSortObject
 	 * @return
@@ -69,52 +69,52 @@ public class HibernateSortObject {
 
 		return hibernateSortObject;
 	}
-	
+
 	/**
 	 * Method creates a Hibernate sorting object in a simplified way.
 	 * Only one sortItem is used here, which is defined only by the field and direction.
-	 * 
-	 * For more elaborated use-cases please consider using the method 
+	 *
+	 * For more elaborated use-cases please consider using the method
 	 * HibernateSortObject create(Class clazz, de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
-	 * 
+	 *
 	 * @param clazz
 	 * @param field
 	 * @param dir
 	 * @return
 	 */
 	public static HibernateSortObject create(Class<?> clazz, String field, String dir) {
-		
+
 		SortItem sortItem = new SortItem();
 		sortItem.setDir(dir);
 		sortItem.setSort(field);
-		
+
 		List<SortItem> sortItems = new ArrayList<SortItem>();
 		sortItems.add(sortItem);
-		
+
 		Sort plainSortObject = new Sort();
 		plainSortObject.setSortItems(sortItems);
-		
+
 		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<?>) clazz, plainSortObject);
-		
+
 		return hibernateSortObject;
 	}
-	
+
 	/**
 	 * Method creates a Hibernate sorting object in a simplified way.
 	 * Only one sortItem is used here, which is defined only by the field.
 	 * Sort direction is set to ASC.
-	 * 
-	 * For more elaborated use-cases please consider using the method 
+	 *
+	 * For more elaborated use-cases please consider using the method
 	 * HibernateSortObject create(Class clazz, de.terrestris.shogun.jsonrequest.Sort plainSortObject) {
-	 * 
+	 *
 	 * @param clazz
 	 * @param field
 	 * @return
 	 */
 	public static HibernateSortObject create(Class<?> clazz, String field) {
-		
+
 		HibernateSortObject hibernateSortObject = HibernateSortObject.create((Class<?>) clazz, field, "ASC");
-		
+
 		return hibernateSortObject;
 	}
 
@@ -138,7 +138,7 @@ public class HibernateSortObject {
 	public List<HibernateSortItem> getSortItems() {
 		return sortItems;
 	}
-	
+
 	/**
 	 * @param sortItems
 	 */

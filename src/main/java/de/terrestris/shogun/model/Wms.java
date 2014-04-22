@@ -22,26 +22,26 @@ import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 
 /**
  * Wms POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_WMS")
 public class Wms extends BaseModel {
-	
+
 	private String supportedVersion;
 	private String baseUrl;
 	private Set<WmsLayer> wmsLayers;
-	
+
 	/**
 	 * The default Constructor
 	 */
 	public Wms() {
 
 	}
-	
+
 	/**
 	 * An alternative constructor for backwards compatibility: Field `wmsLayers`
 	 * is of type Set<WmsLayer>, no longer List<WmsLayer>.
@@ -54,7 +54,7 @@ public class Wms extends BaseModel {
 		this.supportedVersion = supportedVersion;
 		this.baseUrl = baseUrl;
 		this.wmsLayers = new HashSet<WmsLayer>(wmsLayers);
-		
+
 		this.setCreated_at(new Date());
 		this.setUpdated_at(new Date());
 	}
@@ -70,11 +70,11 @@ public class Wms extends BaseModel {
 		this.supportedVersion = supportedVersion;
 		this.baseUrl = baseUrl;
 		this.wmsLayers = wmsLayers;
-		
+
 		this.setCreated_at(new Date());
 		this.setUpdated_at(new Date());
 	}
-	
+
 	/**
 	 * @return the supportedVersion
 	 */
@@ -82,15 +82,15 @@ public class Wms extends BaseModel {
 	public String getSupportedVersion() {
 		return supportedVersion;
 	}
-	
+
 	/**
 	 * @param supportedVersion the supportedVersion to set
 	 */
 	public void setSupportedVersion(String supportedVersion) {
 		this.supportedVersion = supportedVersion;
 	}
-	
-	
+
+
 	/**
 	 * @return the baseUrl
 	 */
@@ -98,7 +98,7 @@ public class Wms extends BaseModel {
 	public String getBaseUrl() {
 		return baseUrl;
 	}
-	
+
 	/**
 	 * @param baseUrl the baseUrl to set
 	 */
@@ -106,7 +106,7 @@ public class Wms extends BaseModel {
 		this.baseUrl = baseUrl;
 	}
 
-	
+
 	/**
 	 * @return the wmsLayers
 	 */
@@ -123,7 +123,7 @@ public class Wms extends BaseModel {
 	public void setWmsLayers(Set<WmsLayer> wmsLayers) {
 		this.wmsLayers = wmsLayers;
 	}
-	
+
 	/**
 	 *
 	 */

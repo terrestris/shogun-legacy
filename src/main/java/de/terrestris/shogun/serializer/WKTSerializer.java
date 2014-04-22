@@ -11,14 +11,14 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A serializer that can handle JTS geometries.
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class WKTSerializer extends JsonSerializer<Geometry> {
 
     /**
-     * Overwrite the original serialize and return a WKT of the JTS geometry. 
+     * Overwrite the original serialize and return a WKT of the JTS geometry.
      */
     @Override
     public void serialize(Geometry jtsGeometry, JsonGenerator jgen,

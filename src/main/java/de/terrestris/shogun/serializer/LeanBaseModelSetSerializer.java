@@ -14,9 +14,9 @@ import de.terrestris.shogun.model.BaseModelInterface;
 /**
  * A serializer that takes sets of instances of {@link BaseModelInterface}
  * and returns a an array of the ids of the instances as serialisation value.
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @SuppressWarnings("rawtypes")
 public class LeanBaseModelSetSerializer extends JsonSerializer<Set> {
@@ -32,5 +32,5 @@ public class LeanBaseModelSetSerializer extends JsonSerializer<Set> {
 		}
 		jgen.writeEndArray();
 	}
-    
+
 }

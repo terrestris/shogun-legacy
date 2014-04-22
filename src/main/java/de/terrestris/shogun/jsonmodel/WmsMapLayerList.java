@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.terrestris.shogun.jsonmodel;
 
@@ -10,7 +10,7 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import de.terrestris.shogun.model.WmsMapLayer;
 
 /**
- * 
+ *
  * @author terrestris GmbH & Co. KG
  * @author Marc Jansen
  * @author Christian Mayer
@@ -18,19 +18,19 @@ import de.terrestris.shogun.model.WmsMapLayer;
  */
 @JsonAutoDetect
 public class WmsMapLayerList {
-	
+
     List<WmsMapLayer> wmsMapLayers;
-    
+
     /**
-     * 
+     *
      * @return List<WmsMapLayer>
      */
     public List<WmsMapLayer> getWmsMapLayers() {
 	    return wmsMapLayers;
     }
-    
+
     /**
-     * 
+     *
      * @param wmsMapLayers
      */
     public void setWmsMapLayers(List<WmsMapLayer> wmsMapLayers) {

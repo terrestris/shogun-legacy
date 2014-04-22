@@ -4,21 +4,21 @@ package de.terrestris.shogun.jsonmodel;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
- * 
+ *
  * A class representing the JSON of a request for LookUp tables (LUT)
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO still needed?
  *
  */
 @JsonAutoDetect
 public class LutParams {
-	
+
 	private String lut_name;
 	private String language;
-	
-	
+
+
 	/**
 	 * @return the lut_name
 	 */
@@ -43,5 +43,5 @@ public class LutParams {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	
+
 }

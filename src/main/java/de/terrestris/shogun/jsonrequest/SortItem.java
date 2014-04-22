@@ -4,9 +4,9 @@ package de.terrestris.shogun.jsonrequest;
 /**
  * Class represents a sort criteria as POJO
  * Given by the client
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class SortItem {
 
@@ -14,12 +14,12 @@ public class SortItem {
 	 * Field which should be used as sort criteria
 	 */
 	private String sort;
-	
+
 	/**
-	 * Sort direction ASC or DESC 
+	 * Sort direction ASC or DESC
 	 */
 	private String dir;
-	
+
 
 	/**
 	 * @return the sort

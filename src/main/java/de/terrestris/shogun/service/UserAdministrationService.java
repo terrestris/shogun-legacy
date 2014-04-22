@@ -265,7 +265,7 @@ public class UserAdministrationService extends AbstractShogunService {
 			if (user.getMapConfig() == null) {
 				user.setMapConfig(oldUser.getMapConfig());
 			}
-			
+
 			// if groups is empty in request from client, keep the old one
 			if (user.getGroups() == null) {
 				user.setGroups(oldUser.getGroups());
@@ -681,7 +681,7 @@ public class UserAdministrationService extends AbstractShogunService {
 
 			subadmin.setUser_password(hashed);
 
-			// save sub-admin to database 
+			// save sub-admin to database
 			User persistentSubadmin =
 				this.getDatabaseDao().createUser(subadmin, false);
 

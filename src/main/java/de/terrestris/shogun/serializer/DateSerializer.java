@@ -12,14 +12,14 @@ import org.codehaus.jackson.map.SerializerProvider;
 
 /**
  * A serializer that can handle java.util.Date-instances.
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class DateSerializer extends JsonSerializer<Date> {
-    
+
     /**
-     * Overwrite the original serialize and return a String representation of 
+     * Overwrite the original serialize and return a String representation of
      * the java.util.Date-instance.
      */
     @Override

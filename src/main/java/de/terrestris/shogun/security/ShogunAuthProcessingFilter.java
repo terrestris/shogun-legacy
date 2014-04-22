@@ -21,25 +21,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * based upon Blogs for Development
  * @see http://javajeedevelopment.blogspot.com/2011/02/integrating-spring-security-3-with.html
- * 
+ *
  * @author mbenrhouma
  */
 
 /**
- * Class overwrites the standard Spring Filter for 
+ * Class overwrites the standard Spring Filter for
  * User/Password authentication.
  * Steering our authentication process.
- * 
+ *
  * @author terrestris GmbH & Co. KG
  */
 public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFilter {
 
 	/**
 	 * On successful authentication by an Authentication Manager of Spring Security
-	 * we intercept with this method  and change the respone to include the ROLES of 
+	 * we intercept with this method  and change the respone to include the ROLES of
 	 * the logged in user.
 	 * This way we can react on the ROLES and redirect accordingly within the requesting login form (here login.js)
-	 * 
+	 *
 	 * @see WebContent/client/login.js
 	 */
     @Override
@@ -56,10 +56,10 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
             }
         });
         super.successfulAuthentication(request, response, authResult);
-        
+
         // build a comma separated string of the ROLES
         String authorityText = StringUtils.join(authResult.getAuthorities(), ",");
-        
+
         // write the servlet return object
         HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response);
         Writer out = responseWrapper.getWriter();
@@ -76,7 +76,7 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
     /**
      * React on unsuccessful authentication.
      * We again intercept the response and return a JSON object with a flag indicating unsuccessful login.
-     * 
+     *
      * @see WebContent/client/login.js
      */
     @Override

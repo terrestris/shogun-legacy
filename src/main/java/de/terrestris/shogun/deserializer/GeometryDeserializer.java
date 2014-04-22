@@ -9,27 +9,27 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
 /**
- * 
+ *
  * Class responsible for deserializing a Geometry
- * Makes a JTS Geometry object out of an WKT String 
- * 
+ * Makes a JTS Geometry object out of an WKT String
+ *
  * @author terrestris GmbH & Co. KG
  *
  */
 public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
 	/**
-	 * Overwrite the deserializer for WKT geometry strings 
+	 * Overwrite the deserializer for WKT geometry strings
 	 */
 	@Override
 	public Geometry deserialize(JsonParser jsonParser, DeserializationContext context)
 			throws JsonProcessingException {
-		
+
 		Geometry geom = null;
-		
+
 		try {
 			geom = new WKTReader().read(jsonParser.getText());
-			if(geom != null) { 
+			if(geom != null) {
 				//TODO: set the SRID dynamically
 				geom.setSRID(900913);
 			}
@@ -38,7 +38,7 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return geom;
 	}
 

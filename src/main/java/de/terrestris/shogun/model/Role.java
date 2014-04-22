@@ -13,9 +13,9 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * Role POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
@@ -39,11 +39,11 @@ public class Role extends BaseModel {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -57,8 +57,8 @@ public class Role extends BaseModel {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -73,7 +73,7 @@ public class Role extends BaseModel {
 				append(getName(), other.getName()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */

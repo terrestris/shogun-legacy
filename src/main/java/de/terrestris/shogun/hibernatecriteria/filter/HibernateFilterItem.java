@@ -25,25 +25,25 @@ import de.terrestris.shogun.hibernatecriteria.filter.FilterItem;
 
 /**
  * Class for a Hibernate filter condition
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 public class HibernateFilterItem extends FilterItem {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static Logger LOGGER = Logger.getLogger(HibernateFilterItem.class);
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7799174921527642750L;
 
 	/**
 	 * Creates a Hibernate criterion by filter conditions
-	 * 
+	 *
 	 * @return the hibernate criterion object
 	 */
 	public Criterion makeCriterion(Class<?> mainClass) {
@@ -55,9 +55,9 @@ public class HibernateFilterItem extends FilterItem {
 
 		String fieldName = this.getFieldName();
 		String originalFieldName = fieldName;
-		
+
 		boolean fieldNameContainsDot = (fieldName != null && fieldName.contains("."));
-		
+
 		// when we were called with a fieldname that contains a dot,
 		// we have to change the mainClass and the fieldname
 		if (fieldNameContainsDot) {
@@ -66,21 +66,21 @@ public class HibernateFilterItem extends FilterItem {
 			mainClass = clz;
 			fieldName = parts[1];
 		}
-		
+
 		String debugMsg = "Will create a '" + operator + "'-criterion" +
 				" for class '" + mainClass.getSimpleName() + "', field '" + fieldName + "'.";
-		
+
 		if (fieldNameContainsDot) {
 			debugMsg += " These values were determined from a fieldname" +
-				" with a dot in it. Originally we were passed '" + 
-				originalFieldName + "' as" + " fieldname and '" + 
+				" with a dot in it. Originally we were passed '" +
+				originalFieldName + "' as" + " fieldname and '" +
 				originalGivenClass.getSimpleName() + "' as class.";
 		}
 		LOGGER.debug(debugMsg);
-		
-		
+
+
 		int operandCount = this.getOperands().size();
-		
+
 		if (operandCount == 0) {
 			LOGGER.debug("Didn't receive any operands to convert. This might" +
 					" lead to problems if the used operator" +
@@ -92,7 +92,7 @@ public class HibernateFilterItem extends FilterItem {
 			LOGGER.debug("Received " + operandCount + " " + operandDsp +
 					" which probably " + needDsp + " conversion.");
 		}
-		
+
 		// Create an Object array with all operands casted to the final datatype
 		Object[] operandsObj = new Object[operandCount];
 		if (operator != Operator.Statement) {
@@ -108,18 +108,18 @@ public class HibernateFilterItem extends FilterItem {
 				operandsObj[0] = this.getOperands().get(0).getOperand().toString();
 			}
 		}
-		
+
 		// Since we most often use either one or two operands, save aliases
 		Object finalOperand1 = null;
 		Object finalOperand2 = null;
-		
+
 		if (operandCount >= 1) {
 			finalOperand1 = operandsObj[0];
 			if (operandCount >= 2) {
 				finalOperand2 = operandsObj[0];
 			}
 		}
-		
+
 		switch (operator) {
 		case Any:
 			List<Object[]> dividedOperands = this.divideObjectArray(operandsObj, 1000);
@@ -146,7 +146,7 @@ public class HibernateFilterItem extends FilterItem {
 			break;
 		case In:
 			List<Object[]> dividedOperands1 = this.divideObjectArray(operandsObj, 1000);
-			
+
 			Conjunction conj1 = Restrictions.conjunction();
 			for (Object[] dividedOperand : dividedOperands1) {
 				Criterion crit = Restrictions.in(originalFieldName, dividedOperand);
@@ -156,7 +156,7 @@ public class HibernateFilterItem extends FilterItem {
 			break;
 		case NotIn:
 			List<Object[]> dividedOperands2 = this.divideObjectArray(operandsObj, 1000);
-			
+
 			Conjunction conj2 = Restrictions.conjunction();
 			for (Object[] dividedOperand : dividedOperands2) {
 				Criterion crit = Restrictions.not(Restrictions.in(originalFieldName, dividedOperand));
@@ -199,12 +199,12 @@ public class HibernateFilterItem extends FilterItem {
 		}
 		return criterion;
 	}
-	
+
 	/**
 	 * Divides a given Object array into a number of Object arrays where the
 	 * length of the smaller chunks never exceeded the given maxCnt. Will return
 	 * the created chunks as a List.
-	 * 
+	 *
 	 * @param inObj
 	 * @param maxCnt
 	 * @return
@@ -221,7 +221,7 @@ public class HibernateFilterItem extends FilterItem {
 
 		final int numSubArrays = (int) Math.ceil(((double) inLength) / ((double) maxCnt));
 		int start = 0;
-		
+
 		for (int i = 0; i < numSubArrays; i++) {
 			int end = (i + 1) * maxCnt;
 			if (end > inLength) {
@@ -233,12 +233,12 @@ public class HibernateFilterItem extends FilterItem {
 		}
 		return dividedList;
 	}
-	
-	
+
+
 	/**
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
 	 * @param fieldName
 	 * @param mainClass
 	 * @return
@@ -254,9 +254,9 @@ public class HibernateFilterItem extends FilterItem {
 					break;
 				}
 			}
-			
+
 			Type t = f.getGenericType();
-			
+
 			if (t instanceof ParameterizedType) {
 				ParameterizedType pt = (ParameterizedType) t;
 				for (Type ttt : pt.getActualTypeArguments()) {
@@ -264,18 +264,18 @@ public class HibernateFilterItem extends FilterItem {
 					break;
 				}
 			}
-			
+
 		} catch (SecurityException e) {
 			LOGGER.warn("Failed to determine the ParameterizedType of Set " +
 					fieldName + " in class " + mainClass.getSimpleName());
 		}
-		
+
 		return c;
 	}
 
 	/**
 	 * Cast the operand to the correct data type of the model (DB)
-	 * 
+	 *
 	 * @param mainClass
 	 * @param fieldName
 	 * @param operand
@@ -285,20 +285,20 @@ public class HibernateFilterItem extends FilterItem {
 		Object finalOperand = null;
 		List<Field> fieldList = new ArrayList<Field>();
 		fieldList = this.getAllFields(fieldList, mainClass);
-		
-		
+
+
 		Class<?> jtsPointClass = com.vividsolutions.jts.geom.Point.class;
 		Class<?> jtsGeometryClass = com.vividsolutions.jts.geom.Geometry.class;
-		
+
 		for (int j = 0, m = fieldList.size(); j < m; j++) {
-			
+
 			Field field = fieldList.get(j);
-			
+
 			if (field.getName().equals(fieldName)) {
-				
+
 				Class<?> fieldType = field.getType();
 				String fieldTypeStr = fieldType.toString();
-				
+
 				if (fieldType.equals(java.lang.Integer.class)) {
 					// Class Integer
 					finalOperand = new Integer(operand);
@@ -323,15 +323,15 @@ public class HibernateFilterItem extends FilterItem {
 						finalOperand = new Date();
 						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						finalOperand = formatter.parse(operand);
-						
+
 					} catch (ParseException e) {
 						LOGGER.error("ParseException in hibernate filteritem for Date: " + operand, e);
 					}
 				} else if (fieldType.equals(jtsPointClass) || fieldType.equals(jtsGeometryClass)) {
-					// data type GEOMETRY POINT, etc... 
+					// data type GEOMETRY POINT, etc...
 					try {
 						Geometry point = new WKTReader().read((String)this.getOperands().get(0).getOperand());
-						
+
 						// we receive null for a string like %titt% although we catch ParseException
 						if (point != null) {
 							point.setSRID(900913); //TODO: set the SRID dynamically
@@ -347,12 +347,12 @@ public class HibernateFilterItem extends FilterItem {
 					// DEFAULT is String
 					finalOperand = operand;
 				}
-				
+
 				// found a matching field, determined a datatype and casted.
 				break;
 			}
 		}
-		
+
 		if (finalOperand == null) {
 			LOGGER.warn("Failed to determine the final data-type of field " +
 				fieldName + " in class " + mainClass.getSimpleName() +
@@ -363,11 +363,11 @@ public class HibernateFilterItem extends FilterItem {
 
 		return finalOperand;
 	}
-	
+
 	/**
 	 * TODO we have a very similar method in {@link DatabaseDao}.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param fields
 	 * @param type
 	 * @return

@@ -103,10 +103,10 @@ public class ShogunService extends AbstractShogunService {
 
 			hibernateSortObject = HibernateSortObject.create(clazz, sortObject);
 			hibernateFilter = HibernateFilter.create(clazz, filter);
-			
+
 			fields = request.getFields();
 			ignoreFields = request.getIgnoreFields();
-			
+
 			// needed to be able to have another global conjunction
 			// temporary solution
 			hibernateAdditionalFilter = HibernateFilter.create(clazz, additionalFilter);

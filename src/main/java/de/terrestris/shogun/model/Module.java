@@ -12,20 +12,20 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * Module POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_MODULE")
 public class Module extends BaseModel {
-	
-	
+
+
 	private String module_name;
 	private String module_fullname;
-	
-	
+
+
 	/**
 	 * @return the module_name
 	 */
@@ -41,7 +41,7 @@ public class Module extends BaseModel {
 		this.module_name = module_name;
 	}
 
-	
+
 	/**
 	 * @return the module_fullname
 	 */
@@ -56,11 +56,11 @@ public class Module extends BaseModel {
 	public void setModule_fullname(String module_fullname) {
 		this.module_fullname = module_fullname;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -74,8 +74,8 @@ public class Module extends BaseModel {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -90,7 +90,7 @@ public class Module extends BaseModel {
 				append(getModule_name(), other.getModule_name()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */

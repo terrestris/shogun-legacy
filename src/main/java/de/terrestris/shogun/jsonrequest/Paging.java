@@ -1,21 +1,21 @@
 package de.terrestris.shogun.jsonrequest;
 
 /**
- * POJO for a paging object in order to 
+ * POJO for a paging object in order to
  * deserialze the corresponding JSON object
- * 
+ *
  * @author terrestris GmbH & Co. KG
  *
  */
 public class Paging {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	String start;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	String limit;
 
@@ -46,7 +46,7 @@ public class Paging {
 	public void setLimit(String limit) {
 		this.limit = limit;
 	}
-	
-	
+
+
 
 }

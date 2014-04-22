@@ -15,7 +15,7 @@
          which is also defined in the web.xml. This context will override everything
          that matches the following context:component-scan base-package.
          This means that we should make explicit and precise base-package declarations in this context.
-         Otherwise we would overwrite things from the parent context, e.g. Hibernate-TransactionManger 
+         Otherwise we would overwrite things from the parent context, e.g. Hibernate-TransactionManger
     -->
     <context:component-scan base-package="de.terrestris.shogun.web" />
 

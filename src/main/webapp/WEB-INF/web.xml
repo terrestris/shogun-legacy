@@ -38,11 +38,11 @@
 
 	<!-- This is the binding of our self-defined class CustomHttpSessionListener
 		 for the handling of session timeouts and logouts.
-		 
-		 It is commented here as it currently only provides useful variables, but 
+
+		 It is commented here as it currently only provides useful variables, but
 		 is not implementing any logic such as cleanup of temporary data.
-		 
-	
+
+
 	<listener>
 		<listener-class>de.terrestris.suite.session.CustomHttpSessionListener</listener-class>
 	</listener>

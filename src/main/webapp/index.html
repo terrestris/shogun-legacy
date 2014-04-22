@@ -1,17 +1,17 @@
 <html>
 <head>
     <title>SHOGun</title>
-    
+
     <!-- ExtJS CSS -->
     <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.4.0/resources/css/ext-all.css" />
 
     <!-- ExtJS js -->
     <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.4.0/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.4.0/ext-all.js"></script>
-    
+
     <!-- App JS -->
     <script type="text/javascript">
-    
+
     /**
      *
      * Copyright (C) 2012  terrestris GmbH & Co. KG, info@terrestris.de
@@ -36,8 +36,8 @@
     var login;
     Ext.onReady(function(){
         Ext.QuickTips.init();
-       
-       
+
+
         var currentLoginStatePanel = new Ext.Panel({
             id: 'currentLoginStatePanel',
             title: 'login status',
@@ -54,8 +54,8 @@
             }],
             renderTo: Ext.getBody()
         });
-       
-       
+
+
         /**
          * Handler to do the submit to authorize.
          * Called on button click and ENTER press
@@ -66,12 +66,12 @@
                 success: function(form, responseObj){
                     var jsonResponse = Ext.decode(responseObj.response.responseText);
                     var role = jsonResponse.role;
-                    
+
                     Ext.getCmp('currentLoginStatePanel').update( 'Logged in with role: "' + role + '".' );
                     Ext.getCmp('logoutBtn').enable();
                 },
                 failure: function(form, responseObj){
-                    if (Ext.isDefined(responseObj.response) && !Ext.isEmpty(responseObj.response.statusText && responseObj.statusText === "Unauthorized")) {  
+                    if (Ext.isDefined(responseObj.response) && !Ext.isEmpty(responseObj.response.statusText && responseObj.statusText === "Unauthorized")) {
                         Ext.Msg.alert('Login Failed!', 'Authentifizierung fehlgeschlagen');
                     }
                     else if (!Ext.isEmpty(responseObj.failureType) && responseObj.failureType === "client"){
@@ -85,10 +85,10 @@
                 }
             });
         };
-       
+
         /**
          * Create a variable to hold our EXT login panel.
-         */ 
+         */
         var login = new Ext.FormPanel({
             labelWidth: 80,
             url: 'j_spring_security_check',
@@ -117,13 +117,13 @@
                 key: [Ext.EventObject.ENTER],
                 handler: doSubmit
             }]
-       
+
         });
-       
+
         /**
-         * This just creates a window to wrap the login form. 
+         * This just creates a window to wrap the login form.
          * The login form is passed to the items collection.
-         */    
+         */
         var win = new Ext.Window({
             layout: 'fit',
             width: 300,
@@ -136,7 +136,7 @@
         });
         win.show();
     });
-    
+
     </script>
 </head>
 <body>

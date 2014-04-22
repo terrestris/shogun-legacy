@@ -187,11 +187,11 @@ public class MapConfig extends BaseModel {
 	public void setScales(String scales) {
 		this.scales = scales;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -206,8 +206,8 @@ public class MapConfig extends BaseModel {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -223,7 +223,7 @@ public class MapConfig extends BaseModel {
 				append(getProjection(), other.getProjection()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */

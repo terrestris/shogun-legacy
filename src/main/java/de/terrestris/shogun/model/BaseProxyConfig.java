@@ -8,19 +8,19 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * BaseProxyConfig Super Class
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  * TODO remove for 0.1 release?
- * 
+ *
  */
 @MappedSuperclass
 public class BaseProxyConfig extends BaseModel {
-	
+
 	private String mandatoryParameters;
 	private String validatorClass;
-	
-	
+
+
 	/**
 	 * @return the mandatoryParameters
 	 */
@@ -34,7 +34,7 @@ public class BaseProxyConfig extends BaseModel {
 	public void setMandatoryParameters(String mandatoryParameters) {
 		this.mandatoryParameters = mandatoryParameters;
 	}
-	
+
 	/**
 	 * @return the validatorClass
 	 */
@@ -48,7 +48,7 @@ public class BaseProxyConfig extends BaseModel {
 	public void setValidatorClass(String validatorClass) {
 		this.validatorClass = validatorClass;
 	}
-	
+
 	/**
 	 *
 	 */

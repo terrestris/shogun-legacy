@@ -16,7 +16,7 @@ public class Password {
 
 	/**
 	 * Helper method to create a random password
-	 * 
+	 *
 	 * @param length the length of the password
 	 * @return the new password
 	 */

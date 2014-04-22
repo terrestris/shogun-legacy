@@ -281,7 +281,7 @@ public class DatabaseContentInitializer {
 		// This group isn't deletable as it is needed for the security approach
 		// we use.
 		desiredGroup.setDeletable(false);
-		
+
 		existingGroup = (Group) this.createOrApplyObjects(existingGroup,
 				desiredGroup);
 
@@ -328,11 +328,11 @@ public class DatabaseContentInitializer {
 		Group existingGroup = (Group) this.dbDao.getEntityByStringField(
 				Group.class, "group_nr", this.defaultSuperAdminGroup.getGroup_nr());
 
-		
+
 		// This group isn't deletable as it is needed for the security approach
 		// we use.
 		desiredGroup.setDeletable(false);
-		
+
 		existingGroup = (Group) this.createOrApplyObjects(existingGroup,
 				desiredGroup);
 

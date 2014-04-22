@@ -10,11 +10,11 @@ import java.util.Set;
  * A base class defining the web controllers.
  */
 public abstract class AbstractWebController {
-	
+
 	/**
 	 * Generates modelMap representing the JSON returning a set of
 	 * data records.
-	 * 
+	 *
 	 * @param data A list of {@link Object} to be returned
 	 * @return the map instance representing the JSON
 	 */
@@ -23,10 +23,10 @@ public abstract class AbstractWebController {
 		returnMap.put("total", data.size());
 		returnMap.put("data", data);
 		returnMap.put("success", true);
-		
+
 		return returnMap;
 	}
-	
+
 	/**
 	 * Generates modelMap representing the JSON returning a set of
 	 * data records.
@@ -46,7 +46,7 @@ public abstract class AbstractWebController {
 	/**
 	 * Generates modelMap representing the JSON returning one
 	 * data record.
-	 * 
+	 *
 	 * @param dataset the {@link Object} instance to be returned
 	 * @return the map instance representing the JSON
 	 */
@@ -55,13 +55,13 @@ public abstract class AbstractWebController {
 		returnMap.put("total", 1);
 		returnMap.put("data", dataset);
 		returnMap.put("success", true);
-		
+
 		return returnMap;
 	}
-	
+
 	/**
 	 * Generates modelMap to representing the JSON returning an error.
-	 * 
+	 *
 	 * @param msg message the error message to be returned
 	 * @return the map instance representing the JSON
 	 */
@@ -72,5 +72,5 @@ public abstract class AbstractWebController {
 
 		return modelMap;
 	}
-	
+
 }

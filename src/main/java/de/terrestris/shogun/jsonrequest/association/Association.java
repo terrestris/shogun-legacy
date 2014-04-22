@@ -7,19 +7,19 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 /**
  * Class represents an association of entities, for example
  * add some layers to an User
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 public class Association {
 
-	
+
 	private String leftEntity;
 	private Integer leftEntityId;
 	private String rightEntity;
 	private List<Integer> associations;
-	
+
 	/**
 	 * @return the leftEntity
 	 */
@@ -68,6 +68,6 @@ public class Association {
 	public void setAssociations(List<Integer> associations) {
 		this.associations = associations;
 	}
-	
+
 
 }

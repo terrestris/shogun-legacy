@@ -15,23 +15,23 @@ import de.terrestris.shogun.model.BaseModel;
 
 /**
  * LayerMetadata POJO
- * 
+ *
  * @author terrestris GmbH & Co. KG
- * 
+ *
  */
 @JsonAutoDetect
 @Entity
 @Table(name="TBL_LAYERMETADATA")
 @Embeddable
 public class LayerMetadata extends BaseModel {
-	
+
 	/** the key of this metadata record  **/
 	private String key;
-	
+
 	/** the value of this metadata record  **/
 	private String value;
-	
-	
+
+
 	/**
 	 * @return the key
 	 */
@@ -39,15 +39,15 @@ public class LayerMetadata extends BaseModel {
 	public String getKey() {
 		return key;
 	}
-	
+
 	/**
 	 * @param key the key to set
 	 */
 	public void setKey(String key) {
 		this.key = key;
 	}
-	
-	
+
+
 	/**
 	 * @return the value
 	 */
@@ -55,18 +55,18 @@ public class LayerMetadata extends BaseModel {
 	public String getValue() {
 		return value;
 	}
-	
+
 	/**
 	 * @param value the value to set
 	 */
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#hashCode()
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -81,8 +81,8 @@ public class LayerMetadata extends BaseModel {
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * According to 
+	 *
+	 * According to
 	 * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
 	 * it is recommended only to use getter-methods when using ORM like Hibernate
 	 */
@@ -98,7 +98,7 @@ public class LayerMetadata extends BaseModel {
 				append(getValue(), other.getValue()).
 				isEquals();
 	}
-	
+
 	/**
 	 *
 	 */
