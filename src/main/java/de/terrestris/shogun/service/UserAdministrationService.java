@@ -51,6 +51,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @throws ShogunServiceException If an error arises
 	 */
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public void updateUserPassword(String userId) throws ShogunServiceException {
 
 		User user = null;
