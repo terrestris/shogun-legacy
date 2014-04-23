@@ -152,6 +152,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @throws IntrospectionException
 	 */
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public Integer updateAssociation(Association association) throws IntrospectionException {
 
 		Class<?> leftClazz;
@@ -561,6 +562,7 @@ public class ShogunService extends AbstractShogunService {
 	 *
 	 * @param module_name
 	 */
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public void deleteModule(String module_name) {
 
 		this.getDatabaseDao().deleteEntityByValue(Module.class, "module_name", module_name);
