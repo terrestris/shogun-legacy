@@ -3,6 +3,7 @@
  */
 package de.terrestris.shogun.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 * @return
 	 */
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public MapConfig updateMapConfigs(MapConfig mapConfig) {
 
 		return (MapConfig)this.getDatabaseDao().updateEntity(MapConfig.class.getSimpleName(),mapConfig);
@@ -63,6 +65,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 * @return
 	 */
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public WmsMapLayer createWmsMapLayer(WmsMapLayer wmsMapLayer) {
 
 		// always set the owner to the currently logged in user.
@@ -83,6 +86,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 * @return
 	 */
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public WmsMapLayer updateWmsMapLayer(WmsMapLayer WmsMapLayer) {
 		return (WmsMapLayer)this.getDatabaseDao().updateEntity(WmsMapLayer.class.getSimpleName(), WmsMapLayer);
 	}
@@ -93,6 +97,7 @@ public class MapAdministrationService extends AbstractShogunService {
 	 * @param the_id
 	 */
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public void deleteMapLayer(int deleteId) {
 
 		// it is only one object - cast to object/bean
