@@ -51,6 +51,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @throws ShogunServiceException If an error arises
 	 */
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public void updateUserPassword(String userId) throws ShogunServiceException {
 
 		User user = null;
@@ -333,7 +334,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @return list of active {@link User} objects
 	 */
 	@Transactional
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public List<User> getActiveUsers() {
 		return this.getDatabaseDao().getEntitiesByBooleanField(User.class, "active", true);
 	}
@@ -595,7 +596,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	 * @return
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
 	public List<Group> getAllOwnedGroups() {
 
 		// check if the logged in user has the ROLE_SUPERADMIN,

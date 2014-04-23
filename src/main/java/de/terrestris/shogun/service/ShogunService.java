@@ -152,6 +152,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @throws IntrospectionException
 	 */
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public Integer updateAssociation(Association association) throws IntrospectionException {
 
 		Class<?> leftClazz;
@@ -294,7 +295,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @throws ShogunDatabaseAccessException
 	 * @throws Exception
 	 */
-	@PreAuthorize("hasRole('ROLE_ANONYMOUS') or hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_SUPERADMIN')")
 	@Transactional
 	public Map<String, Object> getAppContextBySession() throws ShogunServiceException, ShogunDatabaseAccessException {
 
@@ -334,7 +335,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @throws ShogunDatabaseAccessException
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public java.util.Set<Module> getModulesByUser(String username) throws ShogunDatabaseAccessException {
 
 		List<User> users = this.getDatabaseDao().getUserByName(username);
@@ -361,7 +362,7 @@ public class ShogunService extends AbstractShogunService {
 	 *			 Specifiy generic errors with an own error message
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public List<Module> getAllModules() throws ShogunServiceException {
 
 		try {
@@ -437,7 +438,7 @@ public class ShogunService extends AbstractShogunService {
 	 * @throws IOException
 	 */
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public void insertModule(Module module, String contextPath)
 			throws IOException {
 
@@ -561,6 +562,7 @@ public class ShogunService extends AbstractShogunService {
 	 *
 	 * @param module_name
 	 */
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
 	public void deleteModule(String module_name) {
 
 		this.getDatabaseDao().deleteEntityByValue(Module.class, "module_name", module_name);
