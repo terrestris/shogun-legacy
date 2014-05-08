@@ -846,6 +846,10 @@ public class DatabaseDao {
 				criteria.add(Restrictions.ilike(fieldname, value));
 			}
 
+			// this ensures that no cartesian product is returned when
+			// having sub objects, e.g. User <-> Modules
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
 			returnList = (List<T>) criteria.list();
 
 		} catch (Exception e) {
