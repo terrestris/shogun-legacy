@@ -355,7 +355,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the users
 	 */
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "TBL_GROUP_TBL_USER", joinColumns = {
 			@JoinColumn(name = "GROUP_FK", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "USER_FK",
@@ -376,7 +376,7 @@ public class Group extends BaseModel{
 	/**
 	 * @return the modules
 	 */
-	@ManyToMany(fetch = FetchType.LAZY, targetEntity=Module.class)
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=Module.class)
 	@JoinTable(name = "TBL_GROUP_TBL_MODULE",  joinColumns = {
 			@JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "MODULE_ID",
