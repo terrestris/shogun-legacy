@@ -295,7 +295,6 @@ public class ShogunService extends AbstractShogunService {
 	 * @throws ShogunDatabaseAccessException
 	 * @throws Exception
 	 */
-	@PreAuthorize("hasAnyRole('ROLE_SUPERADMIN')")
 	@Transactional
 	public Map<String, Object> getAppContextBySession() throws ShogunServiceException, ShogunDatabaseAccessException {
 
