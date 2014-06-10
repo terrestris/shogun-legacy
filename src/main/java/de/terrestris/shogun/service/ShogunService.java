@@ -312,6 +312,10 @@ public class ShogunService extends AbstractShogunService {
 			throw new ShogunServiceException("No user found, who is logged in at the backend");
 		}
 
+		// fetch the modules within the transaction in order to prevent a LazyLoadingException
+		// while serializing the user object to JSON
+		user.getModules();
+
 		// create an data object containing an JS object for app and user
 		// as a sub object of the return object
 		Map<String, Object> appDataMap = new HashMap<String, Object>(2);
