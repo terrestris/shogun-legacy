@@ -15,8 +15,8 @@
 	<!-- A bean to be used by the initialize database bean that represents the
 		standard WmsMapLayer object, that e.g. the anonymous user will get. -->
 	<bean id="stdWmsMapLayer" class="de.terrestris.shogun.model.WmsMapLayer">
-		<property name="url" value="http://ows.terrestris.de/osm-basemap/service/" />
-		<property name="layers" value="OSM-WMS-Deutschland" />
+		<property name="url" value="http://ows.terrestris.de/osm/service" />
+		<property name="layers" value="OSM-WMS" />
 		<property name="transparent" value="true" />
 		<property name="format" value="image/png" />
 		<property name="name" value="terrestris OSM WMS" />
