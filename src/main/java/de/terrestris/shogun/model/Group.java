@@ -407,7 +407,7 @@ public class Group extends BaseModel{
 			@JoinColumn(name = "MAPLAYER_ID", nullable = false, updatable = false)
 		}
 	)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
