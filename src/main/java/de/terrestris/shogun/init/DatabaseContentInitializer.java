@@ -35,6 +35,7 @@ import de.terrestris.shogun.model.WmsProxyConfig;
  * @author terrestris GmbH & Co. KG
  *
  */
+@SuppressWarnings("deprecation")
 public class DatabaseContentInitializer {
 
 	/**
