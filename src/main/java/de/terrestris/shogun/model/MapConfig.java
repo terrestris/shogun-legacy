@@ -1,9 +1,12 @@
 package de.terrestris.shogun.model;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -242,5 +245,39 @@ public class MapConfig extends BaseModel {
 			.append("scales", scales)
 			.append("zoom", zoom)
 			.toString();
+	}
+
+	/**
+	 * Applies the given {@linkplain MapConfig} properties to the properties of
+	 * this instance, e. g. to restrict it. The id property used a PK in the
+	 * database is preserved.
+	 *
+	 * @param MapConfToApply
+	 *            the MapConfig to be applied
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
+	 */
+	public void restrictBy(MapConfig MapConfToApply)
+			throws IllegalAccessException, InvocationTargetException {
+
+		if (MapConfToApply == null) {
+			return;
+		}
+		// no need to apply when objects are equal
+		if (this.equals(MapConfToApply)) {
+			return;
+		}
+
+		// since most of the MapConfig properties are dependent on the
+		// projection it has to be the same, otherwise skip operation
+		if (this.projection != null
+				&& this.projection.equals(MapConfToApply.getProjection())) {
+			// preserve id
+			int id = this.getId();
+			// merge properties
+			BeanUtils.copyProperties(this, MapConfToApply);
+			// restore id
+			this.setId(id);
+		}
 	}
 }
