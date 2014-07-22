@@ -56,6 +56,7 @@ import de.terrestris.shogun.model.BaseModel;
 import de.terrestris.shogun.model.BaseModelInheritance;
 import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
+import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.User;
 
 
@@ -884,6 +885,27 @@ public class DatabaseDao {
 		return this.getEntitiesByStringFields(clazz, fieldsAndValues);
 	}
 
+	/**
+	 * Returns the {@linkplain MapLayer}s owned by the given {@linkplain User}
+	 *
+	 * @param user
+	 *            the {@linkplain User} object owning the {@linkplain MapLayer}
+	 *            objects to be returned
+	 * @return a {@linkplain List} of {@linkplain MapLayer} objects owned by the
+	 *         given {@linkplain User}
+	 */
+	public List<MapLayer> getOwnedMapLayers(User user) {
+
+		Criteria criteria = this.getSessionFactory().getCurrentSession()
+				.createCriteria(MapLayer.class);
+
+		criteria.add(Restrictions.eq("owner", user));
+		// this ensures that no cartesian product is returned when
+		// having sub objects, e.g. User <-> Modules
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return (List<MapLayer>) criteria.list();
+	}
 
 	/**
 	 * Creates a record of a given Entity in the database
