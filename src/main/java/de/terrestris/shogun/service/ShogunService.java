@@ -292,13 +292,14 @@ public class ShogunService extends AbstractShogunService {
 	 * Builds an application context object, consisting of:
 	 * <ul>
 	 * <li>logged in user from session</li>
-	 * <li>general application information (language, etc...)</li>
+	 * <li>application object derived as a combination of user's permissions
+	 * and the permissions of the user's groups</li>
 	 * <ul>
 	 *
 	 * @return HashMap representing the application context as JSON object
 	 * @throws ShogunDatabaseAccessException
-	 * @throws InvocationTargetException 
-	 * @throws IllegalAccessException 
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
 	 */
 	@Transactional
 	public Map<String, Object> getAppContextBySession() throws ShogunServiceException, ShogunDatabaseAccessException, IllegalAccessException, InvocationTargetException {
