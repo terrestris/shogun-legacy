@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,9 @@ import de.terrestris.shogun.jsonrequest.Sort;
 import de.terrestris.shogun.jsonrequest.association.Association;
 import de.terrestris.shogun.model.BaseModel;
 import de.terrestris.shogun.model.BaseModelInheritance;
+import de.terrestris.shogun.model.Group;
+import de.terrestris.shogun.model.MapConfig;
+import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.Module;
 import de.terrestris.shogun.model.User;
 import de.terrestris.shogun.util.JsHelper;
@@ -293,11 +297,11 @@ public class ShogunService extends AbstractShogunService {
 	 *
 	 * @return HashMap representing the application context as JSON object
 	 * @throws ShogunDatabaseAccessException
-	 * @throws Exception
+	 * @throws InvocationTargetException 
+	 * @throws IllegalAccessException 
 	 */
-	@PreAuthorize("hasAnyRole('ROLE_SUPERADMIN')")
 	@Transactional
-	public Map<String, Object> getAppContextBySession() throws ShogunServiceException, ShogunDatabaseAccessException {
+	public Map<String, Object> getAppContextBySession() throws ShogunServiceException, ShogunDatabaseAccessException, IllegalAccessException, InvocationTargetException {
 
 		// get the authorization context, incl. user name
 		Authentication authResult = SecurityContextHolder.getContext().getAuthentication();
@@ -316,9 +320,37 @@ public class ShogunService extends AbstractShogunService {
 		// while serializing the user object to JSON
 		user.getModules();
 
+		// get groups and layers of user
+		Set<Group> usergroups = user.getGroups();
+		Set<Module> userModules = user.getModules();
+		// container for app related objects
+		Set<MapLayer> appMapLayers = new HashSet<MapLayer>();
+		Set<Module> appModules = new HashSet<Module>();
+
+		// collect layers and modules owned by user's group
+		for (Group usergroup : usergroups) {
+			appMapLayers.addAll(usergroup.getMapLayers());
+			appModules.addAll(usergroup.getModules());
+		}
+
+		// derive the common modules of user an its groups
+		appModules.retainAll(userModules);
+
+		// add all owned layers to the set of map layers in the app
+		List<MapLayer> ownedLayers = this.getDatabaseDao().getOwnedMapLayers(user);
+		// TODO detect co-owned MapLayers as well
+		appMapLayers.addAll(ownedLayers);
+
+		MapConfig stdMapConfig = (MapConfig) this.getDatabaseDao()
+				.getEntityByStringField(MapConfig.class, "mapId", "stdmap");
+		stdMapConfig.restrictBy(user.getMapConfig());
+
 		// create an data object containing an JS object for app and user
 		// as a sub object of the return object
-		Map<String, Object> appDataMap = new HashMap<String, Object>(2);
+		Map<String, Object> appDataMap = new HashMap<String, Object>();
+		appDataMap.put("mapConfig", stdMapConfig);
+		appDataMap.put("mapLayers", appMapLayers);
+		appDataMap.put("modules", appModules);
 
 		// the application context object
 		Map<String, Object> appContextMap = new HashMap<String, Object>(2);
