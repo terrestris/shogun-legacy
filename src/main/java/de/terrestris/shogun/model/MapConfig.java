@@ -249,7 +249,7 @@ public class MapConfig extends BaseModel {
 
 	/**
 	 * Applies the given {@linkplain MapConfig} properties to the properties of
-	 * this instance, e. g. to restrict it. The id property used a PK in the
+	 * this instance, e. g. to restrict it. The id property used as PK in the
 	 * database is preserved.
 	 *
 	 * @param MapConfToApply
