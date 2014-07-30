@@ -35,7 +35,7 @@ public class LayerMetadata extends BaseModel {
 	/**
 	 * @return the key
 	 */
-	@Column(name="KEY")
+	@Column(name="KEY_STRING")
 	public String getKey() {
 		return key;
 	}
