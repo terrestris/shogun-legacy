@@ -32,7 +32,7 @@ package de.terrestris.shogun.jsonrequest;
 
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  * Class represents a complex request to the backend with filter, sort criteria

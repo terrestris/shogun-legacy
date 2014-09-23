@@ -32,7 +32,7 @@ package de.terrestris.shogun.jsonrequest.association;
 
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  * Class represents an association of entities, for example

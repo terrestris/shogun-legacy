@@ -48,7 +48,6 @@ import java.util.Set;
 import javassist.Modifier;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
@@ -74,6 +73,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
 import de.terrestris.shogun.hibernatecriteria.filter.Filter.LogicalOperator;
