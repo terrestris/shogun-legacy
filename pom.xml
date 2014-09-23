@@ -10,6 +10,7 @@
 
 	<properties>
 		<java.version>1.6</java.version>
+		<eclipse-plugin.version>2.9</eclipse-plugin.version>
 		<javax.jstl.version>1.2</javax.jstl.version>
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<project.build.finalName>SHOGun</project.build.finalName>
@@ -247,6 +248,18 @@
 
 	<build>
 		<plugins>
+
+			<!-- The maven eclipse plugin (mvn eclipse:eclipse) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>${eclipse-plugin.version}</version>
+				<configuration>
+					<wtpversion>2.0</wtpversion>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>false</downloadJavadocs>
+				</configuration>
+			</plugin>
 
 			<!-- Maven compiler plugin (see http://maven.apache.org/plugins/maven-compiler-plugin/) -->
 			<plugin>
