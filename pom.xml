@@ -95,7 +95,7 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId> 
+		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.version}</version> </dependency> -->
 
 		<!-- Hibernate -->
@@ -116,7 +116,7 @@
 			<artifactId>hibernate-spatial-postgis</artifactId>
 			<version>1.0</version>
 		</dependency>
-	
+
 		<!-- c3p0 JDBC Connection Pooling -->
 		<dependency>
 			<groupId>com.mchange</groupId>
@@ -183,7 +183,7 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
-			
+
 		<!-- -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -260,8 +260,8 @@
 			</plugin>
 
 			<!-- Maven Tomcat Plugin (see http://mojo.codehaus.org/tomcat-maven-plugin/) -->
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId> 
-				<configuration> <url>http://localhost:8080/manager/text</url> <server>MyTomcat</server> 
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId>
+				<configuration> <url>http://localhost:8080/manager/text</url> <server>MyTomcat</server>
 				<path>/SHOGun</path> </configuration> </plugin> -->
 
 
@@ -271,8 +271,8 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1</version>
 				<executions>
-					<!-- <execution> <id>execution-001</id> <phase>compile</phase> <goals> 
-						<goal>exec</goal> </goals> <configuration> <executable>${basedir}/src/main/webapp/build/build-client-application.sh</executable> 
+					<!-- <execution> <id>execution-001</id> <phase>compile</phase> <goals>
+						<goal>exec</goal> </goals> <configuration> <executable>${basedir}/src/main/webapp/build/build-client-application.sh</executable>
 						</configuration> </execution> -->
 
 				</executions>
@@ -344,8 +344,8 @@
 		</pluginManagement>
 	</build>
 
-	<!-- Project Report generated with 'mvn site'. Generates the JavaDocs at 
-		the moment Can also be called with mvn javadoc:javadoc to get standalone 
+	<!-- Project Report generated with 'mvn site'. Generates the JavaDocs at
+		the moment Can also be called with mvn javadoc:javadoc to get standalone
 		JavaDocs -->
 	<reporting>
 		<plugins>
