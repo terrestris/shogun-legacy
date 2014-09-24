@@ -32,7 +32,7 @@ package de.terrestris.shogun.jsonmodel;
 
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import de.terrestris.shogun.model.User;
 

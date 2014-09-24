@@ -13,6 +13,7 @@
 		<eclipse-plugin.version>2.9</eclipse-plugin.version>
 		<javax.jstl.version>1.2</javax.jstl.version>
 		<spring.version>3.0.5.RELEASE</spring.version>
+		<jackson.version>2.4.2</jackson.version>
 		<project.build.finalName>SHOGun</project.build.finalName>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -44,12 +45,11 @@
 			<version>7.0.26</version>
 		</dependency>
 
-
 		<!-- Jackson JSON Mapper -->
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.7.1</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<!-- Spring 3 dependencies -->

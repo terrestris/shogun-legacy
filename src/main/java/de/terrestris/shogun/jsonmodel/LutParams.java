@@ -30,7 +30,7 @@
  */
 package de.terrestris.shogun.jsonmodel;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  *
