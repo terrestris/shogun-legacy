@@ -12,7 +12,8 @@
 		<java.version>1.6</java.version>
 		<eclipse-plugin.version>2.9</eclipse-plugin.version>
 		<javax.jstl.version>1.2</javax.jstl.version>
-		<spring.version>3.0.5.RELEASE</spring.version>
+		<spring.version>4.1.6.RELEASE</spring.version>
+		<spring-security.version>4.0.1.RELEASE</spring-security.version>
 		<jackson.version>2.4.2</jackson.version>
 		<project.build.finalName>SHOGun</project.build.finalName>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,17 +85,17 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.version}</version> </dependency> -->
