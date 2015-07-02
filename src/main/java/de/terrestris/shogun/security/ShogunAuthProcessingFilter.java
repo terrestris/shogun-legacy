@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -93,15 +94,24 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
 
         // write the servlet return object
         HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response);
-        Writer out = responseWrapper.getWriter();
-        JsonFactory jsonFactory = new JsonFactory();
-        JsonGenerator jsonGenerator = jsonFactory.createGenerator(out);
-        jsonGenerator.writeStartObject();
-        jsonGenerator.writeBooleanField("success", true);
-        jsonGenerator.writeStringField("name", authResult.getName());
-        jsonGenerator.writeStringField("role", authorityText);
-        jsonGenerator.writeEndObject();
-        jsonGenerator.close();
+
+        JsonGenerator jsonGenerator = null;
+        Writer out = null;
+        try {
+            out = responseWrapper.getWriter();
+            JsonFactory jsonFactory = new JsonFactory();
+            jsonGenerator = jsonFactory.createGenerator(out);
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeBooleanField("success", true);
+            jsonGenerator.writeStringField("name", authResult.getName());
+            jsonGenerator.writeStringField("role", authorityText);
+            jsonGenerator.writeEndObject();
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            IOUtils.closeQuietly(out);
+            IOUtils.closeQuietly(jsonGenerator);
+        }
     }
 
     /**
