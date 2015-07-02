@@ -95,7 +95,7 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
         HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response);
         Writer out = responseWrapper.getWriter();
         JsonFactory jsonFactory = new JsonFactory();
-        JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(out);
+        JsonGenerator jsonGenerator = jsonFactory.createGenerator(out);
         jsonGenerator.writeStartObject();
         jsonGenerator.writeBooleanField("success", true);
         jsonGenerator.writeStringField("name", authResult.getName());
