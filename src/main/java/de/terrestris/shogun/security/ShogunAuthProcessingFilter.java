@@ -110,8 +110,8 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
         } catch (IOException e) {
             throw e;
         } finally {
-            IOUtils.closeQuietly(out);
             IOUtils.closeQuietly(jsonGenerator);
+            IOUtils.closeQuietly(out);
         }
     }
 
