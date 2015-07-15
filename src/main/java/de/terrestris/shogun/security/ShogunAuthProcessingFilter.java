@@ -90,6 +90,9 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
         });
         super.successfulAuthentication(request, response, chain, authResult);
 
+        // set content type
+        response.setContentType("application/json;charset=UTF-8");
+
         // build a comma separated string of the ROLES
         String authorityText = StringUtils.join(authResult.getAuthorities(), ",");
 
