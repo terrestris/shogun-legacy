@@ -11,10 +11,9 @@
 	<http auto-config='false' entry-point-ref="authenticationEntryPoint">
 
 	    <!-- see: http://docs.spring.io/spring-security/site/migrate/current/3-to-4/html5/migrate-3-to-4-xml.html#m3to4-xmlnamespace-headers -->
-	    <!-- Disable CSRF as it is enabled by default since Spring Security 4 -->
-<!-- 	    <csrf disabled="true"/> -->
-	    <!-- TODO make GDABodenschutz work with Security HTTP Response Headers -->
-<!-- 	    <headers disabled="true"/> -->
+	    <!-- Disable CSRF and Security HTTP Response Headers since they are both enabled by default in Spring Security 4 -->
+	    <csrf disabled="true"/>
+	    <headers disabled="true"/>
 
 		<!-- interceptors for special URLs -->
 		<intercept-url pattern="/index*" access="permitAll"/>
