@@ -3,12 +3,18 @@
 <beans:beans xmlns="http://www.springframework.org/schema/security"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
 
 	<!-- HTTP configuration for login/logout -->
 	<http auto-config='false' entry-point-ref="authenticationEntryPoint">
+
+	    <!-- see: http://docs.spring.io/spring-security/site/migrate/current/3-to-4/html5/migrate-3-to-4-xml.html#m3to4-xmlnamespace-headers -->
+	    <!-- Disable CSRF as it is enabled by default since Spring Security 4 -->
+	    <csrf disabled="true"/>
+	    <!-- TODO make GDABodenschutz work with Security HTTP Response Headers -->
+	    <headers disabled="true"/>
 
 		<!-- interceptors for special URLs -->
 		<intercept-url pattern="/index*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
