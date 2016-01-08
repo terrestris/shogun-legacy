@@ -78,7 +78,7 @@
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-        <property name="packagesToScan" ref="dbEntitiesPackages" />
+		<property name="packagesToScan" ref="dbEntitiesPackages" />
 
 		<property name="hibernateProperties">
 			<props>
