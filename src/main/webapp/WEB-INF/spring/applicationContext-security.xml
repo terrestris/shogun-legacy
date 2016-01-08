@@ -3,25 +3,30 @@
 <beans:beans xmlns="http://www.springframework.org/schema/security"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
 
 	<!-- HTTP configuration for login/logout -->
 	<http auto-config='false' entry-point-ref="authenticationEntryPoint">
 
+	    <!-- see: http://docs.spring.io/spring-security/site/migrate/current/3-to-4/html5/migrate-3-to-4-xml.html#m3to4-xmlnamespace-headers -->
+	    <!-- Disable CSRF and Security HTTP Response Headers since they are both enabled by default in Spring Security 4 -->
+	    <csrf disabled="true"/>
+	    <headers disabled="true"/>
+
 		<!-- interceptors for special URLs -->
-		<intercept-url pattern="/index*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-		<intercept-url pattern="/config/getAppContext.action" access="ROLE_ANONYMOUS, ROLE_USER, ROLE_ADMIN"/>
+		<intercept-url pattern="/index*" access="permitAll"/>
+		<intercept-url pattern="/config/getAppContext.action" access="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_USER','ROLE_ADMIN')"/>
 
 		<!-- default interception -->
-		<intercept-url pattern="/*" access="ROLE_USER, ROLE_ADMIN" />
+		<intercept-url pattern="/*" access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')" />
 
 		<custom-filter position="FORM_LOGIN_FILTER" ref="authenticationFilter" />
 
 		<!-- Logout configuration -->
 		<logout invalidate-session="true" logout-success-url="/index.html"
-			logout-url="/j_spring_security_logout" />
+			logout-url="/logout" />
 
 		<remember-me key="xaab.springmvclogin" />
 
@@ -42,7 +47,7 @@
 	<!-- the entry point for authentication, via URL -->
 	<beans:bean id="authenticationEntryPoint"
 		class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-		<beans:property name="loginFormUrl" value="/index.html" />
+		<beans:constructor-arg name="loginFormUrl" value="/index.html" />
 	</beans:bean>
 
 	<!-- This is an entry point for a custom Authentication Manager,
