@@ -138,13 +138,17 @@
 			</list>
 		</property>
 
-		<property name="mapConfigs" ref="stdMapConfig" />
+		<property name="mapConfigs">
+			<list>
+				<ref local="stdMapConfig" />
+			</list>
+		</property>
 
 		<property name="wmsMapLayer" ref="stdWmsMapLayer"/>
 
 		<property name="defaultAnonymousGroup" ref="stdAnonymousGroup" />
 
-        <property name="defaultSuperAdminGroup" ref="stdSuperAdminGroup"/>
+		<property name="defaultSuperAdminGroup" ref="stdSuperAdminGroup"/>
 
 	</bean>
 
