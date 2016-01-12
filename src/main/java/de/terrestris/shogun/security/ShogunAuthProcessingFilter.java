@@ -33,6 +33,7 @@ package de.terrestris.shogun.security;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,7 +76,7 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
 	 * @see WebContent/client/login.js
 	 */
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
     	SecurityContextHolder.getContext().setAuthentication(authResult);
 
         SavedRequestAwareAuthenticationSuccessHandler srh = new SavedRequestAwareAuthenticationSuccessHandler();
@@ -87,7 +88,10 @@ public class ShogunAuthProcessingFilter extends UsernamePasswordAuthenticationFi
                     //do nothing, no redirect
             }
         });
-        super.successfulAuthentication(request, response, authResult);
+        super.successfulAuthentication(request, response, chain, authResult);
+
+        // set content type
+        response.setContentType("application/json;charset=UTF-8");
 
         // set content type
         response.setContentType("application/json;charset=UTF-8");

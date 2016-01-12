@@ -9,13 +9,21 @@
 	<url>http://shogun-webmapping.org</url>
 
 	<properties>
+
 		<java.version>1.6</java.version>
 		<eclipse-plugin.version>2.9</eclipse-plugin.version>
 		<javax.jstl.version>1.2</javax.jstl.version>
-		<spring.version>3.0.5.RELEASE</spring.version>
 		<jackson.version>2.4.2</jackson.version>
 		<project.build.finalName>SHOGun</project.build.finalName>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Spring -->
+		<spring.version>4.2.3.RELEASE</spring.version>
+		<spring-security.version>4.0.3.RELEASE</spring-security.version>
+
+		<!-- Hibernate -->
+		<hibernate.version>3.6.10.Final</hibernate.version>
+
 	</properties>
 
 	<repositories>
@@ -52,7 +60,7 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
-		<!-- Spring 3 dependencies -->
+		<!-- Spring dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -78,37 +86,35 @@
 			<artifactId>spring-orm</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 
 
 		<!-- Spring Security -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring-security.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId>
-			<version>${spring.version}</version> </dependency> -->
 
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>3.5.6-Final</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
-			<version>3.5.6-Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 
 		<!-- Hibernate Spatial -->

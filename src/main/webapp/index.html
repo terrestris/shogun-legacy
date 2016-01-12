@@ -67,7 +67,7 @@
                 text: 'Logout',
                 disabled: true,
                 handler: function(){
-                    window.location.href = "./j_spring_security_logout";
+                    window.location.href = "./logout";
                 },
                 id: 'logoutBtn'
             }],
@@ -110,7 +110,7 @@
          */
         var login = new Ext.FormPanel({
             labelWidth: 80,
-            url: 'j_spring_security_check',
+            url: 'login',
             frame: true,
             title: 'Login',
             defaultType: 'textfield',
@@ -119,11 +119,11 @@
             monitorValid: true,
             items: [{
                 fieldLabel: 'Username',
-                name: 'j_username',
+                name: 'username',
                 allowBlank: false
             }, {
                 fieldLabel: 'Password',
-                name: 'j_password',
+                name: 'password',
                 inputType: 'password',
                 allowBlank: false
             }],
