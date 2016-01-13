@@ -140,7 +140,7 @@
 
 		<property name="mapConfigs">
 			<list>
-				<ref local="stdMapConfig" />
+				<ref bean="stdMapConfig" />
 			</list>
 		</property>
 
