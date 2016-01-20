@@ -21,8 +21,10 @@
 		<spring.version>4.2.3.RELEASE</spring.version>
 		<spring-security.version>4.0.3.RELEASE</spring-security.version>
 
-		<!-- Hibernate -->
-		<hibernate.version>3.6.10.Final</hibernate.version>
+		<!-- Hibernate / Persistance -->
+		<hibernate.version>4.3.11.Final</hibernate.version>
+		<hibernate-spatial.version>4.3</hibernate-spatial.version>
+		<c3p0.version>0.9.2.1</c3p0.version>
 
 	</properties>
 
@@ -119,16 +121,16 @@
 
 		<!-- Hibernate Spatial -->
 		<dependency>
-			<groupId>org.hibernatespatial</groupId>
-			<artifactId>hibernate-spatial-postgis</artifactId>
-			<version>1.0</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-spatial</artifactId>
+			<version>${hibernate-spatial.version}</version>
 		</dependency>
 
 		<!-- c3p0 JDBC Connection Pooling -->
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.2.1</version>
+			<version>${c3p0.version}</version>
 		</dependency>
 
 		<!-- H2 database -->

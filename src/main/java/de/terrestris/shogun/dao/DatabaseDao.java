@@ -60,12 +60,6 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.impl.CriteriaImpl;
-import org.hibernate.impl.SessionImpl;
-import org.hibernate.loader.OuterJoinLoader;
-import org.hibernate.loader.criteria.CriteriaLoader;
-import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -1689,31 +1683,6 @@ public class DatabaseDao {
 		// get the logged-in user and check if he has the SuperAdmin role
 		User sessionUser = this.getUserObjectFromSession();
 		return sessionUser.hasSuperAdminRole();
-	}
-
-	/**
-	 * Helper function to print out the SQL from a criteria object
-	 *
-	 * @param criteria
-	 * @return
-	 */
-	private String toSql(Criteria criteria) {
-		try {
-			CriteriaImpl c = (CriteriaImpl) criteria;
-			SessionImpl s = (SessionImpl) c.getSession();
-			SessionFactoryImplementor factory = (SessionFactoryImplementor) s.getSessionFactory();
-			String[] implementors = factory.getImplementors(c.getEntityOrClassName());
-
-			CriteriaLoader loader = new CriteriaLoader(
-					(OuterJoinLoadable) factory
-							.getEntityPersister(implementors[0]),
-					factory, c, implementors[0], s.getLoadQueryInfluencers());
-			Field f = OuterJoinLoader.class.getDeclaredField("sql");
-			f.setAccessible(true);
-			return (String) f.get(loader);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**

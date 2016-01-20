@@ -45,7 +45,7 @@ import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernatespatial.criterion.SpatialRestrictions;
+import org.hibernate.spatial.criterion.SpatialRestrictions;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;

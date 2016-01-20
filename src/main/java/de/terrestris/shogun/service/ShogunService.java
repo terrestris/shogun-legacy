@@ -53,7 +53,7 @@ import java.util.Set;
 import javax.persistence.ManyToMany;
 
 import org.apache.log4j.Logger;
-import org.hibernate.collection.PersistentSet;
+import org.hibernate.collection.internal.PersistentSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -226,7 +226,7 @@ public class ShogunService extends AbstractShogunService {
 				// dynamic invoking of the getter
 				// receive all left objects that are associated to the current right object
 				// e.g. all MapLayers of a User
-				PersistentSet currentAssocedUsersMapLayers = (PersistentSet)rightGetter.invoke(currentAssocedUser);
+				PersistentSet currentAssocedUsersMapLayers = (PersistentSet) rightGetter.invoke(currentAssocedUser);
 
 				/*
 				 * http://www.java-forums.org/new-java/20849-how-can-i-avoid-java-util-concurrentmodificationexception-exception.html
