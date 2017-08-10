@@ -30,6 +30,7 @@
  */
 package de.terrestris.shogun.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -39,6 +40,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
@@ -52,6 +55,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Entity
 @Table(name="TBL_ROLE")
 @Embeddable
+@Cacheable
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class Role extends BaseModel {
 
 	String name;

@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -51,6 +52,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -72,6 +75,8 @@ import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 @Entity
 @Table(name="TBL_GROUP")
 @Embeddable
+@Cacheable
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class Group extends BaseModel{
 
 	// TODO refactor as an enum
@@ -393,6 +398,7 @@ public class Group extends BaseModel{
 					nullable = true, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -414,6 +420,7 @@ public class Group extends BaseModel{
 					nullable = false, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Module> getModules() {
 		return modules;
 	}
@@ -440,6 +447,7 @@ public class Group extends BaseModel{
 	)
 	@Fetch(FetchMode.JOIN)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
 	}
@@ -470,6 +478,7 @@ public class Group extends BaseModel{
 	)
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Role> getRoles() {
 		return roles;
 	}
