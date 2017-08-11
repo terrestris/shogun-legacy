@@ -30,11 +30,14 @@
  */
 package de.terrestris.shogun.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * BaseProxyConfig Super Class
@@ -45,6 +48,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  *
  */
 @MappedSuperclass
+@Cacheable
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class BaseProxyConfig extends BaseModel {
 
 	private String mandatoryParameters;

@@ -45,8 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javassist.Modifier;
-
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -83,6 +81,9 @@ import de.terrestris.shogun.model.BaseModelInterface;
 import de.terrestris.shogun.model.Group;
 import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.User;
+import de.terrestris.shogun.service.UserAdministrationService;
+import de.terrestris.shogun.web.UserAdministrationController;
+import javassist.Modifier;
 
 
 /**
@@ -628,7 +629,6 @@ public class DatabaseDao {
 		return this.getEntityById(id, clazz, true);
 	}
 
-
 	/**
 	 * Returns an object of a certain entity defined by its ID.
 	 *
@@ -686,7 +686,6 @@ public class DatabaseDao {
 				criteria.setFetchMode(field, FetchMode.JOIN);
 			}
 		}
-
 		if (values.length > 0 && values.length <= maxInElems) {
 			criteria.add(Restrictions.in("id", values));
 		} else if (values.length > maxInElems) {
