@@ -1,6 +1,9 @@
 # SHOGun
 
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 [![Build Status](https://travis-ci.org/terrestris/shogun.png)](https://travis-ci.org/terrestris/shogun)
+
+**Note:** This project is deprecated and not maintained anymore. Please make use of [shogun-core](https://github.com/terrestris/shogun-core) instead.
 
 SHOGun, a Java based WebGIS framework.
 
