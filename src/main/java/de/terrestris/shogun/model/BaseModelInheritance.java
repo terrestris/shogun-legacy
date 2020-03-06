@@ -94,8 +94,7 @@ public class BaseModelInheritance implements BaseModelInterface {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
-	@Column(name = "ID", nullable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	public int getId() {
 		return this.id;
 	}

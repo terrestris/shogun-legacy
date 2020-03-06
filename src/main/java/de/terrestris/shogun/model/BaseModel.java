@@ -98,8 +98,7 @@ public class BaseModel implements BaseModelInterface {
 
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="ID", nullable=false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	public int getId() {
 		return this.id;
 	}
