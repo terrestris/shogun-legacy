@@ -28,24 +28,12 @@
 
 	</properties>
 
-	<repositories>
-
-		<repository>
-			<id>central</id>
-			<name>Central Repository</name>
-			<url>http://repo1.maven.apache.org/maven2</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>OSGEO GeoTools repo</id>
-			<url>http://download.osgeo.org/webdav/geotools</url>
-		</repository>
-		<repository>
-			<id>Hibernate Spatial repo</id>
-			<url>http://www.hibernatespatial.org/repository</url>
-		</repository>
-
-	</repositories>
+  <repositories>
+    <repository>
+      <id>nexus.terrestris.de</id>
+      <url>https://nexus.terrestris.de/repository/public/</url>
+    </repository>
+  </repositories>
 
 	<dependencies>
 
