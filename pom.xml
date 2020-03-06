@@ -4,7 +4,7 @@
 	<groupId>de.terrestris.shogun</groupId>
 	<artifactId>SHOGun</artifactId>
 	<packaging>war</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>SHOGun</name>
 	<url>http://shogun-webmapping.org</url>
 
