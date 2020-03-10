@@ -30,6 +30,16 @@
  */
 package de.terrestris.shogun.hibernatecriteria.filter;
 
+import de.terrestris.shogun.dao.DatabaseDao;
+import org.apache.log4j.Logger;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.spatial.criterion.SpatialRestrictions;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,19 +49,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.spatial.criterion.SpatialRestrictions;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
-
-import de.terrestris.shogun.dao.DatabaseDao;
-import de.terrestris.shogun.hibernatecriteria.filter.FilterItem;
 
 /**
  * Class for a Hibernate filter condition
@@ -224,7 +221,7 @@ public class HibernateFilterItem extends FilterItem {
 			criterion = Restrictions.sqlRestriction((String)finalOperand1);
 			break;
 		case DWithin:
-			criterion = SpatialRestrictions.within(originalFieldName, (Geometry)finalOperand1);
+			criterion = SpatialRestrictions.within(originalFieldName, (Geometry) finalOperand1);
 			break;
 		}
 		return criterion;
@@ -317,8 +314,8 @@ public class HibernateFilterItem extends FilterItem {
 		fieldList = this.getAllFields(fieldList, mainClass);
 
 
-		Class<?> jtsPointClass = com.vividsolutions.jts.geom.Point.class;
-		Class<?> jtsGeometryClass = com.vividsolutions.jts.geom.Geometry.class;
+		Class<?> jtsPointClass = org.locationtech.jts.geom.Point.class;
+		Class<?> jtsGeometryClass = org.locationtech.jts.geom.Geometry.class;
 
 		for (int j = 0, m = fieldList.size(); j < m; j++) {
 
@@ -370,7 +367,7 @@ public class HibernateFilterItem extends FilterItem {
 							g.setSRID(900913); //TODO: set the SRID dynamically
 							finalOperand = g;
 						}
-					} catch (com.vividsolutions.jts.io.ParseException e) {
+					} catch (org.locationtech.jts.io.ParseException e) {
 						LOGGER.error("ParseException in hibernate filteritem for Geometry: " + operand, e);
 					}
 				} else {

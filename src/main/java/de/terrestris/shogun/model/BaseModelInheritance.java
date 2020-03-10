@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import de.terrestris.shogun.deserializer.DateDeserializer;
 import de.terrestris.shogun.serializer.DateSerializer;
+import org.hibernate.annotations.Type;
 
 /**
  * BaseModelInheritance POJO ensures that a primary key ID and the internal
@@ -79,7 +80,10 @@ public class BaseModelInheritance implements BaseModelInterface {
 
 	private int id;
 
+	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private Date created_at;
+
+	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private Date updated_at;
 	private String app_user;
 
@@ -90,8 +94,7 @@ public class BaseModelInheritance implements BaseModelInterface {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
-	@Column(name = "ID", nullable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	public int getId() {
 		return this.id;
 	}

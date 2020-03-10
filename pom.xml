@@ -4,7 +4,7 @@
 	<groupId>de.terrestris.shogun</groupId>
 	<artifactId>SHOGun</artifactId>
 	<packaging>war</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>SHOGun</name>
 	<url>http://shogun-webmapping.org</url>
 
@@ -13,46 +13,61 @@
 		<java.version>1.6</java.version>
 		<eclipse-plugin.version>2.9</eclipse-plugin.version>
 		<javax.jstl.version>1.2</javax.jstl.version>
-		<jackson.version>2.4.2</jackson.version>
+		<jackson.version>2.7.5</jackson.version>
 		<project.build.finalName>SHOGun</project.build.finalName>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tomcat.version>7.0.62</tomcat.version>
 
 		<!-- Spring -->
-		<spring.version>4.2.3.RELEASE</spring.version>
-		<spring-security.version>4.0.3.RELEASE</spring-security.version>
+		<spring.version>4.3.26.RELEASE</spring.version>
+		<spring-security.version>4.2.14.RELEASE</spring-security.version>
 
 		<!-- Hibernate / Persistance -->
-		<hibernate.version>4.3.11.Final</hibernate.version>
-		<hibernate-spatial.version>4.3</hibernate-spatial.version>
+		<hibernate.version>5.4.11.Final</hibernate.version>
+		<hibernate-spatial.version>5.4.11.Final</hibernate-spatial.version>
 		<c3p0.version>0.9.2.1</c3p0.version>
+
+		<!-- Database / JDBC -->
+		<h2.database.version>1.4.200</h2.database.version>
+		<postgresql.version>8.4-702.jdbc4</postgresql.version>
+		<postgis-jdbc.version>1.3.3</postgis-jdbc.version>
+
+		<!-- Spatial -->
+		<jts.version>1.16.1</jts.version>
+
+		<!-- Apache -->
+		<commons-lang3.version>3.9</commons-lang3.version>
+		<commons-io.version>2.6</commons-io.version>
+		<commons-beanutils.version>1.9.2</commons-beanutils.version>
+		<apache-derby-version>10.15.2.0</apache-derby-version>
+
+		<!-- Logging -->
+		<slf4j.version>1.7.12</slf4j.version>
+		<log4j.version>1.2.17</log4j.version>
+
+		<!-- Testing -->
+		<junit.version>4.12</junit.version>
+
+		<!-- Other -->
+		<javax.mail.version>1.4.4</javax.mail.version>
+		<javax.persistence>2.2.1</javax.persistence>
+		<cglib.version>2.2.2</cglib.version>
 
 	</properties>
 
-	<repositories>
-
-		<repository>
-			<id>central</id>
-			<name>Central Repository</name>
-			<url>http://repo1.maven.apache.org/maven2</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>OSGEO GeoTools repo</id>
-			<url>http://download.osgeo.org/webdav/geotools</url>
-		</repository>
-		<repository>
-			<id>Hibernate Spatial repo</id>
-			<url>http://www.hibernatespatial.org/repository</url>
-		</repository>
-
-	</repositories>
+  <repositories>
+    <repository>
+      <id>nexus.terrestris.de</id>
+      <url>https://nexus.terrestris.de/repository/public/</url>
+    </repository>
+  </repositories>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-servlet-api</artifactId>
-			<version>7.0.26</version>
+			<version>${tomcat.version}</version>
 		</dependency>
 
 		<!-- Jackson JSON Mapper -->
@@ -137,32 +152,32 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.3.168</version>
+			<version>${h2.database.version}</version>
 		</dependency>
 
 		<!-- derby database -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
-			<version>10.9.1.0</version>
+			<version>${apache-derby-version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derbyclient</artifactId>
-			<version>10.9.1.0</version>
+			<version>${apache-derby-version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derbynet</artifactId>
-			<version>10.9.1.0</version>
+			<version>${apache-derby-version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derbytools</artifactId>
-			<version>10.9.1.0</version>
+			<version>${apache-derby-version}</version>
 		</dependency>
 
 
@@ -171,38 +186,38 @@
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>javax.persistence</artifactId>
-			<version>2.0.0</version>
+			<version>${javax.persistence}</version>
 		</dependency>
 
 		<!-- JDBC -->
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>8.4-702.jdbc4</version>
+			<version>${postgresql.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgis</groupId>
 			<artifactId>postgis-jdbc</artifactId>
-			<version>1.3.3</version>
+			<version>${postgis-jdbc.version}</version>
 		</dependency>
 
 		<!-- Apache Commons -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
+			<version>${commons-io.version}</version>
 		</dependency>
 
 		<!-- -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.3</version>
+			<version>${commons-beanutils.version}</version>
 		</dependency>
 
 
@@ -210,7 +225,7 @@
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
-			<version>2.2.2</version>
+			<version>${cglib.version}</version>
 		</dependency>
 
 
@@ -218,14 +233,14 @@
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
-			<version>1.4.4</version>
+			<version>${javax.mail.version}</version>
 		</dependency>
 
 		<!-- JTS -->
 		<dependency>
-			<groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId>
-			<version>1.8</version>
+			<groupId>org.locationtech.jts</groupId>
+			<artifactId>jts-core</artifactId>
+			<version>${jts.version}</version>
 		</dependency>
 
 
@@ -234,26 +249,26 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.5.8</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.8</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- Log4j -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
+			<version>${log4j.version}</version>
 		</dependency>
 
 		<!-- JUnit testing framework -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 
