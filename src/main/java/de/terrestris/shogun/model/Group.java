@@ -76,7 +76,6 @@ import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 @Table(name="TBL_GROUP")
 @Embeddable
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class Group extends BaseModel{
 
 	// TODO refactor as an enum
@@ -398,6 +397,7 @@ public class Group extends BaseModel{
 					nullable = true, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<User> getUsers() {
 		return users;
@@ -420,6 +420,7 @@ public class Group extends BaseModel{
 					nullable = false, updatable = false) })
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Module> getModules() {
 		return modules;
@@ -447,6 +448,7 @@ public class Group extends BaseModel{
 	)
 	@Fetch(FetchMode.JOIN)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<MapLayer> getMapLayers() {
 		return mapLayers;
@@ -478,6 +480,7 @@ public class Group extends BaseModel{
 	)
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Role> getRoles() {
 		return roles;

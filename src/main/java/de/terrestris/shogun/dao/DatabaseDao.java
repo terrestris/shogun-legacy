@@ -137,7 +137,7 @@ public class DatabaseDao {
 		boolean isPlainModelRequest = (fields == null && ignoreFields == null);
 		Class<?> clazz = hibernateSortObject.getMainClass();
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 
 		// Fields
 		if (fields != null) {
@@ -554,7 +554,7 @@ public class DatabaseDao {
 			boolean groupDependent) {
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(
-				clazz);
+				clazz).setCacheable(true);
 
 		criteria.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property(field), field)));
@@ -581,7 +581,7 @@ public class DatabaseDao {
 		boolean initializeDeeply = initializeDeep.length > 0 ? initializeDeep[0] : false;
 
 		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 
 		// this ensures that no cartesian product is returned when
 		// having sub objects, e.g. User <-> Modules
@@ -607,7 +607,7 @@ public class DatabaseDao {
 
 		// get user ID of logged in User and check if there is the
 		// and it to the query as WHERE
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 		int userId = this.getUserIdFromSession();
 		criteria.add(Restrictions.eq("user_id", userId));
 		List<Object> records = criteria.list();
@@ -639,7 +639,7 @@ public class DatabaseDao {
 	public Object getEntityById(int id, Class<?> clazz, boolean initializeDeep) {
 
 		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 		criteria.add(Restrictions.eq("id", id));
 		// we expect a single record or null
 		Object result = criteria.uniqueResult();
@@ -679,7 +679,7 @@ public class DatabaseDao {
 	public List<? extends Object> getEntitiesByIds(Object[] values, Class<?> clazz, String[] eagerfields) {
 		final int maxInElems = 999;
 		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 
 		if (eagerfields != null && eagerfields.length > 0) {
 			for (String field : eagerfields) {
@@ -731,7 +731,7 @@ public class DatabaseDao {
 	public List<? extends Object> getEntitiesByExcludingIds(Object[] values, Class<?> clazz) {
 
 		Criteria criteria = null;
-		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 
 		if (values.length > 0) {
 			criteria.add(Restrictions.not(Restrictions.in("id", values)));
@@ -813,7 +813,7 @@ public class DatabaseDao {
 	 */
 	public List<Object> getEntitiesByIntegerField(Class<?> clazz, String fieldname, Integer value) {
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 		criteria.add(Restrictions.eq(fieldname, value));
 
 		// this ensures that no cartesian product is returned when
@@ -837,7 +837,7 @@ public class DatabaseDao {
 	public <T> List<T> getEntitiesByBooleanField(Class<T> clazz, String fieldname, Boolean value) {
 
 		Criteria criteria =
-			this.sessionFactory.getCurrentSession().createCriteria(clazz);
+			this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 		criteria.add(Restrictions.eq(fieldname, value));
 
 		// this ensures that no cartesian product is returned when
@@ -864,7 +864,7 @@ public class DatabaseDao {
 		Criteria criteria = null;
 		List<T> returnList = null;
 		try {
-			criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 			for(Iterator<String> iter = fieldsAndValues.keySet().iterator(); iter.hasNext();) {
 				String fieldname = iter.next();
 				String value = fieldsAndValues.get(fieldname);
@@ -921,7 +921,7 @@ public class DatabaseDao {
 	public List<MapLayer> getOwnedMapLayers(User user) {
 
 		Criteria criteria = this.getSessionFactory().getCurrentSession()
-				.createCriteria(MapLayer.class);
+				.createCriteria(MapLayer.class).setCacheable(true);
 
 		criteria.add(Restrictions.eq("owner", user));
 		// this ensures that no cartesian product is returned when
@@ -1050,7 +1050,7 @@ public class DatabaseDao {
 	 */
 	public void deleteEntityByValue(Class<?> clazz, String column, String value) {
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 		criteria.add(Restrictions.eq(column, value));
 		List<Object> records = criteria.list();
 
@@ -1075,7 +1075,7 @@ public class DatabaseDao {
 
 		// get group ID of logged in User and check if there is the
 		// user to be deleted is a child of the current group
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(clazz).setCacheable(true);
 		criteria.add(Restrictions.eq("id", id));
 
 		List<Integer> groupIdsOfSessionUser = this.getGroupIdsFromSession();
@@ -1151,7 +1151,7 @@ public class DatabaseDao {
 
 		try {
 
-			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class).setCacheable(true);
 
 			criteria.add(Restrictions.eq("user_name", name));
 
@@ -1188,7 +1188,7 @@ public class DatabaseDao {
 
 		try {
 
-			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class).setCacheable(true);
 
 			// add additional restrictions like
 			// where user is in group with ID xy
@@ -1238,7 +1238,7 @@ public class DatabaseDao {
 	public User getUserById(int id, String additionalCriteriaPath, Criterion additionalCriterion) {
 
 		Criteria criteria =
-			this.sessionFactory.getCurrentSession().createCriteria(User.class);
+			this.sessionFactory.getCurrentSession().createCriteria(User.class).setCacheable(true);
 
 		// add additional restrictions like
 		// where user is in group with ID xy
@@ -1349,7 +1349,7 @@ public class DatabaseDao {
 	 */
 	public void deleteUser(int id) throws ShogunDatabaseAccessException {
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class).setCacheable(true);
 		criteria.add(Restrictions.eq("id", id));
 		User userToDelete = (User) criteria.uniqueResult();
 
@@ -1390,7 +1390,7 @@ public class DatabaseDao {
 		Criteria criteria = null;
 
 		try {
-			criteria = this.sessionFactory.getCurrentSession().createCriteria(hibernateFilter.getMainClass());
+			criteria = this.sessionFactory.getCurrentSession().createCriteria(hibernateFilter.getMainClass()).setCacheable(true);
 
 		} catch (Exception e) {
 			throw new ShogunDatabaseAccessException(
@@ -1541,7 +1541,7 @@ public class DatabaseDao {
 
 		if (username != null) {
 
-			Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+			Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class).setCacheable(true);
 
 			criteria.setProjection(Projections.property("id"));
 			criteria.add(Restrictions.eq("user_name", username));
@@ -1570,7 +1570,7 @@ public class DatabaseDao {
 		LOGGER.debug("Got authResult: " + authResult.getName());
 		LOGGER.debug("Creating criteria now to get the user.");
 
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(User.class).setCacheable(true);
 
 		criteria.add(Restrictions.eq("user_name", authResult.getName()));
 
@@ -1595,7 +1595,7 @@ public class DatabaseDao {
 	public boolean hasUserRoleByUsernameAndRolename(String userName, String roleName) {
 		boolean hasRole = false;
 
-		Criteria criteria = this.getSessionFactory().getCurrentSession().createCriteria(User.class);
+		Criteria criteria = this.getSessionFactory().getCurrentSession().createCriteria(User.class).setCacheable(true);
 		criteria.add(Restrictions.eq("user_name", userName));
 		criteria.createCriteria("groups", "g");
 		criteria.createCriteria("g.roles", "r");

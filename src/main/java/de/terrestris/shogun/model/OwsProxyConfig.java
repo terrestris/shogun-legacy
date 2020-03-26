@@ -49,7 +49,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @MappedSuperclass
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class OwsProxyConfig extends BaseProxyConfig {
 
 	private String version;

@@ -56,7 +56,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Table(name="TBL_ROLE")
 @Embeddable
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class Role extends BaseModel {
 
 	String name;

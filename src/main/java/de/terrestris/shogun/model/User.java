@@ -71,7 +71,6 @@ import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 @Table(name="TBL_USER")
 @Embeddable
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class User extends BaseModel {
 
 	private String user_name;
@@ -359,10 +358,11 @@ public class User extends BaseModel {
 	/**
 	 * @return the groups
 	 */
-	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Group> getGroups() {
 		return groups;
@@ -378,7 +378,10 @@ public class User extends BaseModel {
 	/**
 	 * @return the mapConfig
 	 */
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@Fetch(FetchMode.SELECT)
+	@org.springframework.cache.annotation.Cacheable
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public MapConfig getMapConfig() {
 		return mapConfig;
 	}
@@ -394,8 +397,11 @@ public class User extends BaseModel {
 	/**
 	 * @return the wfsProxyConfig
 	 */
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@Fetch(FetchMode.SELECT)
 	@JsonIgnore // needed that this is not serialized, hidden to client (security)
+	@org.springframework.cache.annotation.Cacheable
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public WfsProxyConfig getWfsProxyConfig() {
 		return wfsProxyConfig;
 	}
@@ -412,8 +418,11 @@ public class User extends BaseModel {
 	/**
 	 * @return the wmsProxyConfig
 	 */
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@Fetch(FetchMode.SELECT)
 	@JsonIgnore // needed that this is not serialized, hidden to client (security)
+	@org.springframework.cache.annotation.Cacheable
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public WmsProxyConfig getWmsProxyConfig() {
 		return wmsProxyConfig;
 	}

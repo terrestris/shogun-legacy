@@ -54,7 +54,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Entity
 @Table(name="TBL_WFSPROXYCONFIG")
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class WfsProxyConfig extends OwsProxyConfig {
 
 	private String typename;

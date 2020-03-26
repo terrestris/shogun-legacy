@@ -54,7 +54,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Entity
 @Table(name="TBL_WMSLAYER")
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class WmsLayer extends BaseModel {
 
 	/**
