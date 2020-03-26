@@ -32,17 +32,7 @@ package de.terrestris.shogun.model;
 
 import java.util.Set;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -78,7 +68,6 @@ import de.terrestris.shogun.serializer.SimpleUserSerializer;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public abstract class MapLayer extends BaseModelInheritance {
 
 	private String name;
@@ -437,10 +426,10 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the metadata
 	 */
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
-//	@JsonSerialize(using=LeanBaseModelSerializer.class)
+    @org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<LayerMetadata> getMetadata() {
 		return metadata;
@@ -456,10 +445,11 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the groups
 	 */
-	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
+	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
 //	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Group> getGroups() {
 		return groups;
@@ -475,11 +465,12 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the owner
 	 */
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SELECT)
 	@JsonSerialize(using=SimpleUserSerializer.class)
 	// foreign key needed here, otherwise hibernate will generate name which is too long ( > 30 chars)
 	@ForeignKey(name="FKOWNERID")
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public User getOwner() {
 		return owner;
@@ -496,8 +487,8 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the additionalOwners
 	 */
-	@ManyToMany(fetch = FetchType.EAGER, targetEntity=User.class)
-	@Fetch(value = FetchMode.JOIN)
+	@ManyToMany(fetch = FetchType.LAZY, targetEntity=User.class)
+	@Fetch(FetchMode.SUBSELECT)
 	@JoinTable(
 			name = "TBL_MAPLAYER_TBL_ADDOWNERS",
 			joinColumns = {
@@ -516,6 +507,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 			}
 		)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<User> getAdditionalOwners() {
 		return additionalOwners;

@@ -32,12 +32,9 @@ package de.terrestris.shogun.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -48,6 +45,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import de.terrestris.shogun.deserializer.DateDeserializer;
 import de.terrestris.shogun.serializer.DateSerializer;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 
 /**
@@ -76,6 +75,9 @@ import org.hibernate.annotations.Type;
  *
  */
 @MappedSuperclass
+@Cacheable
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Cache(usage= CacheConcurrencyStrategy.READ_WRITE)
 public class BaseModelInheritance implements BaseModelInterface {
 
 	private int id;

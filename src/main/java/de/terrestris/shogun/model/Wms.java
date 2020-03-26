@@ -64,7 +64,6 @@ import de.terrestris.shogun.serializer.LeanBaseModelSetSerializer;
 @Entity
 @Table(name="TBL_WMS")
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class Wms extends BaseModel {
 
 	private String supportedVersion;
@@ -149,6 +148,8 @@ public class Wms extends BaseModel {
 	@OneToMany(fetch = FetchType.LAZY, targetEntity=WmsLayer.class)
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
+	@org.springframework.cache.annotation.Cacheable
+	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<WmsLayer> getWmsLayers() {
 		return wmsLayers;
 	}

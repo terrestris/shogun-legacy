@@ -30,10 +30,7 @@
  */
 package de.terrestris.shogun.model;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -57,7 +54,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Entity
 @Table(name="TBL_WMSMAPLAYER")
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class WmsMapLayer extends MapLayer {
 
 	private String url;

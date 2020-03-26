@@ -58,7 +58,6 @@ import de.terrestris.shogun.model.BaseModel;
 @Table(name="TBL_LAYERMETADATA")
 @Embeddable
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class LayerMetadata extends BaseModel {
 
 	/** the key of this metadata record  **/

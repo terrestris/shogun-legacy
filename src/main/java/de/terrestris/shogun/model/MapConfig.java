@@ -37,6 +37,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -53,11 +54,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @author terrestris GmbH & Co. KG
  *
  */
-@JsonAutoDetect
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name="TBL_MAPCONFIG")
 @Cacheable
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class MapConfig extends BaseModel {
 
 	public static final String DEFAULT_MAPCONFIG = "default-mapconfig";
