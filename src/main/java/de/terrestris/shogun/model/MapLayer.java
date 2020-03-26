@@ -429,7 +429,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	@OneToMany(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
-    @org.springframework.cache.annotation.Cacheable
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<LayerMetadata> getMetadata() {
 		return metadata;
@@ -446,7 +446,6 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 * @return the groups
 	 */
 	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
-//	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	@org.springframework.cache.annotation.Cacheable

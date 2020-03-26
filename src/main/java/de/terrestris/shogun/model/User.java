@@ -362,7 +362,7 @@ public class User extends BaseModel {
 	@JsonIgnore
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
-    @org.springframework.cache.annotation.Cacheable
+	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	public Set<Group> getGroups() {
 		return groups;
