@@ -25,7 +25,7 @@
 		<!-- Hibernate / Persistance -->
 		<hibernate.version>5.4.11.Final</hibernate.version>
 		<hibernate-spatial.version>5.4.11.Final</hibernate-spatial.version>
-		<c3p0.version>0.9.2.1</c3p0.version>
+		<c3p0.version>0.9.5.4</c3p0.version>
 
 		<!-- Database / JDBC -->
 		<h2.database.version>1.4.200</h2.database.version>
