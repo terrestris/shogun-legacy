@@ -426,7 +426,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the metadata
 	 */
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
 	@org.springframework.cache.annotation.Cacheable
@@ -445,7 +445,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the groups
 	 */
-	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.LAZY)
+	@ManyToMany(mappedBy="mapLayers", fetch=FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
 	@JsonSerialize(using=LeanBaseModelSetSerializer.class)
 	@org.springframework.cache.annotation.Cacheable
@@ -464,7 +464,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the owner
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SELECT)
 	@JsonSerialize(using=SimpleUserSerializer.class)
 	// foreign key needed here, otherwise hibernate will generate name which is too long ( > 30 chars)
@@ -486,7 +486,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	/**
 	 * @return the additionalOwners
 	 */
-	@ManyToMany(fetch = FetchType.LAZY, targetEntity=User.class)
+	@ManyToMany(fetch = FetchType.EAGER, targetEntity=User.class)
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinTable(
 			name = "TBL_MAPLAYER_TBL_ADDOWNERS",
