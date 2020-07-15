@@ -1020,10 +1020,15 @@ public class DatabaseDao {
 	 * @param id the ID of the record to be deleted
 	 */
 	public void deleteEntity(Class<?> clazz, Integer id) {
-
 		// delete the object record
 		Object record = this.sessionFactory.getCurrentSession().load(clazz, id);
-		this.sessionFactory.getCurrentSession().delete(record);
+
+		if (record != null) {
+			this.sessionFactory.getCurrentSession().delete(record);
+		} else {
+			LOGGER.error("Could not find record of class " + clazz.getCanonicalName() + " with ID " + id +
+					". Deletion not successful!");
+		}
 	}
 
 
