@@ -38,7 +38,7 @@
 		<!-- Apache -->
 		<commons-lang3.version>3.9</commons-lang3.version>
 		<commons-io.version>2.6</commons-io.version>
-		<commons-beanutils.version>1.9.2</commons-beanutils.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<apache-derby-version>10.15.2.0</apache-derby-version>
 
 		<!-- Logging -->
