@@ -428,7 +428,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	 * @return the metadata
 	 */
 	@OneToMany(fetch = FetchType.EAGER)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
 	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
