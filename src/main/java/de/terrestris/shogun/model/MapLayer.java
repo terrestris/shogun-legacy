@@ -30,6 +30,7 @@
  */
 package de.terrestris.shogun.model;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -92,7 +93,7 @@ public abstract class MapLayer extends BaseModelInheritance {
 	private Boolean displayOutsideMaxExtent = false;
 	private String transitionEffect = null;
 
-	private Set<LayerMetadata> metadata;
+	private List<LayerMetadata> metadata;
 	private Set<Group> groups;
 
 	/**
@@ -431,14 +432,14 @@ public abstract class MapLayer extends BaseModelInheritance {
 	@JoinTable(name="TBL_MAPLAYER_TBL_METADATA")
 	@org.springframework.cache.annotation.Cacheable
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
-	public Set<LayerMetadata> getMetadata() {
+	public List<LayerMetadata> getMetadata() {
 		return metadata;
 	}
 
 	/**
 	 * @param metadata the metadata to set
 	 */
-	public void setMetadata(Set<LayerMetadata> metadata) {
+	public void setMetadata(List<LayerMetadata> metadata) {
 		this.metadata = metadata;
 	}
 
