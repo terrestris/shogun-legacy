@@ -30,38 +30,6 @@
  */
 package de.terrestris.shogun.service;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-
-import javax.persistence.ManyToMany;
-
-import org.apache.log4j.Logger;
-import org.hibernate.collection.internal.PersistentSet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
 import de.terrestris.shogun.exception.ShogunServiceException;
 import de.terrestris.shogun.hibernatecriteria.filter.HibernateFilter;
@@ -71,14 +39,29 @@ import de.terrestris.shogun.jsonrequest.Paging;
 import de.terrestris.shogun.jsonrequest.Request;
 import de.terrestris.shogun.jsonrequest.Sort;
 import de.terrestris.shogun.jsonrequest.association.Association;
-import de.terrestris.shogun.model.BaseModel;
-import de.terrestris.shogun.model.BaseModelInheritance;
-import de.terrestris.shogun.model.Group;
-import de.terrestris.shogun.model.MapConfig;
-import de.terrestris.shogun.model.MapLayer;
 import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.model.User;
+import de.terrestris.shogun.model.*;
 import de.terrestris.shogun.util.JsHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.collection.internal.PersistentSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.ManyToMany;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * A basic service class of SHOGun offering some business logic.
@@ -92,7 +75,7 @@ public class ShogunService extends AbstractShogunService {
 	/**
 	 * the logger instance
 	 */
-	private static Logger LOGGER = Logger.getLogger(ShogunService.class);
+	private static Logger LOGGER = LogManager.getLogger(ShogunService.class);
 
 
 	/**

@@ -30,16 +30,6 @@
  */
 package de.terrestris.shogun.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import de.terrestris.shogun.jsonmodel.DeleteIdList;
 import de.terrestris.shogun.jsonmodel.MapConfigList;
 import de.terrestris.shogun.jsonmodel.WmsMapLayerList;
@@ -48,6 +38,16 @@ import de.terrestris.shogun.model.MapConfig;
 import de.terrestris.shogun.model.Module;
 import de.terrestris.shogun.model.WmsMapLayer;
 import de.terrestris.shogun.service.MapAdministrationService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The web controller handling the map-administration interfaces.
@@ -61,7 +61,7 @@ public class MapAdministrationController extends AbstractWebController {
 	/**
 	 * the logger
 	 */
-	private static final Logger LOGGER = Logger.getLogger(MapAdministrationController.class);
+	private static final Logger LOGGER = LogManager.getLogger(MapAdministrationController.class);
 
 	/**
 	 * the reference to the needed service instance

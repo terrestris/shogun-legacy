@@ -30,11 +30,12 @@
  */
 package de.terrestris.shogun.web;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
+import de.terrestris.shogun.jsonmodel.UserList;
+import de.terrestris.shogun.model.Group;
+import de.terrestris.shogun.model.User;
+import de.terrestris.shogun.service.UserAdministrationService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,10 +43,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.terrestris.shogun.jsonmodel.UserList;
-import de.terrestris.shogun.model.Group;
-import de.terrestris.shogun.model.User;
-import de.terrestris.shogun.service.UserAdministrationService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The web controller handling the user-administration interfaces.
@@ -59,7 +59,7 @@ public class UserAdministrationController extends AbstractWebController {
 	/**
 	 * the logger
 	 */
-	private static final Logger LOGGER = Logger.getLogger(UserAdministrationController.class);
+	private static final Logger LOGGER = LogManager.getLogger(UserAdministrationController.class);
 
 	/**
 	 * the reference to the needed service instance
