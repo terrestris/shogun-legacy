@@ -30,13 +30,14 @@
  */
 package de.terrestris.shogun.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
+import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
+import de.terrestris.shogun.exception.ShogunServiceException;
+import de.terrestris.shogun.model.Module;
+import de.terrestris.shogun.model.*;
+import de.terrestris.shogun.util.Mail;
+import de.terrestris.shogun.util.Password;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -44,17 +45,7 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
-import de.terrestris.shogun.exception.ShogunServiceException;
-import de.terrestris.shogun.model.Group;
-import de.terrestris.shogun.model.MapConfig;
-import de.terrestris.shogun.model.MapLayer;
-import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.model.User;
-import de.terrestris.shogun.model.WfsProxyConfig;
-import de.terrestris.shogun.model.WmsProxyConfig;
-import de.terrestris.shogun.util.Mail;
-import de.terrestris.shogun.util.Password;
+import java.util.*;
 
 /**
  * A service class of SHOGun offering user related business logic.
@@ -68,7 +59,7 @@ public class UserAdministrationService extends AbstractShogunService {
 	/**
 	 *
 	 */
-	private static Logger LOGGER = Logger.getLogger(UserAdministrationService.class);
+	private static Logger LOGGER = LogManager.getLogger(UserAdministrationService.class);
 
 	/**
 	 * User defined by the given userId gets a new password. Password is

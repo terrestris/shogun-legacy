@@ -30,7 +30,8 @@
  */
 package de.terrestris.shogun.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -43,7 +44,7 @@ public class Mail {
 	/**
 	 * the logger
 	 */
-	private static final Logger LOGGER = Logger.getLogger(Mail.class);
+	private static final Logger LOGGER = LogManager.getLogger(Mail.class);
 
 	/**
 	 * Sends an email with the given parameters

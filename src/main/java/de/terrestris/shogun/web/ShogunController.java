@@ -30,16 +30,13 @@
  */
 package de.terrestris.shogun.web;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
+import de.terrestris.shogun.jsonmodel.ModuleList;
+import de.terrestris.shogun.jsonrequest.Request;
+import de.terrestris.shogun.jsonrequest.association.Association;
+import de.terrestris.shogun.model.Module;
+import de.terrestris.shogun.service.ShogunService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,11 +44,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.terrestris.shogun.jsonmodel.ModuleList;
-import de.terrestris.shogun.jsonrequest.Request;
-import de.terrestris.shogun.jsonrequest.association.Association;
-import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.service.ShogunService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * The main web controller of SHOGun
@@ -65,7 +60,7 @@ public class ShogunController extends AbstractWebController {
 	/**
 	 * the logger
 	 */
-	private static final Logger LOGGER = Logger.getLogger(ShogunController.class);
+	private static final Logger LOGGER = LogManager.getLogger(ShogunController.class);
 
 	/**
 	 * the reference to the needed service instance

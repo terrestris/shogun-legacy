@@ -30,17 +30,17 @@
  */
 package de.terrestris.shogun.deserializer;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Class responsible for deserializing a date.
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
  */
 public class DateDeserializer extends JsonDeserializer<Date> {
 
-	private static Logger LOGGER = Logger.getLogger(DateDeserializer.class);
+	private static Logger LOGGER = LogManager.getLogger(DateDeserializer.class);
 
 	private static String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
 

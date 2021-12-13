@@ -31,7 +31,8 @@
 package de.terrestris.shogun.hibernatecriteria.filter;
 
 import de.terrestris.shogun.dao.DatabaseDao;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
@@ -61,7 +62,7 @@ public class HibernateFilterItem extends FilterItem {
 	/**
 	 *
 	 */
-	private static Logger LOGGER = Logger.getLogger(HibernateFilterItem.class);
+	private static Logger LOGGER = LogManager.getLogger(HibernateFilterItem.class);
 
 	/**
 	 *

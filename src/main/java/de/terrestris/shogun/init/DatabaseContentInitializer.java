@@ -30,34 +30,20 @@
  */
 package de.terrestris.shogun.init;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import de.terrestris.shogun.dao.DatabaseDao;
+import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
+import de.terrestris.shogun.model.Module;
+import de.terrestris.shogun.model.*;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
-import de.terrestris.shogun.dao.DatabaseDao;
-import de.terrestris.shogun.exception.ShogunDatabaseAccessException;
-import de.terrestris.shogun.model.BaseModelInterface;
-import de.terrestris.shogun.model.Group;
-import de.terrestris.shogun.model.MapConfig;
-import de.terrestris.shogun.model.MapLayer;
-import de.terrestris.shogun.model.Module;
-import de.terrestris.shogun.model.Role;
-import de.terrestris.shogun.model.User;
-import de.terrestris.shogun.model.WmsMapLayer;
-import de.terrestris.shogun.model.WmsProxyConfig;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  * The class handling the initial import of all data needed for a running setup.
@@ -71,7 +57,7 @@ public class DatabaseContentInitializer {
 	/**
 	 * the logger instance
 	 */
-	private static Logger LOGGER = Logger.getLogger(DatabaseContentInitializer.class);
+	private static Logger LOGGER = LogManager.getLogger(DatabaseContentInitializer.class);
 
 	protected static final String APP_USER_AUTO_CREATED = "auto-create-on-init";
 
