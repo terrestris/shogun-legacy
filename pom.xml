@@ -19,7 +19,7 @@
 		<tomcat.version>7.0.62</tomcat.version>
 
 		<!-- Spring -->
-		<spring.version>4.3.26.RELEASE</spring.version>
+		<spring.version>5.3.19</spring.version>
 		<spring-security.version>4.2.14.RELEASE</spring-security.version>
 
 		<!-- Hibernate / Persistance -->
