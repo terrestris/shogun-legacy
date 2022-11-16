@@ -13,7 +13,7 @@
 		<java.version>1.6</java.version>
 		<eclipse-plugin.version>2.9</eclipse-plugin.version>
 		<javax.jstl.version>1.2</javax.jstl.version>
-		<jackson.version>2.7.5</jackson.version>
+		<jackson.version>2.12.7.1</jackson.version>
 		<project.build.finalName>SHOGun</project.build.finalName>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tomcat.version>7.0.62</tomcat.version>
